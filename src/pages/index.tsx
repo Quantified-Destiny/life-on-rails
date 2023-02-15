@@ -4,6 +4,7 @@ import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "../utils/api";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -65,6 +66,12 @@ const AuthShowcase: React.FC = () => {
     undefined, // no input
     { enabled: sessionData?.user !== undefined },
   );
+
+  let session = useSession();
+  if (session.status=="authenticated") {
+    let router = useRouter();
+    router.push("/app");
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
