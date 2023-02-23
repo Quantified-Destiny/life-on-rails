@@ -1,18 +1,10 @@
-import { type NextPage } from "next";
-import Head from "next/head";
-import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
-
-import { api } from "../utils/api";
-import { useRouter } from "next/router";
-import { FunctionComponent, useEffect } from "react";
-import TopNav from "../components/topnav";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
+import TopNav from "../components/topnav";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
@@ -24,12 +16,12 @@ function SideBar() {
         <div className="ml-1 text-left text-sm font-semibold">OVERVIEW</div>
         <div className="ml-4">Goals</div>
         <div className="ml-4 bg-gray-300">Journal</div>
-        <hr className="w-full cursor-pointer border-2 border-gray-300" />
+        <hr className="border-1 w-full cursor-pointer border-gray-300" />
         <div className="ml-1 text-sm font-semibold">MANAGE</div>
         <div className="ml-3">
           <RightChevron></RightChevron> Create
         </div>
-        <hr className="w-full cursor-pointer border-2 border-gray-300" />
+        <hr className="border-1 w-full cursor-pointer border-gray-300" />
         <div className="ml-1 text-sm font-semibold">REVIEW</div>
         <div className="ml-3">Timeline</div>
         <hr className="w-full cursor-pointer border-2 border-gray-300" />
@@ -60,7 +52,7 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
     <div className="absolute inset-0 min-h-[100vh] min-w-[100vw]">
       <div className="relative z-50 grid h-full w-full grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
         <div id="topbar" className="col-span-2 col-start-1 row-start-1">
-          TOPBAR
+          <TopNav></TopNav>
         </div>
         <div className="col-start-1 row-span-2 row-start-2 h-full w-full bg-gray-100 shadow-[4.0px_8.0px_8.0px_rgba(0,0,0,0.38)]">
           <SideBar></SideBar>
@@ -128,6 +120,7 @@ function Habit({
     </div>
   );
 }
+
 const Journal = () => {
   return (
     <div className="container m-auto w-[80%]">

@@ -9,7 +9,7 @@ const TopNav = () => {
   w-full
   "
     >
-      <div className="container-fluid flex w-full flex-wrap items-center justify-between px-6">
+      <div className="flex w-full flex-wrap items-center justify-between px-6 shadow-lg">
         <button
           className="
       navbar-toggler
@@ -58,12 +58,6 @@ const TopNav = () => {
       "
             href="#"
           >
-            <img
-              src="https://mdbootstrap.com/img/logo/mdb-transaprent-noshadows.png"
-              className="h-[80%]"
-              alt=""
-              loading="lazy"
-            />
           </a>
         </div>
 
