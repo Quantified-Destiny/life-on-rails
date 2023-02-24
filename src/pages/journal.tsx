@@ -5,6 +5,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import TopNav from "../components/topnav";
+import { api } from "../utils/api";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
@@ -54,7 +55,7 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
         <div id="topbar" className="col-span-2 col-start-1 row-start-1">
           <TopNav></TopNav>
         </div>
-        <div className="col-start-1 row-span-2 row-start-2 h-full w-full bg-gray-100 shadow-[4.0px_8.0px_8.0px_rgba(0,0,0,0.38)]">
+        <div className="col-start-1 row-span-2 row-start-2 h-full w-full bg-gray-100 shadow-[2.0px_2.0px_2.0px_rgba(0,0,0,0.38)]">
           <SideBar></SideBar>
         </div>
         <div className="col-start-2 row-start-2 h-full w-full overflow-scroll ">
@@ -65,73 +66,54 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
   );
 };
 
-interface HabitData {
+interface HabitProps {
   desciption: string;
   completed: boolean;
-}
-
-interface JournalData {
-  habits: HabitData[];
   editable: boolean;
-  date: Date;
 }
 
-let state: JournalData = {
-  habits: [
-    {
-      desciption: "Go to the gym",
-      completed: false,
-    },
-    {
-      desciption: "Check the task tracker",
-      completed: false,
-    },
-    {
-      desciption: "Clean the room",
-      completed: true,
-    },
-  ],
-  editable: false,
-  date: new Date(),
-};
-
-function Habit({
-  habit,
-  index,
-}: {
-  habit: HabitData;
-  index: number;
-}): JSX.Element {
+const Habit = ({
+  desciption,
+  editable,
+  completed,
+}: HabitProps): JSX.Element => {
   return (
     <div className="my-2">
       <input
-        id={index.toString()}
         type="checkbox"
         aria-hidden="true"
-        checked={habit.completed}
-        readOnly={!state.editable}
+        checked={completed}
+        readOnly={!editable}
       />
-      <label
-        htmlFor={index.toString()}
-        className={classNames({ "line-through": habit.completed })}
-      >
-        {habit.desciption}
-      </label>
+        {desciption}
+      
     </div>
   );
+};
+
+interface JournalProps {
+  habits: HabitProps[];
+  date: Date;
 }
 
-const Journal = () => {
+const Journal = ({ date, habits }: JournalProps) => {
   return (
     <div className="container m-auto w-[80%]">
-      <TimePicker date={state.date}></TimePicker>
+      <TimePicker date={date}></TimePicker>
       <h1 className="m-auto mt-2 text-center font-sans text-xl font-bold">
         Journal
       </h1>
       <h2 className="font-semibold">Today's Habits</h2>
-      {state.habits.map((habit, index) => (
-        <Habit habit={habit} index={index}></Habit>
+
+      {habits.map((habit, index) => (
+        <Habit
+          desciption={habit.desciption}
+          completed={habit.completed}
+          editable={habit.editable}
+          key={index.toString()}
+        ></Habit>
       ))}
+
       <h2 className="mt-4 font-semibold">Questions</h2>
       <div className="">
         <p>How organized do you feel? </p>
@@ -147,4 +129,13 @@ const Journal = () => {
   );
 };
 
-export default () => <Layout main={Journal}></Layout>;
+let date = new Date();
+
+const JournalPage = () => {
+  let query = api.journal.getHabits.useQuery({ date });
+  if (query.isLoading) return <p>Loading...</p>;
+  if (query.isError) return <p>Query error</p>;
+  return <Journal habits={query.data.habits} date={query.data.date}></Journal>;
+};
+
+export default () => <Layout main={JournalPage}></Layout>;
