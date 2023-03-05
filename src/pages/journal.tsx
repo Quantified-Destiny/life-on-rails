@@ -113,16 +113,16 @@ const Subjective = ({ id, prompt, score }: SubjectiveProps) => {
         <Button onClick={() => setScore.mutate({ id, score: 1 })} colorScheme="teal" size='xs' variant={score==1?"solid": 'outline'}>
           1
         </Button>
-        <Button colorScheme="teal" size='xs' variant='outline'>
+        <Button onClick={() => setScore.mutate({ id, score: 2 })} colorScheme="teal" size='xs' variant={score==2?"solid": 'outline'}>
           2
         </Button>
-        <Button colorScheme="teal" size='xs' variant='outline'>
+        <Button onClick={() => setScore.mutate({ id, score: 3 })} colorScheme="teal" size='xs' variant={score==3?"solid": 'outline'}>
           3
         </Button>
-        <Button colorScheme="teal" size='xs' variant='outline'>
+        <Button onClick={() => setScore.mutate({ id, score: 4 })} colorScheme="teal" size='xs' variant={score==4?"solid": 'outline'}>
           4
         </Button>
-        <Button colorScheme="teal" size='xs' variant='outline'>
+        <Button onClick={() => setScore.mutate({ id, score: 5 })} colorScheme="teal" size='xs' variant={score==5?"solid": 'outline'}>
           5
         </Button>
       </Stack>
