@@ -16,7 +16,7 @@ const Home: NextPage = () => {
           <meta name="description" content="" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 md:px-7 lg:px-8">
+        <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 md:px-7 lg:px-8 text-sm">
   <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-3">
     <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
       <div className="px-4 py-5 sm:p-6">
