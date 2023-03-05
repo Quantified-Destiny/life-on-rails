@@ -1,3 +1,4 @@
+import { Button, Stack } from "@chakra-ui/react";
 import {
   faChevronLeft,
   faChevronRight,
@@ -119,13 +120,20 @@ const Journal = ({ date, habits }: JournalProps) => {
       <h2 className="mt-4 font-semibold">Questions</h2>
       <div className="">
         <p>How organized do you feel? </p>
-        <div className="mt-1 flex flex-row gap-4">
-          <div className="w-5 bg-white text-center shadow-sm ring-2">1</div>
-          <div className="w-5 bg-gray-300 text-center shadow-sm ring-2">2</div>
-          <div className="w-5 bg-white text-center shadow-sm ring-2">3</div>
-          <div className="w-5 bg-white text-center shadow-sm ring-2">4</div>
-          <div className="w-5 bg-white text-center shadow-sm ring-2">5</div>
-        </div>
+        <Stack direction="row" spacing={4} align="center">
+          <Button colorScheme="teal" variant="solid">
+            1
+          </Button>
+          <Button colorScheme="teal" variant="outline">
+            2
+          </Button>
+          <Button colorScheme="teal" variant="ghost">
+            3
+          </Button>
+          <Button colorScheme="teal" variant="link">
+            Button
+          </Button>
+        </Stack>
       </div>
     </div>
   );
