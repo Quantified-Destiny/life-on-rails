@@ -88,8 +88,12 @@ model Subjective {
   prompt                 String
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
+  ownerId                String
+  owner                  User                     @relation(fields: [ownerId], references: [id])
   SubjectiveMeasuresGoal SubjectiveMeasuresGoal[]
-  SubjectiveAnswer       SubjectiveAnswer[]
+  subjectiveAnswers       SubjectiveAnswer[]
+
+  @@index([ownerId])
 }
 
 model SubjectiveAnswer {
@@ -134,15 +138,16 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String       @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?      @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
   Goal          Goal[]
   Habit         Habit[]
+  Subjective    Subjective[]
 }
 
 model VerificationToken {

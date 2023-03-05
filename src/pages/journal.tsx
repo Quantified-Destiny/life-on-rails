@@ -1,3 +1,4 @@
+import { Button, Stack } from "@chakra-ui/react";
 import {
   faChevronLeft,
   faChevronRight,
@@ -6,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
 import TopNav from "../components/topnav";
 import { api } from "../utils/api";
-
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
 
@@ -93,12 +93,50 @@ const Habit = ({
   );
 };
 
+interface SubjectiveProps {
+  id: string;
+  prompt: string;
+  score: number | undefined;
+}
+
+const Subjective = ({ id, prompt, score }: SubjectiveProps) => {
+  const utils = api.useContext();
+  let setScore = api.journal.setSubjectiveScore.useMutation({
+    onSuccess() {
+      utils.journal.getSubjectives.invalidate();
+    }
+  });
+  return (
+    <div className="">
+      <p>{prompt}</p>
+      <Stack direction="row" spacing={4} align="center" >
+        <Button onClick={() => setScore.mutate({ id, score: 1 })} colorScheme="teal" size='xs' variant={score==1?"solid": 'outline'}>
+          1
+        </Button>
+        <Button colorScheme="teal" size='xs' variant='outline'>
+          2
+        </Button>
+        <Button colorScheme="teal" size='xs' variant='outline'>
+          3
+        </Button>
+        <Button colorScheme="teal" size='xs' variant='outline'>
+          4
+        </Button>
+        <Button colorScheme="teal" size='xs' variant='outline'>
+          5
+        </Button>
+      </Stack>
+    </div>
+  )
+}
+
 interface JournalProps {
   habits: HabitProps[];
   date: Date;
+  subjectives: SubjectiveProps[];
 }
 
-const Journal = ({ date, habits }: JournalProps) => {
+const Journal = ({ date, habits, subjectives }: JournalProps) => {
   return (
     <div className="container m-auto w-[80%]">
       <TimePicker date={date}></TimePicker>
@@ -117,16 +155,15 @@ const Journal = ({ date, habits }: JournalProps) => {
       ))}
 
       <h2 className="mt-4 font-semibold">Questions</h2>
-      <div className="">
-        <p>How organized do you feel? </p>
-        <div className="mt-1 flex flex-row gap-4">
-          <div className="w-5 bg-white text-center shadow-sm ring-2">1</div>
-          <div className="w-5 bg-gray-300 text-center shadow-sm ring-2">2</div>
-          <div className="w-5 bg-white text-center shadow-sm ring-2">3</div>
-          <div className="w-5 bg-white text-center shadow-sm ring-2">4</div>
-          <div className="w-5 bg-white text-center shadow-sm ring-2">5</div>
-        </div>
-      </div>
+
+      {subjectives.map((subjective, index) => (
+        <Subjective
+          id={subjective.id}
+          prompt={subjective.prompt}
+          score={subjective.score}
+        ></Subjective>
+      ))}
+
     </div>
   );
 };
@@ -134,14 +171,17 @@ const Journal = ({ date, habits }: JournalProps) => {
 let date = new Date();
 
 const JournalPage = () => {
-  let query = api.journal.getHabits.useQuery({ date });
-  if (query.isLoading) return <p>Loading...</p>;
-  if (query.isError) return <p>Query error</p>;
-
+  let query1 = api.journal.getHabits.useQuery({ date });
+  let query2 = api.journal.getSubjectives.useQuery({ date });
+  if (query1.isLoading || query2.isLoading) return <p>Loading...</p>;
+  if (query1.isError || query2.isError) return <p>Query error</p>;
+  let habitsData = query1.data.habits.map((habit) => ({ editable: true, ...habit }));
+  let subjectivesData = query2.data.subjectives //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
   return (
     <Journal
-      habits={query.data.habits.map((habit) => ({ editable: true, ...habit }))}
-      date={query.data.date}
+      habits={habitsData}
+      date={query1.data.date}
+      subjectives={subjectivesData}
     ></Journal>
   );
 };
