@@ -67,13 +67,14 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
 };
 
 interface HabitProps {
-  desciption: string;
+  id: string;
+  description: string;
   completed: boolean;
   editable: boolean;
 }
 
 const Habit = ({
-  desciption,
+  description,
   editable,
   completed,
 }: HabitProps): JSX.Element => {
@@ -85,8 +86,9 @@ const Habit = ({
         checked={completed}
         readOnly={!editable}
       />
-        {desciption}
-      
+      <span className={classNames({ "line-through": completed })}>
+        {description}
+      </span>
     </div>
   );
 };
@@ -107,10 +109,10 @@ const Journal = ({ date, habits }: JournalProps) => {
 
       {habits.map((habit, index) => (
         <Habit
-          desciption={habit.desciption}
+          id={index.toString()}
+          description={habit.description}
           completed={habit.completed}
           editable={habit.editable}
-          key={index.toString()}
         ></Habit>
       ))}
 
@@ -135,7 +137,13 @@ const JournalPage = () => {
   let query = api.journal.getHabits.useQuery({ date });
   if (query.isLoading) return <p>Loading...</p>;
   if (query.isError) return <p>Query error</p>;
-  return <Journal habits={query.data.habits} date={query.data.date}></Journal>;
+
+  return (
+    <Journal
+      habits={query.data.habits.map((habit) => ({ editable: true, ...habit }))}
+      date={query.data.date}
+    ></Journal>
+  );
 };
 
 export default () => <Layout main={JournalPage}></Layout>;

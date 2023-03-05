@@ -1,5 +1,4 @@
 import { addDays } from "date-fns";
-import add from "date-fns/add";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
@@ -12,7 +11,6 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      /*
       let startDate = new Date(
         input.date.getFullYear(),
         input.date.getMonth(),
@@ -20,7 +18,11 @@ export const journalRouter = createTRPCRouter({
       );
       let endDate = addDays(startDate, 1);
       let data = await ctx.prisma.habit.findMany({
+        where: {
+          ownerId: ctx.session.user.id,
+        },
         select: {
+          id: true,
           description: true,
           completions: {
             where: {
@@ -33,30 +35,15 @@ export const journalRouter = createTRPCRouter({
         },
       });
 
-      return data.map(({ description, completions }) => ({
+      let habits = data.map(({ id, description, completions }) => ({
+        id,
         description,
-        completed: completions.length >= 0,
+        completed: completions.length > 0,
       }));
-      */
+
       return {
-        habits: [
-          {
-            desciption: "Go to the gym",
-            completed: false,
-            editable: false
-          },
-          {
-            desciption: "Check the task tracker",
-            completed: false,
-            editable: false
-          },
-          {
-            desciption: "Clean the room",
-            completed: true,
-            editable: false
-          },
-        ],
-        date: new Date(),
+        habits,
+        date: input.date,
       };
     }),
 });

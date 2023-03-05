@@ -16,27 +16,49 @@ datasource db {
 }
 
 model Goal {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id])
+  id          String                   @id @default(cuid())
+  name        String
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  ownerId     String
+  owner       User                     @relation(fields: [ownerId], references: [id])
+  habits      HabitMeasuresGoal[]
+  subjectives SubjectiveMeasuresGoal[]
 
   @@index([ownerId])
 }
 
+enum FrequencyHorizon {
+  DAY
+  WEEK
+  MONTH
+}
+
 model Habit {
-  id          String            @id @default(cuid())
-  description String
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  ownerId     String
-  owner       User              @relation(fields: [ownerId], references: [id])
-  event       Event[]
-  completions HabitCompletion[]
+  id               String              @id @default(cuid())
+  description      String
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  ownerId          String
+  frequencyHorizon FrequencyHorizon    @default(DAY)
+  frequency        Int                 @default(1)
+  owner            User                @relation(fields: [ownerId], references: [id])
+  completions      HabitCompletion[]
+  goals            HabitMeasuresGoal[]
 
   @@index([ownerId])
+}
+
+model HabitMeasuresGoal {
+  id      String @id @default(cuid())
+  goalId  String
+  habitId String
+
+  goal  Goal  @relation(fields: [goalId], references: [id])
+  habit Habit @relation(fields: [habitId], references: [id])
+
+  @@index([goalId])
+  @@index([habitId])
 }
 
 model HabitCompletion {
@@ -49,15 +71,36 @@ model HabitCompletion {
   @@index([habitId])
 }
 
-model Event {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  habitId   String
-  habit     Habit    @relation(fields: [habitId], references: [id])
+model SubjectiveMeasuresGoal {
+  id           String @id @default(cuid())
+  goalId       String
+  subjectiveId String
 
-  @@index([habitId])
+  goal       Goal       @relation(fields: [goalId], references: [id])
+  subjective Subjective @relation(fields: [subjectiveId], references: [id])
+
+  @@index([goalId])
+  @@index([subjectiveId])
+}
+
+model Subjective {
+  id                     String                   @id @default(cuid())
+  prompt                 String
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  SubjectiveMeasuresGoal SubjectiveMeasuresGoal[]
+  SubjectiveAnswer       SubjectiveAnswer[]
+}
+
+model SubjectiveAnswer {
+  id           String     @id @default(cuid())
+  score        Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  subjectiveId String
+  subjective   Subjective @relation(fields: [subjectiveId], references: [id])
+
+  @@index([subjectiveId])
 }
 
 // Necessary for Next auth

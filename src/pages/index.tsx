@@ -70,7 +70,7 @@ const AuthShowcase: React.FC = () => {
   let session = useSession();
   if (session.status=="authenticated") {
     let router = useRouter();
-    router.push("/app");
+    router.push("/journal");
   }
 
   return (
