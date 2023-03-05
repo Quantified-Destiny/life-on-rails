@@ -1,89 +1,124 @@
-import { addDays } from "date-fns";
+import { endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 
-
-const extractDate = (date: Date) => {
-  return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDay()
-  );
-}
+const onDay = (date: Date) => {
+  let startDate = startOfDay(date);
+  let endDate = endOfDay(startDate);
+  return {
+    gte: startDate,
+    lte: endDate,
+  };
+};
 
 export const journalRouter = createTRPCRouter({
+  addHabit: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.habit.create({
+        data: {
+          description: input,
+          ownerId: ctx.session.user.id,
+        },
+      });
+    }),
+
+  setCompletion: protectedProcedure
+    .input(
+      z.object({ date: z.date(), habitId: z.string(), completed: z.boolean() })
+    )
+    .mutation(async ({ input, ctx }) => {
+      let existingCompletion = await ctx.prisma.habitCompletion.findFirst({
+        where: {
+          habitId: input.habitId,
+          date: onDay(input.date),
+        },
+      });
+      console.log(
+        `Found completion: ${existingCompletion} for habit ${input.habitId}`
+      );
+
+      if (existingCompletion) {
+        console.log(`Marking ${existingCompletion.id} as ${input.completed}`);
+        return await ctx.prisma.habitCompletion.update({
+          where: {
+            id: existingCompletion.id,
+          },
+          data: {
+            date: input.date,
+            isCompleted: input.completed,
+          },
+        });
+      } else {
+        console.log(
+          `Creating new completion for ${input.habitId} as ${input.completed}`
+        );
+        return await ctx.prisma.habitCompletion.create({
+          data: {
+            date: input.date,
+            habitId: input.habitId,
+            isCompleted: input.completed,
+          },
+        });
+      }
+    }),
+
+  deleteHabit: protectedProcedure
+    .input(z.object({ habitId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      let habit = ctx.prisma.habit.delete({
+        where: {
+          id: input.habitId,
+        },
+      });
+      let completions = ctx.prisma.habitCompletion.deleteMany({
+        where: {
+          habitId: input.habitId,
+        },
+      });
+
+      let measures = ctx.prisma.habitMeasuresGoal.deleteMany({
+        where: {
+          habitId: input.habitId,
+        },
+      });
+      return await ctx.prisma.$transaction([measures, completions, habit]);
+    }),
+
   setSubjectiveScore: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
-        score: z.number()
+        subjectiveId: z.string(),
+        score: z.number(),
+        date: z.date(),
       })
     )
-    .mutation((async ({ input, ctx }) => {
-      let currentDate = extractDate(new Date());
+    .mutation(async ({ input, ctx }) => {
       let existing = await ctx.prisma.subjectiveAnswer.findFirst({
         where: {
-          subjectiveId: input.id,
-          createdAt: { gte: currentDate, lte: addDays(currentDate, 1) }
-        }
+          subjectiveId: input.subjectiveId,
+          createdAt: onDay(input.date),
+        },
       });
       if (existing === null) {
         await ctx.prisma.subjectiveAnswer.create({
           data: {
-            subjectiveId: input.id,
-            score: input.score
-          }
-        })
+            subjectiveId: input.subjectiveId,
+            score: input.score,
+          },
+        });
       } else {
         await ctx.prisma.subjectiveAnswer.update({
           where: {
-            id: existing.id
+            id: existing.id,
           },
           data: {
-            score: input.score
-          }
-        })
-      }
-    })),
-
-  getSubjectives: protectedProcedure
-    .input(
-      z.object({
-        date: z.date(),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      let startDate = extractDate(input.date);
-      let endDate = addDays(startDate, 1);
-      let data = await ctx.prisma.subjective.findMany({
-        where: {
-          ownerId: ctx.session.user.id,
-        },
-        select: {
-          id: true,
-          prompt: true,
-          subjectiveAnswers: {
-            where: {
-              createdAt: {
-                gte: startDate,
-                lte: endDate,
-              },
-            },
+            score: input.score,
           },
-        },
-      });
-
-      let subjectives = data.map(({ id, prompt, subjectiveAnswers }) => ({
-        id,
-        prompt,
-        score: subjectiveAnswers[0]?.score
-      }));
-
-      return {
-        subjectives: subjectives,
-        date: input.date
-      };
+        });
+      }
     }),
+
   getHabits: protectedProcedure
     .input(
       z.object({
@@ -91,8 +126,6 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      let startDate = extractDate(input.date);
-      let endDate = addDays(startDate, 1);
       let data = await ctx.prisma.habit.findMany({
         where: {
           ownerId: ctx.session.user.id,
@@ -102,23 +135,54 @@ export const journalRouter = createTRPCRouter({
           description: true,
           completions: {
             where: {
-              date: {
-                gte: startDate,
-                lte: endDate,
-              },
+              date: onDay(input.date),
+            },
+          },
+        },
+      });
+      let habitsData = data.map(({ id, description, completions }) => ({
+        id,
+        description,
+        completed: completions[0]?.isCompleted == true,
+      }));
+
+      return {
+        habits: habitsData,
+        date: input.date,
+      };
+    }),
+
+  getSubjectives: protectedProcedure
+    .input(
+      z.object({
+        date: z.date(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      let data = await ctx.prisma.subjective.findMany({
+        where: {
+          ownerId: ctx.session.user.id,
+        },
+        select: {
+          id: true,
+          prompt: true,
+          subjectiveAnswers: {
+            where: {
+              createdAt: onDay(input.date),
             },
           },
         },
       });
 
-      let habitsData = data.map(it => ({
-        completed: it.completions.length > 0, 
-        id: it.id,
-        description: it.description
-      }))
+      let subjectives = data.map(({ id, prompt, subjectiveAnswers }) => ({
+        id,
+        prompt,
+        score: subjectiveAnswers[0]?.score,
+      }));
+
       return {
-        habits: habitsData,
-        date: input.date
+        subjectives: subjectives,
+        date: input.date,
       };
     }),
 });

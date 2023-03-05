@@ -62,10 +62,11 @@ model HabitMeasuresGoal {
 }
 
 model HabitCompletion {
-  id      String   @id @default(cuid())
-  date    DateTime
-  habitId String
-  Habit   Habit    @relation(fields: [habitId], references: [id])
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  habitId     String
+  isCompleted Boolean  @default(true)
+  Habit       Habit    @relation(fields: [habitId], references: [id])
 
   @@index([date])
   @@index([habitId])
@@ -91,7 +92,7 @@ model Subjective {
   ownerId                String
   owner                  User                     @relation(fields: [ownerId], references: [id])
   SubjectiveMeasuresGoal SubjectiveMeasuresGoal[]
-  subjectiveAnswers       SubjectiveAnswer[]
+  subjectiveAnswers      SubjectiveAnswer[]
 
   @@index([ownerId])
 }
