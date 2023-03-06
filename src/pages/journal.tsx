@@ -216,6 +216,49 @@ const InlineCreateHabit = () => {
   );
 };
 
+const InlineCreateSubjective = () => {
+  let [isActive, setActive] = useState<boolean>(false);
+  let [text, setText] = useState<string>("");
+  let context = api.useContext();
+  let addSubjective = api.journal.addSubjective.useMutation({
+    onSuccess() {
+      context.journal.getSubjectives.invalidate();
+    },
+  });
+
+  if (!isActive) {
+    return (
+      <div className="ring-1" onClick={() => setActive(true)}>
+        <span>
+          <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+          New daily question
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="ring-1">
+      <input
+        autoFocus
+        type="text"
+        value={text}
+        onChange={(event) => {
+          setText(event.target.value);
+        }}
+        onKeyDown={(event) => {
+          if (event.key == "Enter") {
+            console.log(text);
+            addSubjective.mutate({ prompt: text });
+            setActive(false);            
+          } else if(event.key=="Escape") {
+            setActive(false);
+          }
+        }}
+      ></input>
+    </div>
+  );
+};
+
 function Journal({ date, habits, subjectives }: JournalProps) {
   let context = api.useContext();
   let setHabitCompletion = api.journal.setCompletion.useMutation({
@@ -273,6 +316,7 @@ function Journal({ date, habits, subjectives }: JournalProps) {
           }
         ></Subjective>
       ))}
+      <InlineCreateSubjective></InlineCreateSubjective>
     </div>
   );
 }
@@ -289,6 +333,7 @@ const JournalPage = () => {
     ...habit,
   }));
   let subjectivesData = query2.data.subjectives; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
+  console.log(`Got subjectives ${JSON.stringify(subjectivesData)}`);
   return (
     <Journal
       habits={habitsData}

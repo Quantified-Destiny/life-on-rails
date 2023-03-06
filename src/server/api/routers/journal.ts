@@ -23,6 +23,17 @@ export const journalRouter = createTRPCRouter({
       });
     }),
 
+  addSubjective: protectedProcedure
+    .input(z.object({ prompt: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.subjective.create({
+        data: {
+          prompt: input.prompt,
+          ownerId: ctx.session.user.id,
+        },
+      });
+    }),
+
   setCompletion: protectedProcedure
     .input(
       z.object({ date: z.date(), habitId: z.string(), completed: z.boolean() })
