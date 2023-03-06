@@ -11,6 +11,10 @@ import classNames from "classnames";
 import { useState } from "react";
 import Layout from "../components/layout";
 import { api } from "../utils/api";
+
+// fixes zoomed in icons
+import '@fortawesome/fontawesome-svg-core/styles.css';
+
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
 
