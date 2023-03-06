@@ -1,209 +1,262 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
-
+import Layout from "../components/layout";
 import { api } from "../utils/api";
-import { useRouter } from "next/router";
 
-const Home: NextPage = () => {
-    // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-  
-    return (
-      <>
-        <Head>
-          <title>Life on Rails</title>
-          <meta name="description" content="" />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 md:px-7 lg:px-8 text-sm">
-  <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-3">
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Goal </span>
-          <span className="text-sm font-medium text-gray-500"> 60% </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">Get Fit</div>
-          <div className="mt-2 text-gray-600">I want to get in shape and be able to run a 5K by the end of the year.</div>
-        </div>
-      </div>
-      <div className="divide-y bg-gray-50 px-4 py-4 sm:px-6">
-        <ul className="divide-y divide-gray-200">
-          <li className="py-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"> Habit </span>
-              <span className="text-sm font-medium text-gray-500"> 25% </span>
-            </div>
-            <div className="mt-4">
-              <div className="text-lg font-semibold text-gray-900">Run 5 miles a day</div>
-              <div className="mt-2 text-gray-600">I want to build up my endurance and be able to run 5 miles a day by the end of the month.</div>
-            </div>
-          </li>
-          <li className="py-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"> Habit </span>
-              <span className="text-sm font-medium text-gray-500"> 77% </span>
-            </div>
-            <div className="mt-4">
-              <div className="text-lg font-semibold text-gray-900">Lift weights 3 times a week</div>
-              <div className="mt-2 text-gray-600">I want to build muscle and strength by lifting weights 3 times a week.</div>
-            </div>
-          </li>
-          <li className="py-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"> Habit </span>
-              <span className="text-sm font-medium text-gray-500"> 77% </span>
-            </div>
-            <div className="mt-4">
-              <div className="text-lg font-semibold text-gray-900">Lift weights 3 times a week</div>
-              <div className="mt-2 text-gray-600">I want to build muscle and strength by lifting weights 3 times a week.</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800"> Subjective </span>
-          <span className="text-sm font-medium text-gray-500"> 80% </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">How was your day?</div>
-          <div className="mt-2 text-gray-600">I want to track my mood everyday.</div>
-        </div>
-      </div>
-    </div>
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Goal </span>
-          <span className="text-sm font-medium text-gray-500"> January 7, 2020 </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">Get Fit</div>
-          <div className="mt-2 text-gray-600">I want to get in shape and be able to run a 5K by the end of the year.</div>
-        </div>
-      </div>
-      <div className="divide-y bg-gray-50 px-4 py-4 sm:px-6">
-        <ul className="divide-y divide-gray-200">
-          <li className="py-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"> Habit </span>
-              <span className="text-sm font-medium text-gray-500"> 25% </span>
-            </div>
-            <div className="mt-4">
-              <div className="text-lg font-semibold text-gray-900">Run 5 miles a day</div>
-              <div className="mt-2 text-gray-600">I want to build up my endurance and be able to run 5 miles a day by the end of the month.</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Goal </span>
-          <span className="text-sm font-medium text-gray-500"> January 7, 2020 </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">Get Fit</div>
-          <div className="mt-2 text-gray-600">I want to get in shape and be able to run a 5K by the end of the year.</div>
-        </div>
-      </div>
-      <div className="bg-gray-50 px-4 py-4 sm:px-6">
-        <ul className="divide-y divide-gray-200">
-          <li className="py-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"> Habit </span>
-              <span className="text-sm font-medium text-gray-500"> January 7, 2020 </span>
-            </div>
-            <div className="mt-4">
-              <div className="text-lg font-semibold text-gray-900">Run 5 miles a day</div>
-              <div className="mt-2 text-gray-600">I want to build up my endurance and be able to run 5 miles a day by the end of the month.</div>
-            </div>
-          </li>
-          <li className="py-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"> Habit </span>
-              <span className="text-sm font-medium text-gray-500"> January 14, 2020 </span>
-            </div>
-            <div className="mt-4">
-              <div className="text-lg font-semibold text-gray-900">Lift weights 3 times a week</div>
-              <div className="mt-2 text-gray-600">I want to build muscle and strength by lifting weights 3 times a week.</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Goal </span>
-          <span className="text-sm font-medium text-gray-500"> January 7, 2020 </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">Get Fit</div>
-          <div className="mt-2 text-gray-600">I want to get in shape and be able to run a 5K by the end of the year.</div>
-        </div>
-      </div>
-      <div className="bg-gray-50 px-4 py-4 sm:px-6">
-        <ul className="divide-y divide-gray-200">
-          <li className="py-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"> Habit </span>
-              <span className="text-sm font-medium text-gray-500"> January 7, 2020 </span>
-            </div>
-            <div className="mt-4">
-              <div className="text-lg font-semibold text-gray-900">Run 5 miles a day</div>
-              <div className="mt-2 text-gray-600">I want to build up my endurance and be able to run 5 miles a day by the end of the month.</div>
-            </div>
-          </li>
-          <li className="py-4">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800"> Subjective </span>
-              <span className="text-sm font-medium text-gray-500"> January 14, 2020 </span>
-            </div>
-            <div className="mt-4">
-              <div className="text-lg font-semibold text-gray-900">How did your workout feel?</div>
-              <div className="mt-2 text-gray-600">I want to build muscle and strength by lifting weights 3 times a week.</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800"> Subjective </span>
-          <span className="text-sm font-medium text-gray-500"> 80% </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">How was your day?</div>
-          <div className="mt-2 text-gray-600">I want to track my mood everyday.</div>
-        </div>
-      </div>
-    </div>
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800"> Habit </span>
-          <span className="text-sm font-medium text-gray-500"> 50% </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">Brushing Twice a Day</div>
-          <div className="mt-2 text-gray-600">I want to improve my dental hygiene.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+interface PillProps {
+  text: string;
+}
 
-      </>
-    );
-  };
-  
-  export default Home;
+function Pill({ text }: PillProps) {
+  return (
+    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+      {text}
+    </span>
+  );
+}
 
+interface NestedItemsProps {
+  habits: Habit[];
+  subjectives: Subjective[];
+}
+
+function NestedItems({ habits, subjectives }: NestedItemsProps) {
+  return (
+    <ul className="divide-y divide-gray-200">
+      {habits.map((habit) => (
+        <li className="py-4">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+              Habit
+            </span>
+            <span className="text-sm font-medium text-gray-500">
+              {habit.score * 100 + "%"}
+            </span>
+          </div>
+          <div className="mt-4">
+            <div className="text-lg font-semibold text-gray-900">
+              {habit.name}
+            </div>
+            <div className="mt-2 text-gray-600">{habit.description}</div>
+          </div>
+        </li>
+      ))}
+
+      {subjectives.map((subjective) => (
+        <li className="py-4">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
+              Subjective
+            </span>
+            <span className="text-sm font-medium text-gray-500">
+              {subjective.score * 100 + "%"}
+            </span>
+          </div>
+          <div className="mt-4">
+            <div className="text-lg font-semibold text-gray-900">
+              {subjective.name}
+            </div>
+            <div className="mt-2 text-gray-600">{subjective.description}</div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+interface Habit {
+  name: string;
+  description: string;
+  score: number;
+}
+interface Subjective {
+  name: string;
+  description: string;
+  score: number;
+}
+
+interface Goal {
+  name: string;
+  description: string;
+  score: number;
+}
+interface GoalCardProps {
+  goal: Goal;
+  habits: Habit[];
+  subjectives: Subjective[];
+}
+
+function GoalCard({ goal, habits, subjectives }: GoalCardProps) {
+  return (
+    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="flex items-center justify-between">
+          <Pill text={"Goal"}></Pill>
+          <span className="text-sm font-medium text-gray-500">
+            {goal.score * 100 + "%"}
+          </span>
+        </div>
+        <div className="mt-4">
+          <div className="text-lg font-semibold text-gray-900">Get Fit</div>
+          <div className="mt-2 text-gray-600">{goal.description}</div>
+        </div>
+      </div>
+      {subjectives.length == 0 && habits.length == 0 ? undefined : (
+        <div className="divide-y bg-gray-50 px-4 py-4 sm:px-6">
+          <NestedItems habits={habits} subjectives={subjectives}></NestedItems>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SubjectiveCard(subjective: Subjective) {
+  return (
+    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="flex items-center justify-between">
+          <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
+            Subjective
+          </span>
+          <span className="text-sm font-medium text-gray-500">
+            {subjective.score * 100 + "%"}
+          </span>
+        </div>
+        <div className="mt-4">
+          <div className="text-lg font-semibold text-gray-900">
+            {subjective.name}
+          </div>
+          <div className="mt-2 text-gray-600">{subjective.description}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+function HabitCard(habit: Habit) {
+  return (
+    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="flex items-center justify-between">
+          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+            Habit
+          </span>
+          <span className="text-sm font-medium text-gray-500">
+            {habit.score * 100 + "%"}
+          </span>
+        </div>
+        <div className="mt-4">
+          <div className="text-lg font-semibold text-gray-900">
+            {habit.name}
+          </div>
+          <div className="mt-2 text-gray-600">{habit.description}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface OverviewProps {
+  goals: { goal: Goal; habits: Habit[]; subjectives: Subjective[] }[];
+  habits: Habit[];
+  subjectives: Subjective[];
+}
+
+function Overview({ goals, habits, subjectives }: OverviewProps) {
+  return (
+    <div className="mx-auto max-w-7xl py-6 px-4 text-sm sm:px-6 md:px-7 lg:px-8">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-1">
+        {goals.map((goal) => (
+          <GoalCard
+            goal={goal.goal}
+            habits={goal.habits}
+            subjectives={goal.subjectives}
+          ></GoalCard>
+        ))}
+
+        {subjectives.map((subjective) => (
+          <SubjectiveCard
+            name={subjective.name}
+            description={subjective.description}
+            score={subjective.score}
+          ></SubjectiveCard>
+        ))}
+
+        {habits.map((habit) => (
+          <HabitCard
+            name={habit.name}
+            description={habit.description}
+            score={habit.score}
+          ></HabitCard>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+let habits: Habit[] = [
+  {
+    name: "Get swole",
+    description: "get super swole",
+    score: 0.6,
+  },
+];
+let subjectives: Subjective[] = [
+  {
+    name: "How swole do I feel?",
+    description: "i feel smol",
+    score: 0.1,
+  },
+];
+
+let goal: Goal = {
+  name: "Run 5 miles a day",
+  description:
+    "I want to get in shape and be able to run a 5K by the end of the year.",
+  score: 0.6,
+};
+
+let goals = [
+  {
+    goal,
+    habits,
+    subjectives,
+  },
+];
+
+let today = new Date();
+
+function OverviewPage() {
+  //api.journal.getHabits.useQuery({ date: today });
+  //api.journal.getSubjectives.useQuery({ date: today });
+  let goalsQuery = api.goals.getGoals.useQuery({ date: today });
+  if (goalsQuery.isLoading) return <p>Loading...</p>;
+  if (goalsQuery.isError) return <p>Query error</p>;
+
+  let goals = goalsQuery.data.map((g) => ({
+    goal: { name: g.name, description: "", score: 0.0 },
+    habits: g.habits.map((it) => ({
+      name: it.habit.description,
+      description: it.habit.description,
+      score: 0.0,
+    })),
+    subjectives: g.subjectives.map((it) => ({
+      name: it.subjective.prompt,
+      description: "kamslkd",
+      score: 0.0,
+    })),
+  }));
+
+  return (
+    <Overview
+      goals={goals}
+      habits={habits}
+      subjectives={subjectives}
+    ></Overview>
+  );
+}
+
+const Page: NextPage = () => {
+  return <Layout main={OverviewPage}></Layout>;
+};
+
+export default Page;
