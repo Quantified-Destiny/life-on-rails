@@ -26,7 +26,7 @@ function SideBar() {
       </a>
     </li>
     <li>
-      <a href="#" className="flex items-center text-white opacity-75 hover:opacity-100">
+      <a href="create" className="flex items-center text-white opacity-75 hover:opacity-100">
         <FontAwesomeIcon icon={faPlusCircle} className="mr-2" />
       <span>Create</span>
       </a>
