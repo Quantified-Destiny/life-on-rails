@@ -80,7 +80,7 @@ const TopNav = () => {
       "
             href="#"
           >
-            Profile                </a>
+            My Profile                </a>
 
 
         </div>
