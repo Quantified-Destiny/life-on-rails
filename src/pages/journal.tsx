@@ -18,6 +18,16 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
 
+const [currentDate, setCurrentDate] = useState(new Date());
+
+const handlePrevDay = () => {
+  setCurrentDate(new Date(currentDate.getTime() - 24 * 60 * 60 * 1000));
+};
+
+const handleNextDay = () => {
+  setCurrentDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000));
+};
+
 
 const TimePicker = ({ date }: { date: Date }) => (
   <div
@@ -25,15 +35,38 @@ const TimePicker = ({ date }: { date: Date }) => (
     className="mt-3 flex h-10 w-full flex-col items-center"
   >
     <div id="selector-controls">
-      <button className="bg-white bg-opacity-20 ">
+      <button
+        onClick={handlePrevDay}
+        className="bg-white bg-opacity-20 "
+      >
         <LeftChevron></LeftChevron>
       </button>
-      <span className="mx-4">{date.toDateString()}</span>
-      <button className="bg-white bg-opacity-20">
+      <span className="mx-4">{currentDate.toDateString()}</span>
+      <button
+        onClick={handleNextDay}
+        className="bg-white bg-opacity-20"
+      >
         <RightChevron></RightChevron>
       </button>
     </div>
   </div>
+
+
+
+  // <div
+  //   id="time-selector"
+  //   className="mt-3 flex h-10 w-full flex-col items-center"
+  // >
+  //   <div id="selector-controls">
+  //     <button className="bg-white bg-opacity-20 ">
+  //       <LeftChevron></LeftChevron>
+  //     </button>
+  //     <span className="mx-4">{date.toDateString()}</span>
+  //     <button className="bg-white bg-opacity-20">
+  //       <RightChevron></RightChevron>
+  //     </button>
+  //   </div>
+  // </div>
 );
 
 interface HabitProps {
@@ -215,8 +248,8 @@ const InlineCreateSubjective = () => {
           if (event.key == "Enter") {
             console.log(text);
             addSubjective.mutate({ prompt: text });
-            setActive(false);            
-          } else if(event.key=="Escape") {
+            setActive(false);
+          } else if (event.key == "Escape") {
             setActive(false);
           }
         }}
