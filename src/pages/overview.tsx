@@ -211,20 +211,20 @@ let subjectives: Subjective[] = [
   },
 ];
 
-let goal: Goal = {
-  name: "Run 5 miles a day",
-  description:
-    "I want to get in shape and be able to run a 5K by the end of the year.",
-  score: 0.6,
-};
+// let goal: Goal = {
+//   name: "Run 5 miles a day",
+//   description:
+//     "I want to get in shape and be able to run a 5K by the end of the year.",
+//   score: 0.6,
+// };
 
-let goals = [
-  {
-    goal,
-    habits,
-    subjectives,
-  },
-];
+// let goals = [
+//   {
+//     goal,
+//     habits,
+//     subjectives,
+//   },
+// ];
 
 let today = new Date();
 
@@ -239,18 +239,21 @@ function OverviewPage() {
   let goals = data.map((item) => ({
     goal: {
       name: item.goal.name,
-      description: item.goal.description,
-      score: item.goal.score
+      description: item.goal.description, //currently no description field
+      // score: item.goal.score  //currently no score field
+      score: 0.5
     },
     habits: item.habits.map((habit) => ({
       name: habit.name,
       description: habit.description,
-      score: habit.score
+      // score: habit.score
+      score: 0.3
     })),
     subjectives: item.subjectives.map((subjective) => ({
       name: subjective.name,
       description: subjective.description,
-      score: subjective.score
+      // score: subjective.score
+      score: 0.7
     }))
   }));
 
