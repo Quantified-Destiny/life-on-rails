@@ -55,6 +55,7 @@ const Habit = ({
     <div className="my-2" key={id}>
       <input
         type="checkbox"
+        className="mr-1" 
         aria-hidden="true"
         checked={completed}
         onChange={(event) => setCompletion(event.target.checked)}
@@ -63,8 +64,8 @@ const Habit = ({
       <span className={classNames({ "line-through": completed })}>
         {description}
       </span>
-      <FontAwesomeIcon icon={faPencil}></FontAwesomeIcon>
-      <FontAwesomeIcon icon={faSquareMinus}></FontAwesomeIcon>
+      <FontAwesomeIcon className="mx-1" icon={faPencil}></FontAwesomeIcon>
+      <FontAwesomeIcon className="mx-1" icon={faSquareMinus}></FontAwesomeIcon>
     </div>
   );
 };
@@ -78,7 +79,7 @@ interface SubjectiveProps {
 
 const Subjective = ({ id, prompt, score, setScore }: SubjectiveProps) => {
   return (
-    <div className="">
+    <div className="py-1 mb-1">
       <p>{prompt}</p>
       <Stack direction="row" spacing={4} align="center">
         <Button
@@ -155,7 +156,7 @@ const InlineCreateHabit = () => {
     return (
       <div className="ring-1" onClick={() => setActive(true)}>
         <span>
-          <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+          <FontAwesomeIcon className="mx-1" icon={faPlus}></FontAwesomeIcon>
           New habit
         </span>
       </div>
@@ -196,7 +197,7 @@ const InlineCreateSubjective = () => {
     return (
       <div className="ring-1" onClick={() => setActive(true)}>
         <span>
-          <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+          <FontAwesomeIcon className="mx-1" icon={faPlus}></FontAwesomeIcon>
           New daily question
         </span>
       </div>
@@ -265,7 +266,7 @@ function Journal({ date, habits, subjectives }: JournalProps) {
         );
       })}
       <InlineCreateHabit></InlineCreateHabit>
-      <h2 className="mt-4 font-semibold">Questions</h2>
+      <h2 className="pt-8 font-semibold">Today's Questions</h2>
 
       {subjectives.map((subjective) => (
         <Subjective
