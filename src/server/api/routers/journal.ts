@@ -77,23 +77,23 @@ export const journalRouter = createTRPCRouter({
   deleteHabit: protectedProcedure
     .input(z.object({ habitId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      let habit = ctx.prisma.habit.delete({
-        where: {
-          id: input.habitId,
-        },
-      });
-      let completions = ctx.prisma.habitCompletion.deleteMany({
-        where: {
-          habitId: input.habitId,
-        },
-      });
-
-      let measures = ctx.prisma.habitMeasuresGoal.deleteMany({
-        where: {
-          habitId: input.habitId,
-        },
-      });
-      return await ctx.prisma.$transaction([measures, completions, habit]);
+      return await ctx.prisma.$transaction([
+        ctx.prisma.habitMeasuresGoal.deleteMany({
+          where: {
+            habitId: input.habitId,
+          },
+        }),
+        ctx.prisma.habitCompletion.deleteMany({
+          where: {
+            habitId: input.habitId,
+          },
+        }),
+        ctx.prisma.habit.delete({
+          where: {
+            id: input.habitId,
+          },
+        }),
+      ]);
     }),
 
   setSubjectiveScore: protectedProcedure
