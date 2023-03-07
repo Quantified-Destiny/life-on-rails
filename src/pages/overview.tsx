@@ -97,7 +97,7 @@ function GoalCard({ goal, habits, subjectives }: GoalCardProps) {
           </span>
         </div>
         <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">Get Fit</div>
+          <div className="text-lg font-semibold text-gray-900">{goal.name}</div>
           <div className="mt-2 text-gray-600">{goal.description}</div>
         </div>
       </div>
@@ -229,24 +229,29 @@ let goals = [
 let today = new Date();
 
 function OverviewPage() {
-  //api.journal.getHabits.useQuery({ date: today });
-  //api.journal.getSubjectives.useQuery({ date: today });
   let goalsQuery = api.goals.getGoals.useQuery({ date: today });
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
-  console.log(goalsQuery.data);
-  let goals = goalsQuery.data.map((g) => ({
-    goal: { name: g.name, description: "", score: 0.0 },
-    habits: g.habits.map((it) => ({
-      name: it.habit.description,
-      description: it.habit.description,
-      score: 0.0,
+  
+  let data = goalsQuery.data;
+  console.log(data);
+  
+  let goals = data.map((item) => ({
+    goal: {
+      name: item.goal.name,
+      description: item.goal.description,
+      score: item.goal.score
+    },
+    habits: item.habits.map((habit) => ({
+      name: habit.name,
+      description: habit.description,
+      score: habit.score
     })),
-    subjectives: g.subjectives.map((it) => ({
-      name: it.subjective.prompt,
-      description: "kamslkd",
-      score: 0.0,
-    })),
+    subjectives: item.subjectives.map((subjective) => ({
+      name: subjective.name,
+      description: subjective.description,
+      score: subjective.score
+    }))
   }));
 
   return (
@@ -257,6 +262,39 @@ function OverviewPage() {
     ></Overview>
   );
 }
+
+
+// function OverviewPage() {
+//   //api.journal.getHabits.useQuery({ date: today });
+//   //api.journal.getSubjectives.useQuery({ date: today });
+
+
+//   let goalsQuery = api.goals.getGoals.useQuery({ date: today });
+//   if (goalsQuery.isLoading) return <p>Loading...</p>;
+//   if (goalsQuery.isError) return <p>Query error</p>;
+//   console.log(goalsQuery.data);
+//   let goals = goalsQuery.data.map((g) => ({
+//     goal: { name: g.name, description: "test description", score: 0.0 },
+//     habits: g.habits.map((it) => ({
+//       name: it.habit.description,
+//       description: it.habit.description,
+//       score: 0.0,
+//     })),
+//     subjectives: g.subjectives.map((it) => ({
+//       name: it.subjective.prompt,
+//       description: "kamslkd",
+//       score: 0.0,
+//     })),
+//   }));
+
+//   return (
+//     <Overview
+//       goals={goals}
+//       habits={habits}
+//       subjectives={subjectives}
+//     ></Overview>
+//   );
+// }
 
 const Page: NextPage = () => {
   return <Layout main={OverviewPage}></Layout>;
