@@ -1,6 +1,17 @@
 import React from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const TopNav = () => {
+  const { data: sessionData } = useSession();
+  const router = useRouter();
+
+
+  const handleSignOut = async () => {
+    await router.push("/");
+    await signOut();
+  };
+
   return (
     <nav
       className="
@@ -57,13 +68,10 @@ const TopNav = () => {
         lg:mt-0
       "
             href="#"
-          >
-          </a>
+          ></a>
         </div>
 
         <div className="relative flex items-center">
-
-
           <a
             className="
         dropdown-item
@@ -80,9 +88,33 @@ const TopNav = () => {
       "
             href="#"
           >
-            My Profile                </a>
-
-
+            My Profile
+          </a>
+        </div>
+        <div className="relative flex items-center">
+          {/* <a
+            className="
+        dropdown-item
+        block
+        w-full
+        whitespace-nowrap
+        bg-transparent
+        py-2
+        px-4
+        text-sm
+        font-normal
+        text-gray-700
+        hover:bg-gray-100
+      "
+            href="#"
+          >
+            Sign Out
+          </a> */}
+          <button
+            className="rounded-full bg-gray-500 text-xs px-2 py-1 font-semibold text-white no-underline transition hover:bg-black/20"
+            onClick={sessionData ? handleSignOut : () => void signIn()}>
+            {sessionData ? "Sign out" : "Sign in"}
+          </button>
         </div>
       </div>
     </nav>
