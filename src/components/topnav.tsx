@@ -56,7 +56,8 @@ const TopNav = () => {
             ></path>
           </svg> */}
         </button>
-        <div className="text-sm font-bold text-blue-600">
+        <div className="text-sm font-bold text-blue-600"> 
+        {/* text-[#21A8F6] */}
           Life on Rails
         </div>
         <div className="flex-grow items-center" id="navbarSupportedContent">
