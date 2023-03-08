@@ -39,7 +39,7 @@ const CreatePage = () => {
       )}
 
 
-        <div className="mx-auto max-w-xl border border-gray-200 px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 lg:px-8">
             <h2 className="mb-8 text-2xl font-semibold">Choose an option:</h2>
             <div className="flex flex-col space-y-4">
                 <button
