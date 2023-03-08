@@ -20,7 +20,7 @@ const TopNav = () => {
   h-full
   "
     >
-      <div className="flex w-full flex-wrap items-center justify-between px-6 shadow">
+      <div className="flex w-full flex-wrap items-center justify-between pr-6 shadow">
         <button
           className="
       navbar-toggler
@@ -39,7 +39,8 @@ const TopNav = () => {
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-          <svg
+          <img src="lor-logo.png" className="w-9" alt="" />
+          {/* <svg
             aria-hidden="true"
             focusable="false"
             data-prefix="fas"
@@ -53,8 +54,11 @@ const TopNav = () => {
               fill="currentColor"
               d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
             ></path>
-          </svg>
+          </svg> */}
         </button>
+        <div className="text-sm font-bold text-blue-600">
+          Life on Rails
+        </div>
         <div className="flex-grow items-center" id="navbarSupportedContent">
           <a
             className="
