@@ -16,7 +16,7 @@ const GoalFormModal = ({ onClose}) => {
 
 
 return (
-    <div className="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-40">
+    <div className="fixed z-10 inset-0 bg-black bg-opacity-40">
     <div className="flex items-center justify-center min-h-screen">
         {/* <div className="bg-white rounded-lg p-8">
         <h2 className="text-lg font-medium mb-4">Create Goal</h2>
@@ -34,7 +34,7 @@ return (
             </button>
         </form>
         </div> */}
-        <div className="mx-auto max-w-xl border border-gray-200 px-4 py-6 sm:px-6 lg:px-8 bg-white">
+        <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 lg:px-8 bg-white">
   <div className="mb-8 ">
     <h2 className="mb-2 text-2xl font-semibold text-center">Create Goal</h2>
     <form className="flex flex-col space-y-4">
@@ -64,7 +64,7 @@ return (
         <button type="button" className="text-sm mr-2 inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
         onClick={onClose}>Cancel</button>
         
-        <button type="submit" className="text-sm inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Create Goal</button>
+        <button type="submit" className="text-sm inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Create Goal</button>
       </div>
     </form>
   </div>
