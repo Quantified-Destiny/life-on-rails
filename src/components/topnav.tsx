@@ -17,10 +17,10 @@ const TopNav = () => {
       className="
  relative
   flex
-  w-full
+  h-full
   "
     >
-      <div className="flex w-full flex-wrap items-center justify-between px-6 shadow-lg">
+      <div className="flex w-full flex-wrap items-center justify-between px-6 shadow">
         <button
           className="
       navbar-toggler
@@ -86,30 +86,13 @@ const TopNav = () => {
         text-gray-700
         hover:bg-gray-100
       "
-            href="#"
+            href="/profile"
           >
             My Profile
           </a>
         </div>
         <div className="relative flex items-center">
-          {/* <a
-            className="
-        dropdown-item
-        block
-        w-full
-        whitespace-nowrap
-        bg-transparent
-        py-2
-        px-4
-        text-sm
-        font-normal
-        text-gray-700
-        hover:bg-gray-100
-      "
-            href="#"
-          >
-            Sign Out
-          </a> */}
+          
           <button
             className="rounded-full bg-gray-500 text-xs px-2 py-1 font-semibold text-white no-underline transition hover:bg-black/20"
             onClick={sessionData ? handleSignOut : () => void signIn()}>

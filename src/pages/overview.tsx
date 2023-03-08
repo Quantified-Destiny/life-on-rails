@@ -163,7 +163,7 @@ interface OverviewProps {
 
 function Overview({ goals, habits, subjectives }: OverviewProps) {
   return (
-    <div className="mx-auto max-w-5xl py-6 px-4 text-md sm:px-6 md:px-7 lg:px-8">
+    <div className="mx-auto max-w-4xl py-6 px-4 text-md sm:px-6 md:px-7 lg:px-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-1">
         {goals.map((goal) => (
           <GoalCard

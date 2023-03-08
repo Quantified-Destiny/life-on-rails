@@ -9,7 +9,7 @@ import { faHome, faBook, faPlusCircle } from "@fortawesome/free-solid-svg-icons"
 function SideBar() {
   return (
     
-<div className="flex flex-col bg-gray-800 h-screen px-4 py-8">
+<div className="flex flex-col bg-gray-800 h-full px-4 py-8">
   <h1 className="text-white font-bold text-2xl mb-8">Navigation</h1>
   <ul className="flex flex-col space-y-2">
     <li>
@@ -56,15 +56,47 @@ function SideBar() {
 
 const Layout = ({ main }: { main: () => JSX.Element }) => {
   return (
-    <div className="absolute inset-0 min-h-[100vh] min-w-[100vw]">
-      <div className="relative z-50 grid h-full w-full grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
+//     <div className="relative h-screen">
+//   <div className="flex items-center justify-between px-6 py-3 bg-gray-100">
+//     <div className="flex items-center space-x-4">
+//       {/* Add your logo or image here */}
+//       <img src="/path/to/your/logo.png" alt="Logo" className="h-6 w-auto" />
+//       <nav className="space-x-4">
+//         <a href="#">Link 1</a>
+//         <a href="#">Link 2</a>
+//         <a href="#">Link 3</a>
+//       </nav>
+//     </div>
+//     <div className="flex items-center space-x-4">
+//       <button className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded">Profile</button>
+//       <button className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded">Sign Out</button>
+//     </div>
+//   </div>
+//   <div className="flex flex-row h-full">
+//     <div className="flex-none w-64 h-full bg-gray-200 border-r">
+//       {/* Add your sidebar content here */}
+//       <nav className="flex flex-col">
+//         <a href="#">Sidebar Link 1</a>
+//         <a href="#">Sidebar Link 2</a>
+//         <a href="#">Sidebar Link 3</a>
+//       </nav>
+//     </div>
+//     <div className="flex-grow h-full">
+//       {/* Add your main content here */}
+//       <h1>Main Content</h1>
+//     </div>
+//   </div>
+// </div>
+
+    <div className="relative inset-0">
+      <div className="relative z-50 grid grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
         <div id="topbar" className="col-span-2 col-start-1 row-start-1">
           <TopNav></TopNav>
         </div>
-        <div className="col-start-1 row-span-2 row-start-2 h-full w-full bg-gray-100 shadow-[2.0px_2.0px_2.0px_rgba(0,0,0,0.38)]">
+        <div className="col-start-1 row-span-2 row-start-2 bg-gray-100">
           <SideBar></SideBar>
         </div>
-        <div className="col-start-2 row-start-2 h-full w-full overflow-scroll ">
+        <div className="col-start-2 row-start-2 min-h-screen">
           {main()}
         </div>
       </div>
