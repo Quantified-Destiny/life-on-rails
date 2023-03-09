@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
+import { api } from "../utils/api";
 
-const GoalFormModal = ({ onClose}) => {
+const GoalFormModal = ({onClose}: {onClose: () => void}) => {
     // const [isModalOpen, setIsModalOpen] = useState(false);
 
     // const handleModalToggle = () => {
@@ -9,9 +10,11 @@ const GoalFormModal = ({ onClose}) => {
     const [goalName, setGoalName] = useState("");
   const [goalDescription, setGoalDescription] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO: handle form submission
+    let createGoal = api.create.createGoal.useMutation();
+    let newGoal = createGoal.mutate({name: goalName});
   };
 
 
@@ -55,7 +58,7 @@ return (
         id="goalDescription" 
         className="text-sm focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow-sm focus:outline-none" 
         placeholder="Enter goal description" 
-        rows="3" 
+        rows={3}
         onChange={(e) => setGoalDescription(e.target.value)}
         required></textarea>
       </div>

@@ -54,4 +54,24 @@ export const goalsRouter = createTRPCRouter({
 
       return data.map((g) => flatten(g));
     }),
+  getGoalOnly: protectedProcedure
+    .query(async ({ ctx }) => {
+      let data = await ctx.prisma.goal.findMany({
+        where: {
+          ownerId: ctx.session.user.id,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+      let goalData = data.map(({ id, name }) => ({
+        id,
+        name,
+      }));
+
+      return {
+        goalData: goalData
+      };
+    }),
 });

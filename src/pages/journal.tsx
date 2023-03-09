@@ -55,25 +55,6 @@ const TimePicker = ({ date }: { date: Date }) => {
 };
 
 
-
-
-
-  // <div
-  //   id="time-selector"
-  //   className="mt-3 flex h-10 w-full flex-col items-center"
-  // >
-  //   <div id="selector-controls">
-  //     <button className="bg-white bg-opacity-20 ">
-  //       <LeftChevron></LeftChevron>
-  //     </button>
-  //     <span className="mx-4">{date.toDateString()}</span>
-  //     <button className="bg-white bg-opacity-20">
-  //       <RightChevron></RightChevron>
-  //     </button>
-  //   </div>
-  // </div>
-//);
-
 interface HabitProps {
   id: string;
   description: string;

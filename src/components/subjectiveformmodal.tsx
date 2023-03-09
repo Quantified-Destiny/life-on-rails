@@ -1,6 +1,5 @@
-
-
 import { useState } from "react";
+import { api } from "../utils/api";
 
 const SubjectiveFormModal = ({ onClose }) => {
   // const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,9 +10,55 @@ const SubjectiveFormModal = ({ onClose }) => {
   const [subjectiveName, setsubjectiveName] = useState("");
   const [subjectiveDescription, setsubjectiveDescription] = useState("");
 
+  let query = api.goals.getGoalOnly.useQuery();
+  let goals = query.data?.goalData;
+
+  const [selectedGoalID, setSelectedGoalID] = useState("");
+  const handleGoalChange = (event) => {
+    setSelectedGoalID(event.target.value);
+  };
+
+  const dropdownList = () => {
+    if (goals == null) {
+      return (
+        <div>
+          <span>No goal to be selected</span>
+        </div>
+
+      );
+    } else {
+      return (
+        <div>
+          <select
+            id="goal"
+            name="goal"
+            className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow-sm focus:outline-none"
+            value={selectedGoalID}
+            onChange={handleGoalChange}
+          >
+            <option value="">Select a goal</option>
+            {goals.map((goal) => (
+              <option key={goal.id} value={goal.id}>
+                {goal.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // TODO: handle form submission
+    let createSubjective = api.create.createSubjective.useMutation();
+    let newSubjective = createSubjective.mutate({ prompt: subjectiveName });
+
+    let createSubjectiveMeasureGoal = api.create.createSubjectiveMeasureGoal.useMutation();
+    let newLink = createSubjectiveMeasureGoal.mutate({ goalId: selectedGoalID, subjectiveId: newSubjective.data.ownerId})
+
+    //how to add this relationship to the array in goal table and subjective table
   };
 
 
@@ -50,7 +95,7 @@ const SubjectiveFormModal = ({ onClose }) => {
               <div className="my-3 mx-2">
                 <label className="mb-2 block text-sm font-bold text-gray-700" for="description"> Link to a Goal (Optional)</label>
               </div>
-
+              <dropdownList></dropdownList>
               <div className="flex justify-end">
                 <button type="button" className="text-sm mr-2 inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   onClick={onClose}>Cancel</button>

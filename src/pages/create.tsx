@@ -5,7 +5,7 @@ import { useState } from "react";
 import Layout from "../components/layout";
 import { api } from "../utils/api";
 
-import GoalFormModal from "../components/goalformmodal";
+import GoalFormModal from "../components/GoalFormModal";
 import HabitFormModal from "../components/habitformmodal";
 import SubjectiveFormModal from "../components/subjectiveformmodal";
 
