@@ -51,24 +51,20 @@ export const createRouter = createTRPCRouter({
                 },
             });
         }),
-    createHabitMeasureGoal: protectedProcedure
-        .input(z.object({ goalId: z.string(), habitId: z.string() }))
+    createLinkedSubjective: protectedProcedure
+        .input(z.object({ prompt: z.string(), goalId: z.string() }))
         .mutation(async ({ input, ctx }) => {
-            return await ctx.prisma.habitMeasuresGoal.create({
+            let subjective = await ctx.prisma.subjective.create({
                 data: {
-                    goalId: input.goalId,
-                    habitId: input.habitId,
+                    prompt: input.prompt,
+                    ownerId: ctx.session.user.id,
                 },
             });
-        }),
-    createSubjectiveMeasureGoal: protectedProcedure
-        .input(z.object({ goalId: z.string(), subjectiveId: z.string() }))
-        .mutation(async ({ input, ctx }) => {
-            return await ctx.prisma.subjectiveMeasuresGoal.create({
+            await ctx.prisma.subjectiveMeasuresGoal.create({
                 data: {
                     goalId: input.goalId,
-                    subjectiveId: input.subjectiveId,
-                },
+                    subjectiveId: subjective.id,
+                }
             });
         }),
 });

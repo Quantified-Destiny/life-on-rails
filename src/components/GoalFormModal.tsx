@@ -7,8 +7,7 @@ const GoalFormModal = ({onClose}: {onClose: () => void}) => {
     // const handleModalToggle = () => {
     //     setIsModalOpen(!isModalOpen);
     //   };
-    const [goalName, setGoalName] = useState("");
-  const [goalDescription, setGoalDescription] = useState("");
+  const [goalName, setGoalName] = useState("");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -42,26 +41,15 @@ return (
     <h2 className="mb-2 text-2xl font-semibold text-center">Create Goal</h2>
     <form className="flex flex-col space-y-4">
       <div className="my-3 mx-2">
-        <label className="mb-2 block text-sm font-bold text-gray-700" htmlFor="title"> Title </label>
+        <label className="mb-2 block text-sm font-bold text-gray-700" htmlFor="title"> Description </label>
         <input className="text-sm focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow-sm focus:outline-none" 
         id="goalName" 
         type="text" 
-        placeholder="Enter goal title" 
+        placeholder="Enter goal description" 
         onChange={(e) => setGoalName(e.target.value)}
         required/>
       </div>
 
-      <div className="my-3 mx-2">
-        <label className="mb-2 block text-sm font-bold text-gray-700" htmlFor="description"> Description </label>
-        <textarea 
-        name="description" 
-        id="goalDescription" 
-        className="text-sm focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow-sm focus:outline-none" 
-        placeholder="Enter goal description" 
-        rows={3}
-        onChange={(e) => setGoalDescription(e.target.value)}
-        required></textarea>
-      </div>
 
       <div className="flex justify-end">
         <button type="button" className="text-sm mr-2 inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"

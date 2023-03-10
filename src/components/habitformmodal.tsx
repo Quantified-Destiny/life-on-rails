@@ -61,11 +61,11 @@ function HabitForm({ goals, onClose, createHabit }: HabitFormProps) {
             <h2 className="mb-2 text-2xl font-semibold text-center">Create Habit</h2>
             <form className="flex flex-col space-y-4" onSubmit={(e) => { e.preventDefault(); createHabit(habitName, selectedGoal); onClose(); }}>
               <div className="my-3 mx-2">
-                <label className="mb-2 block text-sm font-bold text-gray-700" htmlFor="title"> Title </label>
+                <label className="mb-2 block text-sm font-bold text-gray-700" htmlFor="title"> Description </label>
                 <input className="text-sm focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow-sm focus:outline-none"
-                  id="goalName"
+                  id="habitName"
                   type="text"
-                  placeholder="Enter habit title"
+                  placeholder="Enter habit description"
                   onChange={(e) => setHabitName(e.target.value)}
                   required />
               </div>
@@ -91,12 +91,6 @@ function HabitForm({ goals, onClose, createHabit }: HabitFormProps) {
 
 
 const HabitFormModal = ({ onClose }: { onClose: () => void }) => {
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // const handleModalToggle = () => {
-  //     setIsModalOpen(!isModalOpen);
-  //   };
-
   let createHabit = api.create.createHabit.useMutation();
   let createLinkedHabit = api.create.createLinkedHabit.useMutation();
 
@@ -106,7 +100,6 @@ const HabitFormModal = ({ onClose }: { onClose: () => void }) => {
   let goals = query.data.goalData;
 
   const createHabitFn = (habitName: string, goalId: string | undefined) => {
-    // TODO: handle form submission
     if (goalId == undefined) {
       console.log(`Creating standalone habit with description ${habitName}`);
       createHabit.mutate({ description: habitName });
