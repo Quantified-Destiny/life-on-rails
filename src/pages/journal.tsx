@@ -14,21 +14,24 @@ import { api } from "../utils/api";
 
 // fixes zoomed in icons
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import { addDays, subDays } from "date-fns";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
 
+interface TimePickerProps {
+  date: Date
+  setDate: (date: Date) => void
+};
 
-
-const TimePicker = ({ date }: { date: Date }) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const TimePicker = ({ date, setDate }: TimePickerProps) => {
 
   const handlePrevDay = () => {
-    setCurrentDate(new Date(currentDate.getTime() - 24 * 60 * 60 * 1000));
+    setDate(subDays(date, 1));
   };
 
   const handleNextDay = () => {
-    setCurrentDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000));
+    setDate(addDays(date, 1));
   };
   return (
     <div
@@ -42,7 +45,7 @@ const TimePicker = ({ date }: { date: Date }) => {
         >
           <LeftChevron></LeftChevron>
         </button>
-        <span className="mx-4">{currentDate.toDateString()}</span>
+        <span className="mx-4">{date.toDateString()}</span>
         <button
           onClick={handleNextDay}
           className="bg-white bg-opacity-20"
@@ -54,25 +57,6 @@ const TimePicker = ({ date }: { date: Date }) => {
   )
 };
 
-
-
-
-
-  // <div
-  //   id="time-selector"
-  //   className="mt-3 flex h-10 w-full flex-col items-center"
-  // >
-  //   <div id="selector-controls">
-  //     <button className="bg-white bg-opacity-20 ">
-  //       <LeftChevron></LeftChevron>
-  //     </button>
-  //     <span className="mx-4">{date.toDateString()}</span>
-  //     <button className="bg-white bg-opacity-20">
-  //       <RightChevron></RightChevron>
-  //     </button>
-  //   </div>
-  // </div>
-//);
 
 interface HabitProps {
   id: string;
@@ -93,7 +77,7 @@ const Habit = ({
     <div className="my-2" key={id}>
       <input
         type="checkbox"
-        className="mr-1" 
+        className="mr-1"
         aria-hidden="true"
         checked={completed}
         onChange={(event) => setCompletion(event.target.checked)}
@@ -164,21 +148,6 @@ const Subjective = ({ id, prompt, score, setScore }: SubjectiveProps) => {
     </div>
   );
 };
-
-interface JournalProps {
-  habits: {
-    id: string;
-    description: string;
-    completed: boolean;
-    editable: boolean;
-  }[];
-  date: Date;
-  subjectives: {
-    id: string;
-    prompt: string;
-    score: number | undefined;
-  }[];
-}
 
 const InlineCreateHabit = () => {
   let [isActive, setActive] = useState<boolean>(false);
@@ -264,7 +233,23 @@ const InlineCreateSubjective = () => {
   );
 };
 
-function Journal({ date, habits, subjectives }: JournalProps) {
+interface JournalProps {
+  habits: {
+    id: string;
+    description: string;
+    completed: boolean;
+    editable: boolean;
+  }[];
+  date: Date;
+  setDate: (date: Date) => void
+  subjectives: {
+    id: string;
+    prompt: string;
+    score: number | undefined;
+  }[];
+}
+
+function Journal({ date, setDate, habits, subjectives }: JournalProps) {
   let context = api.useContext();
   let setHabitCompletion = api.journal.setCompletion.useMutation({
     onSuccess() {
@@ -276,10 +261,9 @@ function Journal({ date, habits, subjectives }: JournalProps) {
       context.journal.getSubjectives.invalidate();
     },
   });
-
   return (
     <div className="container m-auto w-[80%]">
-      <TimePicker date={date}></TimePicker>
+      <TimePicker date={date} setDate={setDate}></TimePicker>
       <h1 className="m-auto mt-2 text-center font-sans text-xl font-bold">
         Journal
       </h1>
@@ -326,9 +310,11 @@ function Journal({ date, habits, subjectives }: JournalProps) {
   );
 }
 
-let date = new Date();
+let today = new Date();
 
 const JournalPage = () => {
+  const [date, setDate] = useState(today);
+
   let query1 = api.journal.getHabits.useQuery({ date });
   let query2 = api.journal.getSubjectives.useQuery({ date });
   if (query1.isLoading || query2.isLoading) return <p>Loading...</p>;
@@ -342,7 +328,8 @@ const JournalPage = () => {
   return (
     <Journal
       habits={habitsData}
-      date={query1.data.date}
+      date={date}
+      setDate={setDate}
       subjectives={subjectivesData}
     ></Journal>
   );
