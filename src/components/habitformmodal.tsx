@@ -9,8 +9,8 @@ interface GoalSelectorProps {
   }[],
   selectedGoal: string | undefined,
   onSelect: (goalId: string) => void,
-
 }
+
 const GoalSelector = ({ goals, selectedGoal, onSelect }: GoalSelectorProps) => {
   if (goals == undefined) {
     return (
@@ -53,7 +53,7 @@ interface HabitFormProps {
 function HabitForm({ goals, onClose, createHabit }: HabitFormProps) {
   const [habitName, setHabitName] = useState("");
   const [selectedGoal, setSelectedGoal] = useState<string | undefined>(undefined);
-    return (
+  return (
     <div className="fixed z-10 inset-0 bg-black bg-opacity-40">
       <div className="flex items-center justify-center min-h-screen">
         <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 lg:px-8 bg-white">
@@ -108,8 +108,6 @@ const HabitFormModal = ({ onClose }: { onClose: () => void }) => {
       createLinkedHabit.mutate({ description: habitName, goalId: goalId });
     }
   };
-
-
   return <HabitForm goals={goals} onClose={onClose} createHabit={createHabitFn}></HabitForm>;
 };
 

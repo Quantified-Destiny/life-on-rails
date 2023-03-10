@@ -8,15 +8,14 @@ interface GoalSelectorProps {
   }[],
   selectedGoal: string | undefined,
   onSelect: (goalId: string) => void,
-
 }
+
 const GoalSelector = ({ goals, selectedGoal, onSelect }: GoalSelectorProps) => {
   if (goals == undefined) {
     return (
       <div>
         <span>No goals available</span>
       </div>
-
     );
   }
   return (
@@ -106,9 +105,7 @@ const SubjectiveFormModal = ({ onClose }: { onClose: () => void }) => {
       createLinkedSubjective.mutate({ prompt: subjectiveName, goalId: goalId });
     }
   };
-
   return <SubjectiveForm goals={goals} onClose={onClose} createSubjective={createSubjectiveFn}></SubjectiveForm>;
-
 };
 
 export default SubjectiveFormModal;
