@@ -4,11 +4,12 @@ import { api } from "../utils/api";
 
 
 const ProfilePage = () => {
-  let query1 = api.profile.getPersonalInfo.useQuery();
-  let query2 = api.profile.getProviderInfo.useQuery();
+  let query = api.profile.getProfile.useQuery();
 
-  let personalInfo = query1.data?.profileData;
-  let providerInfo = query2.data?.providerData;
+  if (query.isLoading) return <p>Loading</p>;
+  if (query.isError) return <p>Error</p>;
+
+  let profile = query.data;
 
   return (<>
     <div className="flex min-h-screen justify-center ">
@@ -18,7 +19,11 @@ const ProfilePage = () => {
             <div className="flex items-center justify-between px-4 py-5 sm:px-6 ">
               <h3 className="text-lg font-medium leading-6 text-gray-700">Profile Information</h3>
               <div className="h-12 w-12 rounded-full bg-gray-200">
-                <img src={personalInfo.image} alt="" />
+                {
+                  (profile.image == undefined)
+                    ? <img src="https://media.istockphoto.com/id/1210939712/vector/user-icon-people-icon-isolated-on-white-background-vector-illustration.jpg?s=612x612&w=0&k=20&c=vKDH9j7PPMN-AiUX8vsKlmOonwx7wjqdKiLge7PX1ZQ="></img>
+                    : <img src={profile.image} alt="" />
+                }
               </div>
             </div>
 
@@ -26,15 +31,15 @@ const ProfilePage = () => {
               <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Username</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{personalInfo.name}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">{profile.name}</dd>
                 </div>
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Email</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{personalInfo.email}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">{profile.email}</dd>
                 </div>
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Provider</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{providerInfo.provider}</dd>
+                  <dt className="text-sm font-medium text-gray-500">Provider:</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{profile.providers.join(", ")}</dd>
                 </div>
               </dl>
             </div>
