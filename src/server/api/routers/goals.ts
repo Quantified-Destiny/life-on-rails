@@ -16,15 +16,13 @@ const score = () => Math.random();
 
 function flatten(data: Ret) {
   return {
-    goal: { name: data.name, description: "", score: 0.0 },
+    goal: { name: data.name, score: score() },
     habits: data.habits.map((it) => ({
       name: it.habit.description,
-      description: it.habit.description,
       score: score(),
     })),
     subjectives: data.subjectives.map((it) => ({
       name: it.subjective.prompt,
-      description: "kamslkd",
       score: score(),
     })),
   };

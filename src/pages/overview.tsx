@@ -4,6 +4,7 @@ import Layout from "../components/layout";
 import { api } from "../utils/api";
 
 const displayPercent = (percent: number) => `${(percent * 100).toFixed(2)}%`;
+
 interface PillProps {
   text: string;
 }
@@ -31,7 +32,7 @@ function NestedItems({ habits, subjectives }: NestedItemsProps) {
               Habit
             </span>
             <span className="text-md font-medium text-gray-500">
-              {habit.score * 100 + "%"}
+              {displayPercent(habit.score)}
             </span>
           </div>
           <div className="mt-4">
@@ -65,18 +66,15 @@ function NestedItems({ habits, subjectives }: NestedItemsProps) {
 
 interface Habit {
   name: string;
-  //description: string;
   score: number;
 }
 interface Subjective {
   name: string;
-  //description: string;
   score: number;
 }
 
 interface Goal {
   name: string;
-  description: string;
   score: number;
 }
 interface GoalCardProps {
@@ -97,7 +95,6 @@ function GoalCard({ goal, habits, subjectives }: GoalCardProps) {
         </div>
         <div className="mt-4">
           <div className="text-lg font-semibold text-gray-900">{goal.name}</div>
-          <div className="mt-2 text-gray-600">{goal.description}</div>
         </div>
       </div>
       {subjectives.length == 0 && habits.length == 0 ? undefined : (
@@ -105,6 +102,28 @@ function GoalCard({ goal, habits, subjectives }: GoalCardProps) {
           <NestedItems habits={habits} subjectives={subjectives}></NestedItems>
         </div>
       )}
+    </div>
+  );
+}
+
+function HabitCard(habit: Habit) {
+  return (
+    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="flex items-center justify-between">
+          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+            Habit
+          </span>
+          <span className="text-md rounded-md bg-slate-100 p-1 font-medium text-gray-500">
+            {displayPercent(habit.score)}
+          </span>
+        </div>
+        <div className="mt-4">
+          <div className="text-lg font-semibold text-gray-900">
+            {habit.name}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -130,27 +149,6 @@ function SubjectiveCard(subjective: Subjective) {
     </div>
   );
 }
-function HabitCard(habit: Habit) {
-  return (
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-            Habit
-          </span>
-          <span className="text-md rounded-md bg-slate-100 p-1 font-medium text-gray-500">
-            {displayPercent(habit.score)}
-          </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">
-            {habit.name}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 interface OverviewProps {
   goals: { goal: Goal; habits: Habit[]; subjectives: Subjective[] }[];
@@ -170,7 +168,10 @@ function Overview({ goals, habits, subjectives }: OverviewProps) {
           ></GoalCard>
         ))}
         {habits.map((habit) => (
-          <HabitCard name={habit.name} score={habit.score}></HabitCard>
+          <HabitCard
+            name={habit.name}
+            score={habit.score}
+          ></HabitCard>
         ))}
         {subjectives.map((subjective) => (
           <SubjectiveCard
@@ -182,21 +183,6 @@ function Overview({ goals, habits, subjectives }: OverviewProps) {
     </div>
   );
 }
-
-// let goal: Goal = {
-//   name: "Run 5 miles a day",
-//   description:
-//     "I want to get in shape and be able to run a 5K by the end of the year.",
-//   score: 0.6,
-// };
-
-// let goals = [
-//   {
-//     goal,
-//     habits,
-//     subjectives,
-//   },
-// ];
 
 let today = new Date();
 
@@ -211,21 +197,15 @@ function OverviewPage() {
   let goals = data.goals.map((item) => ({
     goal: {
       name: item.goal.name,
-      description: item.goal.description, //currently no description field
-      // score: item.goal.score  //currently no score field
-      score: 0.5,
+      score: item.goal.score,
     },
     habits: item.habits.map((habit) => ({
       name: habit.name,
-      description: habit.description,
-      // score: habit.score
-      score: 0.3,
+      score: habit.score,
     })),
     subjectives: item.subjectives.map((subjective) => ({
       name: subjective.name,
-      description: subjective.description,
-      // score: subjective.score
-      score: 0.7,
+      score: subjective.score,
     })),
   }));
 
@@ -237,37 +217,6 @@ function OverviewPage() {
     ></Overview>
   );
 }
-
-// function OverviewPage() {
-//   //api.journal.getHabits.useQuery({ date: today });
-//   //api.journal.getSubjectives.useQuery({ date: today });
-
-//   let goalsQuery = api.goals.getGoals.useQuery({ date: today });
-//   if (goalsQuery.isLoading) return <p>Loading...</p>;
-//   if (goalsQuery.isError) return <p>Query error</p>;
-//   console.log(goalsQuery.data);
-//   let goals = goalsQuery.data.map((g) => ({
-//     goal: { name: g.name, description: "test description", score: 0.0 },
-//     habits: g.habits.map((it) => ({
-//       name: it.habit.description,
-//       description: it.habit.description,
-//       score: 0.0,
-//     })),
-//     subjectives: g.subjectives.map((it) => ({
-//       name: it.subjective.prompt,
-//       description: "kamslkd",
-//       score: 0.0,
-//     })),
-//   }));
-
-//   return (
-//     <Overview
-//       goals={goals}
-//       habits={habits}
-//       subjectives={subjectives}
-//     ></Overview>
-//   );
-// }
 
 const Page: NextPage = () => {
   return <Layout main={OverviewPage}></Layout>;
