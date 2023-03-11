@@ -1,9 +1,25 @@
+import classNames from "classnames";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Layout from "../components/layout";
 import { api } from "../utils/api";
 
-const displayPercent = (percent: number) => `${(percent * 100).toFixed(2)}%`;
+const textcolor = (score: number) => {
+  return score < 0.25
+    ? "text-red-300"
+    : score < 0.7
+    ? "text-yellow-400"
+    : "text-green-200";
+};
+
+const displayPercent = (percent: number) => (
+  <span
+    className={classNames(
+      "text-md rounded-md bg-slate-50  p-1 font-semibold",
+      textcolor(percent)
+    )}
+  >{`${percent.toFixed(2)}`}</span>
+);
 
 interface PillProps {
   text: string;
@@ -26,7 +42,7 @@ function NestedItems({ habits, subjectives }: NestedItemsProps) {
   return (
     <ul className="divide-y divide-gray-200">
       {habits.map((habit) => (
-        <li className="py-4">
+        <li className="py-2">
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
               Habit
@@ -35,7 +51,7 @@ function NestedItems({ habits, subjectives }: NestedItemsProps) {
               {displayPercent(habit.score)}
             </span>
           </div>
-          <div className="mt-4">
+          <div className="mt-2">
             <div className="text-lg font-semibold text-gray-900">
               {habit.name}
             </div>
@@ -86,19 +102,15 @@ interface GoalCardProps {
 function GoalCard({ goal, habits, subjectives }: GoalCardProps) {
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
+      <div className="px-2 py-5 sm:p-6">
         <div className="flex items-center justify-between">
           <Pill text={"Goal"}></Pill>
-          <span className="text-md rounded-md bg-slate-100  p-1 font-medium text-gray-500">
-            {displayPercent(goal.score)}
-          </span>
+          {displayPercent(goal.score)}
         </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">{goal.name}</div>
-        </div>
+        <div className="text-lg font-semibold text-gray-900">{goal.name}</div>
       </div>
       {subjectives.length == 0 && habits.length == 0 ? undefined : (
-        <div className="divide-y bg-gray-50 px-4 py-4 sm:px-6">
+        <div className="divide-y bg-gray-50 px-4 py-2 sm:px-6">
           <NestedItems habits={habits} subjectives={subjectives}></NestedItems>
         </div>
       )}
@@ -168,10 +180,7 @@ function Overview({ goals, habits, subjectives }: OverviewProps) {
           ></GoalCard>
         ))}
         {habits.map((habit) => (
-          <HabitCard
-            name={habit.name}
-            score={habit.score}
-          ></HabitCard>
+          <HabitCard name={habit.name} score={habit.score}></HabitCard>
         ))}
         {subjectives.map((subjective) => (
           <SubjectiveCard
