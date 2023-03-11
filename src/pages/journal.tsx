@@ -69,6 +69,30 @@ const Habit = ({
   edit,
   deleteHabit,
 }: HabitProps): JSX.Element => {
+  let [editMode, setEditMode] = useState(false);
+  
+  // FIXME this state really should belong to the edit part of this component
+  let [text, setText] = useState(description);
+  if (editMode)
+    return (
+      <div>
+        <input
+          autoFocus
+          type="text"
+          value={text}
+          onChange={(event) => {
+            setText(event.target.value);
+          }}
+          onKeyDown={(event) => {
+            if (event.key == "Enter") {
+              console.log(text);
+              edit(text);
+              setEditMode(false);
+            }
+          }}
+        ></input>
+      </div>
+    );
   return (
     <div className="my-2" key={id}>
       <input
@@ -82,7 +106,7 @@ const Habit = ({
       <span className={classNames({ "line-through": completed })}>
         {description}
       </span>
-      <FontAwesomeIcon className="mx-1" icon={faPencil}></FontAwesomeIcon>
+      <FontAwesomeIcon className="mx-1" icon={faPencil} onClick={() => setEditMode(true)}></FontAwesomeIcon>
       <FontAwesomeIcon
         className="mx-1"
         icon={faSquareMinus}
