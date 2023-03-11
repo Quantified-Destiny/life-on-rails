@@ -95,6 +95,19 @@ export const journalRouter = createTRPCRouter({
         }),
       ]);
     }),
+  editHabit: protectedProcedure
+    .input(z.object({ habitId: z.string(), description: z.string() }))
+    .mutation(
+      async ({ input, ctx }) =>
+        await ctx.prisma.habit.update({
+          where: {
+            id: input.habitId,
+          },
+          data: {
+            description: input.description,
+          },
+        })
+    ),
 
   setSubjectiveScore: protectedProcedure
     .input(

@@ -13,19 +13,18 @@ import Layout from "../components/layout";
 import { api } from "../utils/api";
 
 // fixes zoomed in icons
-import '@fortawesome/fontawesome-svg-core/styles.css';
+import "@fortawesome/fontawesome-svg-core/styles.css";
 import { addDays, subDays } from "date-fns";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
 
 interface TimePickerProps {
-  date: Date
-  setDate: (date: Date) => void
-};
+  date: Date;
+  setDate: (date: Date) => void;
+}
 
 const TimePicker = ({ date, setDate }: TimePickerProps) => {
-
   const handlePrevDay = () => {
     setDate(subDays(date, 1));
   };
@@ -39,24 +38,17 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
       className="mt-3 flex h-10 w-full flex-col items-center"
     >
       <div id="selector-controls">
-        <button
-          onClick={handlePrevDay}
-          className="bg-white bg-opacity-20 "
-        >
+        <button onClick={handlePrevDay} className="bg-white bg-opacity-20 ">
           <LeftChevron></LeftChevron>
         </button>
         <span className="mx-4">{date.toDateString()}</span>
-        <button
-          onClick={handleNextDay}
-          className="bg-white bg-opacity-20"
-        >
+        <button onClick={handleNextDay} className="bg-white bg-opacity-20">
           <RightChevron></RightChevron>
         </button>
       </div>
     </div>
-  )
+  );
 };
-
 
 interface HabitProps {
   id: string;
@@ -64,6 +56,8 @@ interface HabitProps {
   completed: boolean;
   editable: boolean;
   setCompletion: (completed: boolean) => void;
+  edit: (description: string) => void;
+  deleteHabit: () => void;
 }
 
 const Habit = ({
@@ -72,6 +66,8 @@ const Habit = ({
   editable,
   completed,
   setCompletion,
+  edit,
+  deleteHabit,
 }: HabitProps): JSX.Element => {
   return (
     <div className="my-2" key={id}>
@@ -87,7 +83,11 @@ const Habit = ({
         {description}
       </span>
       <FontAwesomeIcon className="mx-1" icon={faPencil}></FontAwesomeIcon>
-      <FontAwesomeIcon className="mx-1" icon={faSquareMinus}></FontAwesomeIcon>
+      <FontAwesomeIcon
+        className="mx-1"
+        icon={faSquareMinus}
+        onClick={deleteHabit}
+      ></FontAwesomeIcon>
     </div>
   );
 };
@@ -101,7 +101,7 @@ interface SubjectiveProps {
 
 const Subjective = ({ id, prompt, score, setScore }: SubjectiveProps) => {
   return (
-    <div className="py-1 mb-1">
+    <div className="mb-1 py-1">
       <p>{prompt}</p>
       <Stack direction="row" spacing={4} align="center">
         <Button
@@ -241,7 +241,7 @@ interface JournalProps {
     editable: boolean;
   }[];
   date: Date;
-  setDate: (date: Date) => void
+  setDate: (date: Date) => void;
   subjectives: {
     id: string;
     prompt: string;
@@ -261,6 +261,17 @@ function Journal({ date, setDate, habits, subjectives }: JournalProps) {
       context.journal.getSubjectives.invalidate();
     },
   });
+  let deleteHabit = api.journal.deleteHabit.useMutation({
+    onSuccess() {
+      context.journal.getHabits.invalidate();
+    },
+  });
+  let editHabit = api.journal.editHabit.useMutation({
+    onSuccess() {
+      context.journal.getHabits.invalidate();
+    },
+  });
+
   return (
     <div className="container m-auto w-[80%]">
       <TimePicker date={date} setDate={setDate}></TimePicker>
@@ -282,6 +293,17 @@ function Journal({ date, setDate, habits, subjectives }: JournalProps) {
                 date: date,
                 habitId: habit.id,
                 completed,
+              })
+            }
+            edit={(description: string) =>
+              editHabit.mutate({
+                habitId: habit.id,
+                description,
+              })
+            }
+            deleteHabit={() =>
+              deleteHabit.mutate({
+                habitId: habit.id,
               })
             }
           ></Habit>
