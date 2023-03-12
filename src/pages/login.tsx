@@ -21,7 +21,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     props: { providers: providers ?? [] },
   };
 }
-
 export default function SignIn({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -40,8 +39,8 @@ export default function SignIn({
               onClick={() => signIn(provider.id)}
             >
               <img
-                src="https://tuk-cdn.s3.amazonaws.com/can-uploader/sign_in-svg2.svg"
-                alt="google"
+                src="/discord-circle-blue-logo-16640.png" className="w-7"
+                alt="discord"
               />
               <p className="ml-4 text-base font-medium text-gray-700">
                 Continue with {provider.name}
