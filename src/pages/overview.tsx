@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { type NextPage } from "next";
-import Head from "next/head";
 import Layout from "../components/layout";
 import { api } from "../utils/api";
 
@@ -15,7 +14,7 @@ const textcolor = (score: number) => {
 const displayPercent = (percent: number) => (
   <span
     className={classNames(
-      "text-md rounded-md bg-slate-50  p-1 font-semibold",
+      "text-md rounded-md bg-slate-50 p-1 font-semibold",
       textcolor(percent)
     )}
   >{`${percent.toFixed(2)}`}</span>
