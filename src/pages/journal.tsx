@@ -70,7 +70,7 @@ const Habit = ({
   deleteHabit,
 }: HabitProps): JSX.Element => {
   let [editMode, setEditMode] = useState(false);
-  
+
   // FIXME this state really should belong to the edit part of this component
   let [text, setText] = useState(description);
   if (editMode)
@@ -88,6 +88,8 @@ const Habit = ({
               console.log(text);
               edit(text);
               setEditMode(false);
+            } else if ((event.key = "Escape")) {
+              setEditMode(false);
             }
           }}
         ></input>
@@ -95,23 +97,51 @@ const Habit = ({
     );
   return (
     <div className="my-2" key={id}>
-      <input
-        type="checkbox"
-        className="mr-1"
-        aria-hidden="true"
-        checked={completed}
-        onChange={(event) => setCompletion(event.target.checked)}
-        readOnly={!editable}
-      />
-      <span className={classNames({ "line-through": completed })}>
-        {description}
-      </span>
-      <FontAwesomeIcon className="mx-1" icon={faPencil} onClick={() => setEditMode(true)}></FontAwesomeIcon>
-      <FontAwesomeIcon
-        className="mx-1"
-        icon={faSquareMinus}
-        onClick={deleteHabit}
-      ></FontAwesomeIcon>
+      <div className="flex flex-row">
+        <input
+          type="checkbox"
+          className="mr-1"
+          aria-hidden="true"
+          checked={completed}
+          onChange={(event) => setCompletion(event.target.checked)}
+          readOnly={!editable}
+        />
+        <span className={classNames({ "line-through": completed })}>
+          {description}
+        </span>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="h-6 w-6 cursor-pointer fill-green-200 hover:fill-green-300"
+          onClick={() => setEditMode(true)}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+          />
+        </svg>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="h-6 w-6 cursor-pointer fill-red-300 hover:fill-red-400"
+          onClick={deleteHabit}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
+          />
+        </svg>
+      </div>
     </div>
   );
 };
@@ -173,50 +203,51 @@ const Subjective = ({ id, prompt, score, setScore }: SubjectiveProps) => {
   );
 };
 
-const InlineCreateHabit = () => {
+const InlineEdit = ({
+  placeholder,
+  commit,
+}: {
+  placeholder: string;
+  commit: (text: string) => void;
+}) => {
   let [isActive, setActive] = useState<boolean>(false);
   let [text, setText] = useState<string>("");
-  let context = api.useContext();
-  let addHabit = api.journal.addHabit.useMutation({
-    onSuccess() {
-      context.journal.getHabits.invalidate();
-    },
-  });
-
   if (!isActive) {
     return (
-      <div className="ring-1" onClick={() => setActive(true)}>
-        <span>
+      <div className="bg-slate-100">
+        <span onClick={() => setActive(true)}>
           <FontAwesomeIcon className="mx-1" icon={faPlus}></FontAwesomeIcon>
-          New habit
+          {placeholder}
         </span>
       </div>
     );
-  }
-  return (
-    <div className="ring-1">
-      <input
-        autoFocus
-        type="text"
-        value={text}
-        onChange={(event) => {
-          setText(event.target.value);
-        }}
-        onKeyDown={(event) => {
-          if (event.key == "Enter") {
-            console.log(text);
-            addHabit.mutate(text);
-            setActive(false);
-          }
-        }}
-      ></input>
-    </div>
-  );
+  } else
+    return (
+      <div className="bg-slate-100">
+        <input
+          autoFocus
+          type="text"
+          value={text}
+          onBlur={() => setActive(false)}
+          onChange={(event) => {
+            setText(event.target.value);
+          }}
+          onKeyDown={(event) => {
+            if (event.key == "Enter") {
+              console.log(text);
+              commit(text);
+              setActive(false);
+            } else if (event.key == "Escape") {
+              setText("");
+              setActive(false);
+            }
+          }}
+        ></input>
+      </div>
+    );
 };
 
 const InlineCreateSubjective = () => {
-  let [isActive, setActive] = useState<boolean>(false);
-  let [text, setText] = useState<string>("");
   let context = api.useContext();
   let addSubjective = api.journal.addSubjective.useMutation({
     onSuccess() {
@@ -224,38 +255,29 @@ const InlineCreateSubjective = () => {
     },
   });
 
-  if (!isActive) {
-    return (
-      <div className="ring-1" onClick={() => setActive(true)}>
-        <span>
-          <FontAwesomeIcon className="mx-1" icon={faPlus}></FontAwesomeIcon>
-          New daily question
-        </span>
-      </div>
-    );
-  }
   return (
-    <div className="ring-1">
-      <input
-        autoFocus
-        type="text"
-        value={text}
-        onChange={(event) => {
-          setText(event.target.value);
-        }}
-        onKeyDown={(event) => {
-          if (event.key == "Enter") {
-            console.log(text);
-            addSubjective.mutate({ prompt: text });
-            setActive(false);
-          } else if (event.key == "Escape") {
-            setActive(false);
-          }
-        }}
-      ></input>
-    </div>
+    <InlineEdit
+      placeholder="New subjective"
+      commit={(text: string) => addSubjective.mutate({ prompt: text })}
+    />
   );
 };
+
+function InlineCreateHabit() {
+  let context = api.useContext();
+  let addHabit = api.journal.addHabit.useMutation({
+    onSuccess() {
+      context.journal.getHabits.invalidate();
+    },
+  });
+
+  return (
+    <InlineEdit
+      placeholder="New habit"
+      commit={(text: string) => addHabit.mutate(text)}
+    />
+  );
+}
 
 interface JournalProps {
   habits: {

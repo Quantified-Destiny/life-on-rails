@@ -15,6 +15,11 @@ datasource db {
   relationMode = "prisma"
 }
 
+model Tag {
+  id   String @id @default(cuid())
+  name String
+}
+
 model Goal {
   id          String                   @id @default(cuid())
   name        String
@@ -85,14 +90,14 @@ model SubjectiveMeasuresGoal {
 }
 
 model Subjective {
-  id                     String                   @id @default(cuid())
-  prompt                 String
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  ownerId                String
-  owner                  User                     @relation(fields: [ownerId], references: [id])
-  goals SubjectiveMeasuresGoal[]
-  subjectiveAnswers      SubjectiveAnswer[]
+  id                String                   @id @default(cuid())
+  prompt            String
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  ownerId           String
+  owner             User                     @relation(fields: [ownerId], references: [id])
+  goals             SubjectiveMeasuresGoal[]
+  subjectiveAnswers SubjectiveAnswer[]
 
   @@index([ownerId])
 }
