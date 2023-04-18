@@ -50,15 +50,15 @@ model HabitTag {
 }
 
 model Goal {
-  id          String                   @id @default(cuid())
-  name        String
-  createdAt   DateTime                 @default(now())
-  updatedAt   DateTime                 @updatedAt
-  ownerId     String
-  owner       User                     @relation(fields: [ownerId], references: [id])
-  habits      HabitMeasuresGoal[]
-  subjectives SubjectiveMeasuresGoal[]
-  GoalTag     GoalTag[]
+  id        String               @id @default(cuid())
+  name      String
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  ownerId   String
+  owner     User                 @relation(fields: [ownerId], references: [id])
+  habits    HabitMeasuresGoal[]
+  metrics   MetricMeasuresGoal[]
+  GoalTag   GoalTag[]
 
   @@index([ownerId])
 }
@@ -81,8 +81,34 @@ model Habit {
   completions      HabitCompletion[]
   goals            HabitMeasuresGoal[]
   HabitTag         HabitTag[]
+  CompletionMetric LinkedMetric[]
 
   @@index([ownerId])
+}
+
+// links a habit to post-completion metrics
+model LinkedMetric {
+  id       String   @id @default(cuid())
+  date     DateTime @default(now())
+  habitId  String
+  habit    Habit    @relation(fields: [habitId], references: [id])
+  metricId String
+  metric   Metric   @relation(fields: [metricId], references: [id])
+
+  @@index([habitId])
+  @@index([metricId])
+}
+
+model HabitCompletion {
+  id            String         @id @default(cuid())
+  date          DateTime       @default(now())
+  habitId       String
+  isCompleted   Boolean        @default(true)
+  Habit         Habit          @relation(fields: [habitId], references: [id])
+  linkedAnswers MetricAnswer[]
+
+  @@index([date])
+  @@index([habitId])
 }
 
 model HabitMeasuresGoal {
@@ -97,51 +123,53 @@ model HabitMeasuresGoal {
   @@index([habitId])
 }
 
-model HabitCompletion {
-  id          String   @id @default(cuid())
-  date        DateTime @default(now())
-  habitId     String
-  isCompleted Boolean  @default(true)
-  Habit       Habit    @relation(fields: [habitId], references: [id])
+model MetricMeasuresGoal {
+  id       String @id @default(cuid())
+  goalId   String
+  metricId String
 
-  @@index([date])
-  @@index([habitId])
-}
-
-model SubjectiveMeasuresGoal {
-  id           String @id @default(cuid())
-  goalId       String
-  subjectiveId String
-
-  goal       Goal       @relation(fields: [goalId], references: [id])
-  subjective Subjective @relation(fields: [subjectiveId], references: [id])
+  goal   Goal   @relation(fields: [goalId], references: [id])
+  metric Metric @relation(fields: [metricId], references: [id])
 
   @@index([goalId])
-  @@index([subjectiveId])
+  @@index([metricId])
 }
 
-model Subjective {
-  id                String                   @id @default(cuid())
-  prompt            String
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
-  ownerId           String
-  owner             User                     @relation(fields: [ownerId], references: [id])
-  goals             SubjectiveMeasuresGoal[]
-  subjectiveAnswers SubjectiveAnswer[]
+enum AnswerFormat {
+  FIVE_POINT
+  FIVE_POINT_MID
+  NUMERIC_INPUT
+}
+
+model Metric {
+  id               String               @id @default(cuid())
+  prompt           String
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  ownerId          String
+  owner            User                 @relation(fields: [ownerId], references: [id])
+  goals            MetricMeasuresGoal[]
+  format           AnswerFormat         @default(FIVE_POINT)
+  metricAnswers    MetricAnswer[]
+  completionMetric LinkedMetric[]
 
   @@index([ownerId])
 }
 
-model SubjectiveAnswer {
-  id           String     @id @default(cuid())
-  score        Int
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  subjectiveId String
-  subjective   Subjective @relation(fields: [subjectiveId], references: [id])
+model MetricAnswer {
+  id        String   @id @default(cuid())
+  value     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  metricId  String
+  metric    Metric   @relation(fields: [metricId], references: [id])
 
-  @@index([subjectiveId])
+  // if this answer is linked to a metric, this will specify which habit-completion this answer relates to
+  HabitCompletion   HabitCompletion? @relation(fields: [habitCompletionId], references: [id])
+  habitCompletionId String?
+
+  @@index([metricId])
+  @@index([habitCompletionId])
 }
 
 // Necessary for Next auth
@@ -175,16 +203,16 @@ model Session {
 }
 
 model User {
-  id            String       @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?      @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
   Goal          Goal[]
   Habit         Habit[]
-  Subjective    Subjective[]
+  metric        Metric[]
   Tag           Tag[]
 }
 
