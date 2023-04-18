@@ -87,7 +87,7 @@ const Habit = ({
             if (event.key == "Enter") {
               edit(text);
               setEditMode(false);
-            } else if ((event.key == "Escape")) {
+            } else if (event.key == "Escape") {
               setEditMode(false);
             }
           }}
@@ -252,7 +252,7 @@ const InlineCreateSubjective = () => {
   let context = api.useContext();
   let addSubjective = api.journal.addSubjective.useMutation({
     onSuccess() {
-      context.journal.getSubjectives.invalidate();
+      context.journal.getMetrics.invalidate();
     },
   });
 
@@ -291,14 +291,19 @@ interface JournalProps {
   }[];
   date: Date;
   setDate: (date: Date) => void;
-  subjectives: {
+  metrics: {
     id: string;
     prompt: string;
     score: number | undefined;
   }[];
 }
 
-function Journal({ date, setDate, habits, subjectives }: JournalProps) {
+function Journal({
+  date,
+  setDate,
+  habits,
+  metrics: subjectives,
+}: JournalProps) {
   let context = api.useContext();
   let setHabitCompletion = api.journal.setCompletion.useMutation({
     onSuccess() {
@@ -307,7 +312,7 @@ function Journal({ date, setDate, habits, subjectives }: JournalProps) {
   });
   let setScore = api.journal.setSubjectiveScore.useMutation({
     onSuccess() {
-      context.journal.getSubjectives.invalidate();
+      context.journal.getMetrics.invalidate();
     },
   });
   let deleteHabit = api.journal.deleteHabit.useMutation({
@@ -369,7 +374,7 @@ function Journal({ date, setDate, habits, subjectives }: JournalProps) {
           score={subjective.score}
           setScore={(score: number) =>
             setScore.mutate({
-              subjectiveId: subjective.id,
+              metricId: subjective.id,
               date: date,
               score: score,
             })
@@ -387,21 +392,21 @@ const JournalPage = () => {
   const [date, setDate] = useState(today);
 
   let query1 = api.journal.getHabits.useQuery({ date });
-  let query2 = api.journal.getSubjectives.useQuery({ date });
+  let query2 = api.journal.getMetrics.useQuery({ date });
   if (query1.isLoading || query2.isLoading) return <p>Loading...</p>;
   if (query1.isError || query2.isError) return <p>Query error</p>;
   let habitsData = query1.data.habits.map((habit) => ({
     editable: true,
     ...habit,
   }));
-  let subjectivesData = query2.data.subjectives; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
-  console.log(`Got subjectives ${JSON.stringify(subjectivesData)}`);
+  let metricsData = query2.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
+  console.log(`Got subjectives ${JSON.stringify(metricsData)}`);
   return (
     <Journal
       habits={habitsData}
       date={date}
       setDate={setDate}
-      subjectives={subjectivesData}
+      metrics={metricsData}
     ></Journal>
   );
 };

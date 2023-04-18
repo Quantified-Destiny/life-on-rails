@@ -26,7 +26,7 @@ export const journalRouter = createTRPCRouter({
   addSubjective: protectedProcedure
     .input(z.object({ prompt: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.subjective.create({
+      await ctx.prisma.metric.create({
         data: {
           prompt: input.prompt,
           ownerId: ctx.session.user.id,
@@ -112,32 +112,32 @@ export const journalRouter = createTRPCRouter({
   setSubjectiveScore: protectedProcedure
     .input(
       z.object({
-        subjectiveId: z.string(),
+        metricId: z.string(),
         score: z.number(),
         date: z.date(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      let existing = await ctx.prisma.subjectiveAnswer.findFirst({
+      let existing = await ctx.prisma.metricAnswer.findFirst({
         where: {
-          subjectiveId: input.subjectiveId,
+          metricId: input.metricId,
           createdAt: onDay(input.date),
         },
       });
       if (existing === null) {
-        await ctx.prisma.subjectiveAnswer.create({
+        await ctx.prisma.metricAnswer.create({
           data: {
-            subjectiveId: input.subjectiveId,
-            score: input.score,
+            metricId: input.metricId,
+            value: input.score,
           },
         });
       } else {
-        await ctx.prisma.subjectiveAnswer.update({
+        await ctx.prisma.metricAnswer.update({
           where: {
             id: existing.id,
           },
           data: {
-            score: input.score,
+            value: input.score,
           },
         });
       }
@@ -176,21 +176,21 @@ export const journalRouter = createTRPCRouter({
       };
     }),
 
-  getSubjectives: protectedProcedure
+  getMetrics: protectedProcedure
     .input(
       z.object({
         date: z.date(),
       })
     )
     .query(async ({ input, ctx }) => {
-      let data = await ctx.prisma.subjective.findMany({
+      let data = await ctx.prisma.metric.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
         select: {
           id: true,
           prompt: true,
-          subjectiveAnswers: {
+          metricAnswers: {
             where: {
               createdAt: onDay(input.date),
             },
@@ -198,14 +198,14 @@ export const journalRouter = createTRPCRouter({
         },
       });
 
-      let subjectives = data.map(({ id, prompt, subjectiveAnswers }) => ({
+      let metrics = data.map(({ id, prompt, metricAnswers }) => ({
         id,
         prompt,
-        score: subjectiveAnswers[0]?.score,
+        score: metricAnswers[0]?.value,
       }));
 
       return {
-        subjectives: subjectives,
+        metrics: metrics,
         date: input.date,
       };
     }),

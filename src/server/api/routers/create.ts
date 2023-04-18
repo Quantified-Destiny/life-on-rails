@@ -44,7 +44,7 @@ export const createRouter = createTRPCRouter({
     createSubjective: protectedProcedure
         .input(z.object({ prompt: z.string() }))
         .mutation(async ({ input, ctx }) => {
-            return await ctx.prisma.subjective.create({
+            return await ctx.prisma.metric.create({
                 data: {
                     prompt: input.prompt,
                     ownerId: ctx.session.user.id,
@@ -54,16 +54,16 @@ export const createRouter = createTRPCRouter({
     createLinkedSubjective: protectedProcedure
         .input(z.object({ prompt: z.string(), goalId: z.string() }))
         .mutation(async ({ input, ctx }) => {
-            let subjective = await ctx.prisma.subjective.create({
+            let subjective = await ctx.prisma.metric.create({
                 data: {
                     prompt: input.prompt,
                     ownerId: ctx.session.user.id,
                 },
             });
-            await ctx.prisma.subjectiveMeasuresGoal.create({
+            await ctx.prisma.metricMeasuresGoal.create({
                 data: {
                     goalId: input.goalId,
-                    subjectiveId: subjective.id,
+                    metricId: subjective.id,
                 }
             });
         }),

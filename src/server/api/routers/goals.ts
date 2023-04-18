@@ -1,4 +1,4 @@
-import { Goal, Habit, Subjective } from "@prisma/client";
+import { Goal, Habit, Metric } from "@prisma/client";
 import { id } from "date-fns/locale";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -7,8 +7,8 @@ type Ret = Goal & {
   habits: {
     habit: Habit;
   }[];
-  subjectives: {
-    subjective: Subjective;
+  metrics: {
+    metric: Metric;
   }[];
 };
 
@@ -21,8 +21,8 @@ function flatten(data: Ret) {
       name: it.habit.description,
       score: score(),
     })),
-    subjectives: data.subjectives.map((it) => ({
-      name: it.subjective.prompt,
+    subjectives: data.metrics.map((it) => ({
+      name: it.metric.prompt,
       score: score(),
     })),
   };
@@ -66,9 +66,9 @@ export const goalsRouter = createTRPCRouter({
               habit: true,
             },
           },
-          subjectives: {
+          metrics: {
             include: {
-              subjective: true,
+              metric: true,
             },
           },
         },
@@ -90,7 +90,7 @@ export const goalsRouter = createTRPCRouter({
         score: score(),
       }));
 
-      let unlinkedSubjectives = await ctx.prisma.subjective.findMany({
+      let unlinkedSubjectives = await ctx.prisma.metric.findMany({
         where: {
           ownerId: ctx.session.user.id,
           goals: {
