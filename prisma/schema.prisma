@@ -16,8 +16,37 @@ datasource db {
 }
 
 model Tag {
-  id   String @id @default(cuid())
-  name String
+  id      String @id @default(cuid())
+  name    String
+  ownerId String
+
+  owner    User       @relation(fields: [ownerId], references: [id])
+  GoalTag  GoalTag[]
+  HabitTag HabitTag[]
+
+  @@index([ownerId])
+}
+
+model GoalTag {
+  id     String @id @default(cuid())
+  goalId String
+  tagId  String
+  goal   Goal   @relation(fields: [goalId], references: [id])
+  tag    Tag    @relation(fields: [tagId], references: [id])
+
+  @@index([goalId])
+  @@index([tagId])
+}
+
+model HabitTag {
+  id      String @id @default(cuid())
+  habitId String
+  tagId   String
+  habit   Habit  @relation(fields: [habitId], references: [id])
+  tag     Tag    @relation(fields: [tagId], references: [id])
+
+  @@index([habitId])
+  @@index([tagId])
 }
 
 model Goal {
@@ -29,6 +58,7 @@ model Goal {
   owner       User                     @relation(fields: [ownerId], references: [id])
   habits      HabitMeasuresGoal[]
   subjectives SubjectiveMeasuresGoal[]
+  GoalTag     GoalTag[]
 
   @@index([ownerId])
 }
@@ -50,6 +80,7 @@ model Habit {
   owner            User                @relation(fields: [ownerId], references: [id])
   completions      HabitCompletion[]
   goals            HabitMeasuresGoal[]
+  HabitTag         HabitTag[]
 
   @@index([ownerId])
 }
@@ -154,6 +185,7 @@ model User {
   Goal          Goal[]
   Habit         Habit[]
   Subjective    Subjective[]
+  Tag           Tag[]
 }
 
 model VerificationToken {

@@ -6,7 +6,6 @@ const TopNav = () => {
   const { data: sessionData } = useSession();
   const router = useRouter();
 
-
   const handleSignOut = async () => {
     await router.push("/");
     await signOut();
@@ -56,8 +55,8 @@ const TopNav = () => {
             ></path>
           </svg> */}
         </button>
-        <div className="text-sm font-bold text-blue-600"> 
-        {/* text-[#21A8F6] */}
+        <div className="text-sm font-bold text-blue-600">
+          {/* text-[#21A8F6] */}
           Life on Rails
         </div>
         <div className="flex-grow items-center" id="navbarSupportedContent">
@@ -97,10 +96,10 @@ const TopNav = () => {
           </a>
         </div>
         <div className="relative flex items-center">
-          
           <button
-            className="rounded-full bg-gray-500 text-xs px-2 py-1 font-semibold text-white no-underline transition hover:bg-black/20"
-            onClick={sessionData ? handleSignOut : () => void signIn()}>
+            className="rounded-full bg-gray-500 px-2 py-1 text-xs font-semibold text-white no-underline transition hover:bg-black/20"
+            onClick={sessionData ? handleSignOut : () => void signIn()}
+          >
             {sessionData ? "Sign out" : "Sign in"}
           </button>
         </div>

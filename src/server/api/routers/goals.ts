@@ -29,6 +29,30 @@ function flatten(data: Ret) {
 }
 
 export const goalsRouter = createTRPCRouter({
+  getGoal: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      let goal = await ctx.prisma.goal.findFirstOrThrow({
+        where: {
+          id: input.id,
+          ownerId: ctx.session.user.id,
+        },
+      });
+
+      let habits = await ctx.prisma.habitMeasuresGoal.findMany({
+        where: {
+          goalId: goal.id,
+        },
+        include: {
+          habit: true,
+        },
+      });
+      return {
+        goal: goal,
+        habits: habits,
+      };
+    }),
+
   getGoals: protectedProcedure
     .input(z.object({ date: z.date() }))
     .query(async ({ input, ctx }) => {

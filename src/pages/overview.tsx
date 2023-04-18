@@ -178,6 +178,7 @@ function Overview({ goals, habits, subjectives }: OverviewProps) {
             subjectives={goal.subjectives}
           ></GoalCard>
         ))}
+        <h1 className="font-semibold text-gray-900 my-2">Uncategorized</h1>
         {habits.map((habit) => (
           <HabitCard name={habit.name} score={habit.score}></HabitCard>
         ))}

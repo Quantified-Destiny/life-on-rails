@@ -26,7 +26,7 @@ function SideBar() {
         </li>
         <li>
           <Link
-            href="journal"
+            href="/journal"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >
             <FontAwesomeIcon icon={faBook} className="mr-2" />
@@ -35,7 +35,7 @@ function SideBar() {
         </li>
         <li>
           <Link
-            href="create"
+            href="/create"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >
             <FontAwesomeIcon icon={faPlusCircle} className="mr-2" />
@@ -44,7 +44,7 @@ function SideBar() {
         </li>
         <li>
           <Link
-            href="habits"
+            href="/habits"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >
             <svg

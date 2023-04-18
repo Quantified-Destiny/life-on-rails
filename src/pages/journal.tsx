@@ -85,10 +85,9 @@ const Habit = ({
           }}
           onKeyDown={(event) => {
             if (event.key == "Enter") {
-              console.log(text);
               edit(text);
               setEditMode(false);
-            } else if ((event.key = "Escape")) {
+            } else if ((event.key == "Escape")) {
               setEditMode(false);
             }
           }}
@@ -205,13 +204,15 @@ const Subjective = ({ id, prompt, score, setScore }: SubjectiveProps) => {
 
 const InlineEdit = ({
   placeholder,
+  initialText,
   commit,
 }: {
   placeholder: string;
+  initialText: string;
   commit: (text: string) => void;
 }) => {
   let [isActive, setActive] = useState<boolean>(false);
-  let [text, setText] = useState<string>("");
+  let [text, setText] = useState<string>(initialText);
   if (!isActive) {
     return (
       <div className="bg-slate-100">
@@ -258,6 +259,7 @@ const InlineCreateSubjective = () => {
   return (
     <InlineEdit
       placeholder="New subjective"
+      initialText=""
       commit={(text: string) => addSubjective.mutate({ prompt: text })}
     />
   );
@@ -274,6 +276,7 @@ function InlineCreateHabit() {
   return (
     <InlineEdit
       placeholder="New habit"
+      initialText=""
       commit={(text: string) => addHabit.mutate(text)}
     />
   );
