@@ -1,3 +1,4 @@
+import { HabitCompletion, LinkedMetric, Metric } from "@prisma/client";
 import { endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
@@ -150,13 +151,25 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      let data = await ctx.prisma.habit.findMany({
+      let data: {
+        id: string;
+        metrics: {
+          metric: Metric;
+        }[];
+        completions: HabitCompletion[];
+        description: string;
+      }[] = await ctx.prisma.habit.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
         select: {
           id: true,
           description: true,
+          metrics: {
+            select: {
+              metric: true,
+            },
+          },
           completions: {
             where: {
               date: onDay(input.date),
@@ -164,11 +177,14 @@ export const journalRouter = createTRPCRouter({
           },
         },
       });
-      let habitsData = data.map(({ id, description, completions }) => ({
-        id,
-        description,
-        completed: completions[0]?.isCompleted == true,
-      }));
+      let habitsData = data.map(
+        ({ id, description, metrics, completions }) => ({
+          id,
+          description,
+          metrics: metrics.map((m) => m.metric),
+          completed: completions[0]?.isCompleted == true,
+        })
+      );
 
       return {
         habits: habitsData,

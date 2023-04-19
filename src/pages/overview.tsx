@@ -3,21 +3,22 @@ import { type NextPage } from "next";
 import Layout from "../components/layout";
 import { api } from "../utils/api";
 
-const textcolor = (score: number) => {
+const textcolor = (score: number | undefined) => {
+  if (!score) return "text-green-400";
   return score < 0.25
     ? "text-red-300"
     : score < 0.7
-      ? "text-yellow-400"
-      : "text-green-200";
+    ? "text-yellow-400"
+    : "text-green-200";
 };
 
-const displayPercent = (percent: number) => (
+const displayPercent = (percent: number | undefined) => (
   <span
     className={classNames(
       "text-md rounded-md bg-slate-50 p-1 font-semibold",
       textcolor(percent)
     )}
-  >{`${percent.toFixed(2)}`}</span>
+  >{`${percent ? percent.toFixed(2) : "unscorable"}`}</span>
 );
 
 interface PillProps {
@@ -34,7 +35,7 @@ function Pill({ text }: PillProps) {
 
 interface NestedItemsProps {
   habits: Habit[];
-  subjectives: Subjective[];
+  subjectives: Metric[];
 }
 
 function NestedItems({ habits, subjectives }: NestedItemsProps) {
@@ -70,7 +71,7 @@ function NestedItems({ habits, subjectives }: NestedItemsProps) {
           </div>
           <div className="mt-4">
             <div className="text-lg font-semibold text-gray-900">
-              {subjective.name}
+              {subjective.prompt}
             </div>
           </div>
         </li>
@@ -81,21 +82,21 @@ function NestedItems({ habits, subjectives }: NestedItemsProps) {
 
 interface Habit {
   description: string;
-  score: number;
+  score: number | undefined;
 }
-interface Subjective {
-  name: string;
-  score: number;
+interface Metric {
+  prompt: string;
+  score: number | undefined;
 }
 
 interface Goal {
   name: string;
-  score: number;
+  score: number | undefined;
 }
 interface GoalCardProps {
   goal: Goal;
   habits: Habit[];
-  subjectives: Subjective[];
+  subjectives: Metric[];
 }
 
 function GoalCard({ goal, habits, subjectives }: GoalCardProps) {
@@ -139,7 +140,7 @@ function HabitCard(habit: Habit) {
   );
 }
 
-function SubjectiveCard(subjective: Subjective) {
+function SubjectiveCard(subjective: Metric) {
   return (
     <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
       <div className="px-4 py-5 sm:p-6">
@@ -153,7 +154,7 @@ function SubjectiveCard(subjective: Subjective) {
         </div>
         <div className="mt-4">
           <div className="text-lg font-semibold text-gray-900">
-            {subjective.name}
+            {subjective.prompt}
           </div>
         </div>
       </div>
@@ -162,9 +163,9 @@ function SubjectiveCard(subjective: Subjective) {
 }
 
 interface OverviewProps {
-  goals: { goal: Goal; habits: Habit[]; subjectives: Subjective[] }[];
+  goals: { goal: Goal; habits: Habit[]; metrics: Metric[] }[];
   habits: Habit[];
-  subjectives: Subjective[];
+  subjectives: Metric[];
 }
 
 function Overview({ goals, habits, subjectives }: OverviewProps) {
@@ -175,16 +176,19 @@ function Overview({ goals, habits, subjectives }: OverviewProps) {
           <GoalCard
             goal={goal.goal}
             habits={goal.habits}
-            subjectives={goal.subjectives}
+            subjectives={goal.metrics}
           ></GoalCard>
         ))}
-        <h1 className="font-semibold text-gray-900 my-2">Uncategorized</h1>
+        <h1 className="my-2 font-semibold text-gray-900">Uncategorized</h1>
         {habits.map((habit) => (
-          <HabitCard description={habit.description} score={habit.score}></HabitCard>
+          <HabitCard
+            description={habit.description}
+            score={habit.score}
+          ></HabitCard>
         ))}
         {subjectives.map((subjective) => (
           <SubjectiveCard
-            name={subjective.name}
+            prompt={subjective.prompt}
             score={subjective.score}
           ></SubjectiveCard>
         ))}
@@ -203,24 +207,9 @@ function OverviewPage() {
   let data = goalsQuery.data;
   console.log(data);
 
-  let goals = data.goals.map((item) => ({
-    goal: {
-      name: item.goal.name,
-      score: item.goal.score,
-    },
-    habits: item.habits.map((habit) => ({
-      description: habit.description,
-      score: habit.score,
-    })),
-    subjectives: item.metrics.map((subjective) => ({
-      name: subjective.prompt,
-      score: subjective.score,
-    })),
-  }));
-
   return (
     <Overview
-      goals={goals}
+      goals={data.goals}
       habits={data.habits}
       subjectives={data.metrics}
     ></Overview>

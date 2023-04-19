@@ -15,6 +15,7 @@ import { api } from "../utils/api";
 // fixes zoomed in icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { addDays, subDays } from "date-fns";
+import { LinkedMetric, Metric } from "@prisma/client";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
@@ -54,6 +55,7 @@ interface HabitProps {
   id: string;
   description: string;
   completed: boolean;
+  metrics: Metric[];
   editable: boolean;
   setCompletion: (completed: boolean) => void;
   edit: (description: string) => void;
@@ -65,6 +67,7 @@ const Habit = ({
   description,
   editable,
   completed,
+  metrics,
   setCompletion,
   edit,
   deleteHabit,
@@ -140,6 +143,7 @@ const Habit = ({
             d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
           />
         </svg>
+        {JSON.stringify(metrics)}
       </div>
     </div>
   );
@@ -288,6 +292,7 @@ interface JournalProps {
     description: string;
     completed: boolean;
     editable: boolean;
+    metrics: Metric[];
   }[];
   date: Date;
   setDate: (date: Date) => void;
@@ -340,6 +345,7 @@ function Journal({
             id={habit.id}
             key={habit.id}
             description={habit.description}
+            metrics={habit.metrics}
             completed={habit.completed}
             editable={habit.editable}
             setCompletion={(completed) =>
@@ -391,15 +397,15 @@ let today = new Date();
 const JournalPage = () => {
   const [date, setDate] = useState(today);
 
-  let query1 = api.journal.getHabits.useQuery({ date });
-  let query2 = api.journal.getMetrics.useQuery({ date });
-  if (query1.isLoading || query2.isLoading) return <p>Loading...</p>;
-  if (query1.isError || query2.isError) return <p>Query error</p>;
-  let habitsData = query1.data.habits.map((habit) => ({
+  let habits = api.journal.getHabits.useQuery({ date });
+  let metrics = api.journal.getMetrics.useQuery({ date });
+  if (habits.isLoading || metrics.isLoading) return <p>Loading...</p>;
+  if (habits.isError || metrics.isError) return <p>Query error</p>;
+  let habitsData = habits.data.habits.map((habit) => ({
     editable: true,
     ...habit,
   }));
-  let metricsData = query2.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
+  let metricsData = metrics.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
   console.log(`Got subjectives ${JSON.stringify(metricsData)}`);
   return (
     <Journal
@@ -411,4 +417,6 @@ const JournalPage = () => {
   );
 };
 
-export default () => <Layout main={JournalPage}></Layout>;
+export default function () {
+  return <Layout main={JournalPage}></Layout>;
+}

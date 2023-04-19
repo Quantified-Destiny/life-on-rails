@@ -20,9 +20,10 @@ model Tag {
   name    String
   ownerId String
 
-  owner    User       @relation(fields: [ownerId], references: [id])
-  GoalTag  GoalTag[]
-  HabitTag HabitTag[]
+  owner     User        @relation(fields: [ownerId], references: [id])
+  GoalTag   GoalTag[]
+  HabitTag  HabitTag[]
+  MetricTag MetricTag[]
 
   @@index([ownerId])
 }
@@ -46,6 +47,17 @@ model HabitTag {
   tag     Tag    @relation(fields: [tagId], references: [id])
 
   @@index([habitId])
+  @@index([tagId])
+}
+
+model MetricTag {
+  id       String @id @default(cuid())
+  metricId String @map("metricTag")
+  tagId    String
+  metric   Metric @relation(fields: [metricId], references: [id])
+  tag      Tag    @relation(fields: [tagId], references: [id])
+
+  @@index([metricId])
   @@index([tagId])
 }
 
@@ -81,7 +93,7 @@ model Habit {
   completions      HabitCompletion[]
   goals            HabitMeasuresGoal[]
   HabitTag         HabitTag[]
-  CompletionMetric LinkedMetric[]
+  metrics          LinkedMetric[]
 
   @@index([ownerId])
 }
@@ -152,6 +164,7 @@ model Metric {
   format           AnswerFormat         @default(FIVE_POINT)
   metricAnswers    MetricAnswer[]
   completionMetric LinkedMetric[]
+  MetricTag        MetricTag[]
 
   @@index([ownerId])
 }
