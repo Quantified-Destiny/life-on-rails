@@ -65,7 +65,7 @@ export const goalsRouter = createTRPCRouter({
   getGoals: protectedProcedure
     .input(z.object({ date: z.date() }))
     .query(async ({ input, ctx }) => {
-      let habits = await ctx.prisma.habit.findMany({
+      let habits: Habit[] = await ctx.prisma.habit.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
@@ -83,6 +83,14 @@ export const goalsRouter = createTRPCRouter({
           date: { gt: subDays(new Date(), 14) },
         },
       });
+
+      let habitCompletionsCount: Map<String, number> = new Map(
+        habitCompletions.map((it) => {
+          console.log(it.habitId);
+          return [it.habitId, it._count._all];
+        })
+      );
+
       let habitScores: Map<String, number> = new Map(
         habitCompletions.map((it) => {
           console.log(it.habitId);
@@ -97,6 +105,7 @@ export const goalsRouter = createTRPCRouter({
       let habitsData = habits.map((h) => {
         return {
           ...h,
+          completions: habitCompletionsCount.get(h.id) ?? 0,
           score: habitScores.get(h.id) ?? 0,
         };
       });
@@ -147,6 +156,7 @@ export const goalsRouter = createTRPCRouter({
         return {
           goal: { ...g, score },
           habits: g.habits.map((h) => ({
+            completions: habitCompletionsCount.get(h.habitId) ?? 0,
             score: habitScores.get(h.habitId) ?? -1,
             ...habitsMap.get(h.habitId)!,
           })),
@@ -163,7 +173,7 @@ export const goalsRouter = createTRPCRouter({
         metrics: metricsData,
       };
     }),
-    
+
   getGoalOnly: protectedProcedure.query(async ({ ctx }) => {
     let data = await ctx.prisma.goal.findMany({
       where: {

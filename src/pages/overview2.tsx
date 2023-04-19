@@ -1,33 +1,59 @@
-import { Goal, Habit } from "@prisma/client";
+import { Goal, Habit, Metric } from "@prisma/client";
 import classNames from "classnames";
-import { type NextPage } from "next";
 import Layout from "../components/layout";
 import { api } from "../utils/api";
 
 const textcolor = (score: number | undefined) => {
-  if (!score) return "text-green-400";
+  if (!score) return "text-black";
   return score < 0.25
-    ? "text-red-300"
+    ? "text-red-500"
     : score < 0.7
-    ? "text-yellow-400"
+    ? "text-yellow-500"
     : "text-green-400";
+};
+
+const bgcolor = (score: number | undefined) => {
+  if (!score) return "text-black";
+  return score < 0.25
+    ? "bg-red-500"
+    : score < 0.7
+    ? "bg-yellow-500"
+    : "bg-green-400";
 };
 
 function Header() {
   return (
-    <div className="mb-4 flex items-center justify-between">
+    <div className="mb-4 flex w-full items-end justify-between">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Overview</h1>
+        <h1 className="ml-2 text-xl font-semibold uppercase text-gray-800">
+          Overview
+        </h1>
       </div>
       <div className="flex">
-        <button className="mr-2 rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700">
-          Search
-        </button>
-        <button className="mr-2 rounded bg-gray-500 py-2 px-4 font-bold text-white hover:bg-gray-700">
+        <button className="rounded py-2 px-2 text-gray-500 hover:bg-gray-200">
           Filter
         </button>
-        <button className="rounded bg-gray-500 py-2 px-4 font-bold text-white hover:bg-gray-700">
+        <button className="rounded py-2 px-2 text-gray-500 hover:bg-gray-200">
           Sort
+        </button>
+        <button className="rounded py-2 px-2 text-gray-500 hover:bg-gray-200">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.7}
+            stroke="currentColor"
+            className="h-6 w-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
+        </button>
+        <button className="rounded stroke-gray-500 py-2 px-2 hover:bg-gray-200">
+          ...
         </button>
       </div>
     </div>
@@ -55,7 +81,7 @@ function HabitHeaderLine({
         </span>
         {weight && (
           <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
-            Weight: {weight}
+            Weight: {weight.toFixed(2)}
           </span>
         )}
       </div>
@@ -69,20 +95,21 @@ function HabitHeaderLine({
         <div className="flex items-center space-x-2">
           <div
             className={classNames(
-              "rounded-lg bg-gray-100 p-2 text-xl font-bold ",
+              "rounded-lg bg-gray-100 p-2 text-xl font-bold",
               textcolor(score)
             )}
           >
-            {score}
+            {score.toFixed(2)}
           </div>
-          {/* <span class="text-gray-400">/</span>
-<div class="text-xl font-bold text-gray-400">100%</div> */}
         </div>
       </div>
       <div className="my-4">
         <div className="h-2 rounded-full bg-gray-200">
           <div
-            className="h-2 rounded-full bg-green-500"
+            className={classNames(
+              "h-2 rounded-full bg-green-500",
+              bgcolor(score)
+            )}
             style={{ width: score * 100 + "%" }}
           />
         </div>
@@ -116,23 +143,33 @@ function HabitStatusBlock({
   );
 }
 
-function HabitFooter({ tags }: { tags: string[] }) {
+function HabitFooter({ tags, linked }: { tags: string[]; linked: boolean }) {
   return (
     <div className="mt-6">
       <div className="flex justify-between">
         <div>
           <div className="flex items-center space-x-2">
             {tags.map((tag) => (
-              <div className="rounded-r-full bg-gray-200 px-2 py-1 text-xs">
+              <div
+                key={tag}
+                className="rounded-r-full bg-gray-200 px-2 py-1 text-xs"
+              >
                 {tag}
               </div>
             ))}
           </div>
         </div>
         <div className="flex items-center space-x-4">
-          <button className="font-bold text-blue-500 hover:underline">
-            Unlink from Goal
-          </button>
+          {linked ? (
+            <button className="font-bold text-blue-500 hover:underline">
+              Unlink from Goal
+            </button>
+          ) : (
+            <button className="font-bold text-blue-500 hover:underline">
+              Link to Goal
+            </button>
+          )}
+
           <button className="font-bold text-gray-500 hover:text-gray-700">
             Edit
           </button>
@@ -142,9 +179,18 @@ function HabitFooter({ tags }: { tags: string[] }) {
   );
 }
 
-function GoalCard({ name, score }: Goal & { score: number }) {
+function GoalCard({
+  name,
+  score,
+  habits,
+  metrics,
+}: Goal & {
+  score: number;
+  habits: (Habit & { completions: number; score: number })[];
+  metrics: (Metric & { score: number })[];
+}) {
   return (
-    <div className="mb-8 rounded-lg bg-white p-6 shadow-lg">
+    <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
       <div className="mb-1">
         <span className="mb-2 inline-block rounded-full bg-yellow-500 px-2 py-1 text-xs font-bold text-white">
           Goal
@@ -154,10 +200,8 @@ function GoalCard({ name, score }: Goal & { score: number }) {
         <h2 className="text-xl font-bold">{name}</h2>
         <div className="flex items-center space-x-2">
           <div className="rounded-lg bg-gray-100 p-2 text-xl font-bold text-yellow-500">
-            {score}
+            {score.toFixed(2)}
           </div>
-          {/* <span class="text-gray-400">/</span>
-<div class="text-xl font-bold text-gray-400">100%</div> */}
         </div>
       </div>
 
@@ -169,27 +213,32 @@ function GoalCard({ name, score }: Goal & { score: number }) {
           />
         </div>
       </div>
-
-      <LinkedHabit
-        score={0.75}
-        weight={1.0}
-        description={"Run a 5k"}
-        frequency={2}
-        frequencyHorizon={"WEEK"}
-      ></LinkedHabit>
+      {habits.map((habit) => (
+        <HabitCard {...habit} weight={0.4} linked={true}></HabitCard>
+      ))}
     </div>
   );
 }
 
 function HabitCard({
+  linked = false,
   score,
   weight,
   description,
   frequency,
   frequencyHorizon,
-}: Habit & { score: number; weight: number | undefined }) {
+  completions,
+}: Habit & {
+  score: number;
+  weight: number | undefined;
+  completions: number;
+  linked: boolean;
+}) {
+  let classes = linked
+    ? "mb-6 rounded-sm border-l-4 p-6"
+    : "mb-6 rounded-lg bg-white p-6 shadow-md";
   return (
-    <div className="mb-6 rounded-lg bg-white p-6 shadow-lg">
+    <div className={classes}>
       <HabitHeaderLine
         weight={weight}
         description={description}
@@ -198,59 +247,14 @@ function HabitCard({
         score={score}
       ></HabitHeaderLine>
       <HabitStatusBlock
-        currentCompletions={2}
-        target={3}
-        weight={0}
+        currentCompletions={completions}
+        target={frequency}
+        weight={0.76}
       ></HabitStatusBlock>
-      <div className="mt-2 rounded-lg bg-gray-100 p-2">
-        <button className="mx-auto block rounded text-sm font-bold text-gray-600">
-          + Create a new Linked Metric
-        </button>
-      </div>
-      <HabitFooter tags={["tag1", "tag2"]}></HabitFooter>
-    </div>
-  );
-}
-
-function LinkedHabit({
-  score,
-  weight,
-  description,
-  frequency,
-  frequencyHorizon,
-}: Habit & { score: number; weight: number }) {
-  return (
-    <div className="mb-6 rounded-sm border-l-4 p-6">
-      <HabitHeaderLine
-        weight={weight}
-        description={description}
-        frequency={frequency}
-        frequencyHorizon={frequencyHorizon}
-        score={score}
-      ></HabitHeaderLine>
-      <HabitStatusBlock
-        currentCompletions={3}
-        target={4}
-        weight={0.1}
-      ></HabitStatusBlock>
-
-      <div className="mt-6">
-        {/* Nested Habit Cards */}
-        <LinkedMetric
-          weight={0.5}
-          prompt="Did you feel any improvement in your stamina or endurance during
-                your runs this week?"
-        ></LinkedMetric>
-        {/* More nested Habit Cards */}
-        <LinkedMetric weight={0.5} prompt="How was the run?"></LinkedMetric>
-
-        <div className="mt-2 rounded-lg bg-gray-100 p-2">
-          <button className="mx-auto block rounded text-sm font-bold text-gray-600">
-            + Create a new Linked Metric
-          </button>
-        </div>
-      </div>
-      <HabitFooter tags={["tag1", "tag2"]}></HabitFooter>
+      <button className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200">
+        + Create a new Linked Metric
+      </button>
+      <HabitFooter tags={["tag1", "tag2"]} linked={linked}></HabitFooter>
     </div>
   );
 }
@@ -263,7 +267,7 @@ function LinkedMetric({ weight, prompt }: { weight: number; prompt: string }) {
           Linked Metric
         </span>
         <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
-          Weight: {weight}
+          Weight: {weight.toFixed(2)}
         </span>
       </div>
       <div className="mb-2">
@@ -282,29 +286,37 @@ function LinkedMetric({ weight, prompt }: { weight: number; prompt: string }) {
   );
 }
 
+let today = new Date();
+
 function OverviewPage() {
+  let goalsQuery = api.goals.getGoals.useQuery({ date: today });
+  if (goalsQuery.isLoading) return <p>Loading...</p>;
+  if (goalsQuery.isError) return <p>Query error</p>;
+
+  let data = goalsQuery.data;
+  console.log(data.goals);
   return (
-    <>
-      {/* score, frequency/time period (schedule), weight, how many times it has been completed in the current period (2/3 times/week), maybe guages instead of progress bar, bg tint instead of pbars (implies end) */}
-      <div className="bg-gray-100">
-        <div className="container mx-auto py-8">
+    <div className="bg-gray-100">
+      <div className="container mx-auto py-8">
+        <>
           <Header></Header>
-          {/* <h1 class="mb-8 text-2xl font-bold">Overview Page</h1> */}
-          {/* Goals Card */}
-          <GoalCard name={"Get Fit"} score={0.65}></GoalCard>
+          {data.goals.map((goal) => (
+            <GoalCard
+              {...goal.goal}
+              habits={goal.habits}
+              metrics={goal.metrics}
+            ></GoalCard>
+          ))}
           {/* Habit Card with Progress Bar */}
-          <h1 class="mb-4 ml-2 text-lg font-semibold uppercase text-slate-600">
+          <h1 className="mb-4 ml-2 text-lg font-semibold uppercase text-slate-600">
             Unlinked Items
           </h1>
-          <HabitCard
-            score={0.33}
-            description={"Go for a run"}
-            frequency={3}
-            frequencyHorizon={"WEEK"}
-          ></HabitCard>
-        </div>
+          {data.habits.map((habit) => (
+            <HabitCard {...habit} weight={0.5} linked={false}></HabitCard>
+          ))}
+        </>
       </div>
-    </>
+    </div>
   );
 }
 

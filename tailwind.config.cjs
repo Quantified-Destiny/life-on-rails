@@ -2,6 +2,9 @@
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   extend: {
+    fontFamily: {
+      roboto: ["Roboto", "sans-serif"],
+    },
     gridTemplateColumns: {
       shell: "10em 1fr",
     },
