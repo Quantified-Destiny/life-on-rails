@@ -7,8 +7,8 @@ const textcolor = (score: number) => {
   return score < 0.25
     ? "text-red-300"
     : score < 0.7
-    ? "text-yellow-400"
-    : "text-green-200";
+      ? "text-yellow-400"
+      : "text-green-200";
 };
 
 const displayPercent = (percent: number) => (
@@ -52,7 +52,7 @@ function NestedItems({ habits, subjectives }: NestedItemsProps) {
           </div>
           <div className="mt-2">
             <div className="text-lg font-semibold text-gray-900">
-              {habit.name}
+              {habit.description}
             </div>
           </div>
         </li>
@@ -80,7 +80,7 @@ function NestedItems({ habits, subjectives }: NestedItemsProps) {
 }
 
 interface Habit {
-  name: string;
+  description: string;
   score: number;
 }
 interface Subjective {
@@ -131,7 +131,7 @@ function HabitCard(habit: Habit) {
         </div>
         <div className="mt-4">
           <div className="text-lg font-semibold text-gray-900">
-            {habit.name}
+            {habit.description}
           </div>
         </div>
       </div>
@@ -180,7 +180,7 @@ function Overview({ goals, habits, subjectives }: OverviewProps) {
         ))}
         <h1 className="font-semibold text-gray-900 my-2">Uncategorized</h1>
         {habits.map((habit) => (
-          <HabitCard name={habit.name} score={habit.score}></HabitCard>
+          <HabitCard description={habit.description} score={habit.score}></HabitCard>
         ))}
         {subjectives.map((subjective) => (
           <SubjectiveCard
@@ -209,11 +209,11 @@ function OverviewPage() {
       score: item.goal.score,
     },
     habits: item.habits.map((habit) => ({
-      name: habit.name,
+      description: habit.description,
       score: habit.score,
     })),
-    subjectives: item.subjectives.map((subjective) => ({
-      name: subjective.name,
+    subjectives: item.metrics.map((subjective) => ({
+      name: subjective.prompt,
       score: subjective.score,
     })),
   }));
@@ -222,7 +222,7 @@ function OverviewPage() {
     <Overview
       goals={goals}
       habits={data.habits}
-      subjectives={data.subjectives}
+      subjectives={data.metrics}
     ></Overview>
   );
 }
