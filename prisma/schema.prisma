@@ -90,6 +90,8 @@ model Habit {
   frequencyHorizon FrequencyHorizon    @default(DAY)
   frequency        Int                 @default(1)
   owner            User                @relation(fields: [ownerId], references: [id])
+  // the weight for completions in calculating score. Should be 0-1
+  completionWeight Float               @default(1)
   completions      HabitCompletion[]
   goals            HabitMeasuresGoal[]
   HabitTag         HabitTag[]

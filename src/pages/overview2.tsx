@@ -136,7 +136,7 @@ function HabitStatusBlock({
         </span>
       </div>
       <div className="flex items-center justify-between text-sm font-bold text-gray-500">
-        <span>Habit Weight</span>
+        <span>Completions Weight</span>
         <span>{weight}</span>
       </div>
     </div>
@@ -186,7 +186,7 @@ function GoalCard({
   metrics,
 }: Goal & {
   score: number;
-  habits: (Habit & { completions: number; score: number })[];
+  habits: (Habit & { completions: number; score: number; metrics: Metric[] })[];
   metrics: (Metric & { score: number })[];
 }) {
   return (
@@ -228,11 +228,13 @@ function HabitCard({
   frequency,
   frequencyHorizon,
   completions,
+  metrics,
 }: Habit & {
   score: number;
   weight: number | undefined;
   completions: number;
   linked: boolean;
+  metrics: Metric[];
 }) {
   let classes = linked
     ? "mb-6 rounded-sm border-l-4 p-6"
@@ -251,6 +253,9 @@ function HabitCard({
         target={frequency}
         weight={0.76}
       ></HabitStatusBlock>
+      {metrics.map((m) => (
+        <LinkedMetric {...m} weight={0.5}></LinkedMetric>
+      ))}
       <button className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200">
         + Create a new Linked Metric
       </button>
