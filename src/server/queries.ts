@@ -7,6 +7,7 @@ import {
   Metric,
   MetricMeasuresGoal,
   MetricTag,
+  Tag,
 } from "@prisma/client";
 import { subDays } from "date-fns";
 
@@ -20,34 +21,42 @@ function targetCount(h: Habit) {
   } else return h.frequency / 2;
 }
 
-interface ExpandedHabit extends Habit {
-  metrics: LinkedMetric[];
-  HabitTag: HabitTag[];
+export interface ExpandedHabit extends Habit {
+  metrics: ExpandedMetric[];
+  tags: string[];
+  goals: string[];
+  completions: number;
+  score: number;
 }
 
 export async function getHabits(
   prisma: typeof prismaClient,
+  metricsMap: Map<string, ExpandedMetric>,
   userId: string
 ): Promise<
   [
     ExpandedHabit[],
-    Map<string, Habit>,
+    Map<string, ExpandedHabit>,
     Map<string, number>,
     Map<string, number>
   ]
 > {
-  let habits: (Habit & { metrics: LinkedMetric[]; HabitTag: HabitTag[] })[] =
-    await prisma.habit.findMany({
-      where: {
-        ownerId: userId,
-      },
-      include: {
-        metrics: true,
-        HabitTag: { include: { habit: true } },
-      },
-    });
-
+  let habits: (Habit & {
+    metrics: LinkedMetric[];
+    HabitTag: (HabitTag & { tag: Tag })[];
+    goals: HabitMeasuresGoal[];
+  })[] = await prisma.habit.findMany({
+    where: {
+      ownerId: userId,
+    },
+    include: {
+      metrics: true,
+      HabitTag: { include: { tag: true } },
+      goals: true,
+    },
+  });
   let habitsMap = new Map<string, Habit>(habits.map((h) => [h.id, h]));
+
   let habitCompletions = await prisma.habitCompletion.groupBy({
     by: ["habitId"],
     _count: {
@@ -73,26 +82,49 @@ export async function getHabits(
       ];
     })
   );
-  return [habits, habitsMap, habitCompletionsCount, habitScores];
+  let expandedHabits = habits.map((h) => ({
+    ...h,
+    score: habitScores.get(h.id) ?? 0,
+    goals: h.goals.map((it) => it.goalId),
+    tags: h.HabitTag.map((it) => it.tag.name),
+    metrics: h.metrics.map((it) => metricsMap.get(it.metricId)!),
+    completions: habitCompletionsCount.get(h.id) ?? 0,
+  }));
+  let expandedHabitsMap = new Map<string, ExpandedHabit>(
+    expandedHabits.map((h) => [h.id, h])
+  );
+
+  return [
+    expandedHabits,
+    expandedHabitsMap,
+    habitCompletionsCount,
+    habitScores,
+  ];
 }
 
-interface ExpandedMetric extends Metric {
-  completionMetric: LinkedMetric[];
-  MetricTag: MetricTag[];
+export interface ExpandedMetric extends Metric {
+  linkedHabits: string[];
+  tags: Tag[];
+  score: number;
 }
 
 export async function getMetrics(
   prisma: typeof prismaClient,
   userId: string
-): Promise<[ExpandedMetric[], Map<string, Metric>, Map<string, number>]> {
-  let metrics: ExpandedMetric[] = await prisma.metric.findMany({
+): Promise<
+  [ExpandedMetric[], Map<string, ExpandedMetric>, Map<string, number>]
+> {
+  let metrics: (Metric & {
+    completionMetric: LinkedMetric[];
+    MetricTag: (MetricTag & { tag: Tag })[];
+  })[] = await prisma.metric.findMany({
     where: {
       ownerId: userId,
     },
     include: {
       completionMetric: true,
       MetricTag: {
-        include: { metric: true },
+        include: { tag: true },
       },
     },
   });
@@ -110,6 +142,21 @@ export async function getMetrics(
   let metricScores = new Map<string, number>(
     metricAnswers.map((a) => [a.metricId, a._avg.value ?? 0])
   );
-  let metricsMap = new Map<string, Metric>(metrics.map((m) => [m.id, m]));
-  return [metrics, metricsMap, metricScores];
+
+  let expandedMetrics = metrics.map((m) => ({
+    ...m,
+    linkedHabits: m.completionMetric.map((it) => it.habitId),
+    tags: m.MetricTag.map((mt) => mt.tag),
+    score: metricScores.get(m.id) ?? 0,
+  }));
+
+  let metricsMap = new Map<string, ExpandedMetric>();
+  expandedMetrics.forEach((m) => {
+    console.log(`Tried to set metric ${m.id} to ${JSON.stringify(m)}`);
+    metricsMap.set(m.id, m);
+  });
+
+  //console.log(metricsMap);
+
+  return [expandedMetrics, metricsMap, metricScores];
 }

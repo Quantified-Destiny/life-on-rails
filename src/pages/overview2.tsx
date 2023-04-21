@@ -12,9 +12,11 @@ import {
 } from "@radix-ui/react-icons";
 import { SelectItem } from "@radix-ui/react-select";
 import { useForm } from "react-hook-form";
+import { ExpandedHabit, ExpandedMetric } from "../server/queries";
+import { useState } from "react";
 
 const textcolor = (score: number | undefined) => {
-  if (!score) return "text-black";
+  if (typeof score === "undefined") return "text-black";
   return score < 0.25
     ? "text-red-500"
     : score < 0.7
@@ -338,7 +340,55 @@ function HabitStatusBlock({
   );
 }
 
-function HabitFooter({ tags, linked }: { tags: string[]; linked: boolean }) {
+function CreateTag({ commit }: { commit: (name: string) => void }) {
+  let [active, setActive] = useState<boolean>(false);
+  let [text, setText] = useState<string>("");
+  return (
+    <div
+      className="rounded-r-full bg-gray-200 px-2 py-1 text-xs hover:bg-gray-200"
+      onClick={() => setActive(true)}
+    >
+      {active ? (
+        <input
+          autoFocus
+          type="text"
+          value={text}
+          className="rounded-r-full bg-gray-100 text-xs"
+          onBlur={() => setActive(false)}
+          onChange={(event) => {
+            setText(event.target.value);
+          }}
+          onKeyDown={(event) => {
+            if (event.key == "Enter") {
+              console.log(text);
+              commit(text);
+              setActive(false);
+            } else if (event.key == "Escape") {
+              setText("");
+              setActive(false);
+            }
+          }}
+        ></input>
+      ) : (
+        "+ New Tag"
+      )}
+    </div>
+  );
+}
+
+function HabitFooter({
+  id,
+  tags,
+  linked,
+  linkHabit,
+  unlinkHabit,
+}: {
+  id: string;
+  tags: string[];
+  linked: boolean;
+  linkHabit: (args: { habitId: string; tagName: string }) => void;
+  unlinkHabit: (args: { habitId: string; tagName: string }) => void;
+}) {
   return (
     <div className="mt-6">
       <div className="flex justify-between">
@@ -347,11 +397,36 @@ function HabitFooter({ tags, linked }: { tags: string[]; linked: boolean }) {
             {tags.map((tag) => (
               <div
                 key={tag}
-                className="rounded-r-full bg-gray-200 px-2 py-1 text-xs"
+                className="hover:bg-slate:300 flex flex-row flex-nowrap divide-x-0 divide-gray-800 whitespace-nowrap rounded-r-full bg-slate-200 px-2 py-1"
               >
-                {tag}
+                <span>{tag}</span>
+                <span
+                  className=" hover:stroke-red-300"
+                  onClick={() => unlinkHabit({ habitId: id, tagName: tag })}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-6 w-6 cursor-pointer hover:stroke-red-300"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </span>
               </div>
             ))}
+            {/* TODO add combobox features */}
+            <CreateTag
+              commit={(name: string) =>
+                linkHabit({ habitId: id, tagName: name })
+              }
+            ></CreateTag>
           </div>
         </div>
         <div className="flex items-center space-x-4">
@@ -381,7 +456,11 @@ function GoalCard({
   metrics,
 }: Goal & {
   score: number;
-  habits: (Habit & { completions: number; score: number; metrics: Metric[] })[];
+  habits: (ExpandedHabit & {
+    completions: number;
+    score: number;
+    metrics: ExpandedMetric[];
+  })[];
   metrics: (Metric & { score: number })[];
 }) {
   return (
@@ -430,14 +509,24 @@ function HabitCard({
   frequencyHorizon,
   completions,
   metrics,
-}: Habit & {
-  score: number;
+  tags,
+}: ExpandedHabit & {
   weight: number | undefined;
-  completions: number;
   linked: boolean;
-  metrics: Metric[];
 }) {
   let openModal = useStore((store) => store.openCreateLinkedModal);
+
+  let context = api.useContext();
+  let linkHabit = api.tags.linkHabit.useMutation({
+    onSuccess() {
+      context.goals.getGoals.invalidate();
+    },
+  });
+  let unlinkHabit = api.tags.unlinkHabit.useMutation({
+    onSuccess() {
+      context.goals.getGoals.invalidate();
+    },
+  });
 
   let classes = linked
     ? "mb-6 rounded-sm border-l-4 p-6"
@@ -466,12 +555,26 @@ function HabitCard({
       >
         + Create a new Linked Metric
       </button>
-      <HabitFooter tags={["tag1", "tag2"]} linked={linked}></HabitFooter>
+      <HabitFooter
+        id={id}
+        tags={tags}
+        linked={linked}
+        linkHabit={linkHabit.mutate}
+        unlinkHabit={unlinkHabit.mutate}
+      ></HabitFooter>
     </div>
   );
 }
 
-function LinkedMetric({ weight, prompt }: { weight: number; prompt: string }) {
+function LinkedMetric({
+  weight,
+  prompt,
+  score,
+}: {
+  weight: number;
+  prompt: string;
+  score: number;
+}) {
   return (
     <div className="mt-2 rounded-lg bg-gray-100 p-4">
       <div className="mb-2">
@@ -482,13 +585,20 @@ function LinkedMetric({ weight, prompt }: { weight: number; prompt: string }) {
           Weight: {weight.toFixed(2)}
         </span>
       </div>
-      <div className="mb-2">
-        <h3 className="text-sm font-bold">{prompt}</h3>
-      </div>
-      <div className="flex items-center space-x-2">
-        <div className="text-xs font-bold text-green-500">75%</div>
-        <span className="text-gray-400">/</span>
-        <div className="text-xs font-bold text-gray-400">100%</div>
+      <div className="flex w-full justify-between space-x-2">
+        <div className="mb-2">
+          <h3 className="text-sm font-bold">{prompt}</h3>
+        </div>
+        <div className="bg-white px-2">
+          <span
+            className={classNames(
+              "min-w-fit text-xs font-bold",
+              textcolor(score)
+            )}
+          >
+            {score}
+          </span>
+        </div>
       </div>
       {/* <div class="mt-2">
 <div class="h-2 rounded-full bg-gray-200">

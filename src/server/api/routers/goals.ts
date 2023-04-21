@@ -1,22 +1,8 @@
-import {
-  Goal,
-  Habit,
-  HabitMeasuresGoal,
-  HabitTag,
-  LinkedMetric,
-  Metric,
-  MetricMeasuresGoal,
-  MetricTag,
-} from "@prisma/client";
-import { id } from "date-fns/locale";
+import { Goal } from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { subDays } from "date-fns";
 
-import { prisma as prismaClient } from "../../db";
-import { getMetrics, getHabits } from "../../queries";
-
-const score = () => Math.random();
+import { getHabits, getMetrics } from "../../queries";
 
 export const goalsRouter = createTRPCRouter({
   getGoal: protectedProcedure
@@ -52,7 +38,7 @@ export const goalsRouter = createTRPCRouter({
       );
 
       let [habits, habitsMap, habitCompletionsCount, habitScores] =
-        await getHabits(ctx.prisma, ctx.session.user.id);
+        await getHabits(ctx.prisma, metricsMap, ctx.session.user.id);
 
       let goals = await ctx.prisma.goal.findMany({
         where: {
@@ -60,13 +46,12 @@ export const goalsRouter = createTRPCRouter({
         },
         include: {
           habits: {
-            include: { habit: { include: { metrics: true } } },
+            include: { habit: { include: { metrics: true, goals: true } } },
           },
           metrics: true,
           GoalTag: { include: { tag: true } },
         },
       });
-
       let goalsData = goals.map((g) => {
         let m: number[] = g.metrics.map(
           (it) => metricScores.get(it.metricId) ?? 0
@@ -101,46 +86,20 @@ export const goalsRouter = createTRPCRouter({
               ...h.habit,
               completions: habitCompletionsCount.get(h.id) ?? 0,
               score,
+              goals: h.habit.goals.map((g) => g.goalId),
               metrics: linkedMetrics,
               tags: tags,
             };
           }),
           metrics: g.metrics.map((m) => ({
-            score: metricScores.get(m.metricId) ?? -1,
             ...metricsMap.get(m.metricId)!,
           })),
         };
       });
 
-      let habitsData: (Habit & {
-        completions: number;
-        score: number;
-        metrics: Metric[];
-      })[] = habits.map((h) => {
-        let linkedMetrics = h.metrics.map((m) => metricsMap.get(m.metricId)!);
-        let linkedMetricScores = linkedMetrics
-          .map((m) => metricScores.get(m.id) ?? 0)
-          .reduce((a, b) => a + b, 0);
-        let score: number =
-          linkedMetrics.length == 0
-            ? habitScores.get(h.id) ?? 0
-            : h.completionWeight * (habitScores.get(h.id) ?? 0) +
-              (1 - h.completionWeight) *
-                (linkedMetricScores / linkedMetrics.length);
+      let habitsData = habits.filter((h) => h.goals.length == 0);
 
-        return {
-          ...h,
-          completions: habitCompletionsCount.get(h.id) ?? 0,
-          score,
-          metrics: linkedMetrics,
-        };
-      });
-
-      let metricsData = metrics
-        .filter((m) => m.completionMetric.length == 0)
-        .map((m) => {
-          return { ...m, score: metricScores.get(m.id) };
-        });
+      let metricsData = metrics.filter((m) => m.linkedHabits.length == 0);
 
       return {
         goals: goalsData,

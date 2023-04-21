@@ -4,6 +4,7 @@ import { journalRouter } from "./routers/journal";
 import { goalsRouter } from "./routers/goals";
 import { createRouter } from "./routers/create";
 import { profileRouter } from "./routers/profile";
+import { taggingRouter } from "./routers/tags";
 
 /**
  * This is the primary router for your server.
@@ -15,7 +16,8 @@ export const appRouter = createTRPCRouter({
   journal: journalRouter,
   goals: goalsRouter,
   create: createRouter,
-  profile: profileRouter
+  profile: profileRouter,
+  tags: taggingRouter
 });
 
 // export type definition of API

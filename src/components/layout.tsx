@@ -12,7 +12,7 @@ import {
 
 function SideBar() {
   return (
-    <div className="flex h-full flex-col bg-gray-800 px-4 py-8">
+    <div className="flex h-full w-fit flex-col bg-gray-800 px-4 py-8">
       <h1 className="mb-8 text-2xl font-bold text-white">Navigation</h1>
       <ul className="flex flex-col space-y-2">
         <li>
@@ -53,7 +53,7 @@ function SideBar() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="h-6 w-6 mr-2"
+              className="mr-2 h-6 w-6"
             >
               <path
                 strokeLinecap="round"
@@ -71,7 +71,7 @@ function SideBar() {
 
 const Layout = ({ main }: { main: () => JSX.Element }) => {
   return (
-    <div className="relative inset-0 font-roboto">
+    <div className="font-roboto relative inset-0">
       <div className="relative z-50 grid grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
         <div id="topbar" className="col-span-2 col-start-1 row-start-1">
           <TopNav></TopNav>

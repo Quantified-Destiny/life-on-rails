@@ -25,6 +25,7 @@ model Tag {
   HabitTag  HabitTag[]
   MetricTag MetricTag[]
 
+  @@unique([ownerId, name])
   @@index([ownerId])
 }
 
