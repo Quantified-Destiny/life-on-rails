@@ -2,6 +2,16 @@ import { Goal, Habit, Metric } from "@prisma/client";
 import classNames from "classnames";
 import Layout from "../components/layout";
 import { api } from "../utils/api";
+import { create } from "zustand";
+import { combine } from "zustand/middleware";
+import * as Select from "@radix-ui/react-select";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@radix-ui/react-icons";
+import { SelectItem } from "@radix-ui/react-select";
+import { useForm } from "react-hook-form";
 
 const textcolor = (score: number | undefined) => {
   if (!score) return "text-black";
@@ -12,6 +22,34 @@ const textcolor = (score: number | undefined) => {
     : "text-green-400";
 };
 
+enum State {
+  None,
+  CreateLinkedHabit,
+}
+
+interface CreateLinkedHabit {
+  state: State.CreateLinkedHabit;
+  habitId: string;
+  desc: string;
+}
+interface OverviewStore {
+  modal: CreateLinkedHabit | undefined;
+  openCreateLinkedModal: (habitId: string, desc: string) => void;
+  reset: () => void;
+}
+
+const useStore = create<OverviewStore>()((set) => ({
+  modal: undefined,
+  openCreateLinkedModal: (habitId, desc) => {
+    set((_state) => ({
+      modal: { state: State.CreateLinkedHabit, habitId, desc },
+    }));
+  },
+  reset: () => {
+    set((_) => ({ modal: undefined }));
+  },
+}));
+
 const bgcolor = (score: number | undefined) => {
   if (!score) return "text-black";
   return score < 0.25
@@ -20,6 +58,163 @@ const bgcolor = (score: number | undefined) => {
     ? "bg-yellow-500"
     : "bg-green-400";
 };
+
+const SelectType = () => (
+  <Select.Root>
+    <Select.Trigger className="SelectTrigger" aria-label="Food">
+      <Select.Value placeholder="Select a fruit…" />
+      <Select.Icon className="SelectIcon">
+        <ChevronDownIcon />
+      </Select.Icon>
+    </Select.Trigger>
+    <Select.Portal>
+      <Select.Content className="SelectContent">
+        <Select.ScrollUpButton className="SelectScrollButton">
+          <ChevronUpIcon />
+        </Select.ScrollUpButton>
+        <Select.Viewport className="SelectViewport">
+          <Select.Group>
+            <Select.Label className="SelectLabel">Fruits</Select.Label>
+            <SelectItem value="apple">Apple</SelectItem>
+            <SelectItem value="banana">Banana</SelectItem>
+            <SelectItem value="blueberry">Blueberry</SelectItem>
+            <SelectItem value="grapes">Grapes</SelectItem>
+            <SelectItem value="pineapple">Pineapple</SelectItem>
+          </Select.Group>
+
+          <Select.Separator className="SelectSeparator" />
+
+          <Select.Group>
+            <Select.Label className="SelectLabel">Vegetables</Select.Label>
+            <SelectItem value="aubergine">Aubergine</SelectItem>
+            <SelectItem value="broccoli">Broccoli</SelectItem>
+            <SelectItem value="carrot" disabled>
+              Carrot
+            </SelectItem>
+            <SelectItem value="courgette">Courgette</SelectItem>
+            <SelectItem value="leek">Leek</SelectItem>
+          </Select.Group>
+
+          <Select.Separator className="SelectSeparator" />
+
+          <Select.Group>
+            <Select.Label className="SelectLabel">Meat</Select.Label>
+            <SelectItem value="beef">Beef</SelectItem>
+            <SelectItem value="chicken">Chicken</SelectItem>
+            <SelectItem value="lamb">Lamb</SelectItem>
+            <SelectItem value="pork">Pork</SelectItem>
+          </Select.Group>
+        </Select.Viewport>
+        <Select.ScrollDownButton className="SelectScrollButton">
+          <ChevronDownIcon />
+        </Select.ScrollDownButton>
+      </Select.Content>
+    </Select.Portal>
+  </Select.Root>
+);
+
+interface FormData {
+  prompt: string;
+  type: "FIVE_POINT|NUMBER";
+}
+
+function CreateLinkedHabitModal({ visible }: { visible: boolean }) {
+  let reset = useStore((store) => store.reset);
+  let modal = useStore((store) => store.modal);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>();
+  const onSubmit = (data: FormData) => {
+    reset();
+    console.log(data);
+  };
+
+  return (
+    <div
+      className={classNames(
+        "fixed inset-0 z-50 flex h-screen w-screen items-center justify-center overflow-y-auto overflow-x-hidden backdrop-blur-sm backdrop-brightness-50",
+        { hidden: !visible }
+      )}
+      onKeyDown={(it) => {
+        console.log(it);
+        if (it.key == "Escape") reset();
+      }}
+    >
+      <div className="relative max-h-full w-full max-w-md">
+        {/* Modal content */}
+        <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
+          <button
+            type="button"
+            className="absolute top-3 right-2.5 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
+            onClick={reset}
+          >
+            <svg
+              className="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+          <div className="px-6 py-6 lg:px-8">
+            <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
+              Create a metric linked to {modal?.desc}
+            </h3>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              <div>
+                <label
+                  htmlFor="prompt"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Prompt
+                </label>
+                <input
+                  type="text"
+                  id="prompt"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
+                  placeholder="name@company.com"
+                  required
+                  {...register("prompt")}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="type"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Metric type
+                </label>
+                <select
+                  id="type"
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
+                  {...register("type")}
+                >
+                  <option value="FIVE_POINT">5-point</option>
+                  <option value="number">number</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Create
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Header() {
   return (
@@ -214,13 +409,19 @@ function GoalCard({
         </div>
       </div>
       {habits.map((habit) => (
-        <HabitCard {...habit} weight={0.4} linked={true}></HabitCard>
+        <HabitCard
+          {...habit}
+          weight={0.4}
+          linked={true}
+          key={habit.id}
+        ></HabitCard>
       ))}
     </div>
   );
 }
 
 function HabitCard({
+  id,
   linked = false,
   score,
   weight,
@@ -236,9 +437,12 @@ function HabitCard({
   linked: boolean;
   metrics: Metric[];
 }) {
+  let openModal = useStore((store) => store.openCreateLinkedModal);
+
   let classes = linked
     ? "mb-6 rounded-sm border-l-4 p-6"
     : "mb-6 rounded-lg bg-white p-6 shadow-md";
+
   return (
     <div className={classes}>
       <HabitHeaderLine
@@ -254,9 +458,12 @@ function HabitCard({
         weight={0.76}
       ></HabitStatusBlock>
       {metrics.map((m) => (
-        <LinkedMetric {...m} weight={0.5}></LinkedMetric>
+        <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>
       ))}
-      <button className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200">
+      <button
+        className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200"
+        onClick={() => openModal(id, description)}
+      >
         + Create a new Linked Metric
       </button>
       <HabitFooter tags={["tag1", "tag2"]} linked={linked}></HabitFooter>
@@ -294,6 +501,7 @@ function LinkedMetric({ weight, prompt }: { weight: number; prompt: string }) {
 let today = new Date();
 
 function OverviewPage() {
+  let store = useStore();
   let goalsQuery = api.goals.getGoals.useQuery({ date: today });
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
@@ -302,6 +510,9 @@ function OverviewPage() {
   console.log(data.goals);
   return (
     <div className="bg-gray-100">
+      <CreateLinkedHabitModal
+        visible={store.modal?.state === State.CreateLinkedHabit}
+      ></CreateLinkedHabitModal>
       <div className="container mx-auto py-8">
         <>
           <Header></Header>
@@ -310,6 +521,7 @@ function OverviewPage() {
               {...goal.goal}
               habits={goal.habits}
               metrics={goal.metrics}
+              key={goal.goal.id}
             ></GoalCard>
           ))}
           {/* Habit Card with Progress Bar */}
@@ -317,7 +529,12 @@ function OverviewPage() {
             Unlinked Items
           </h1>
           {data.habits.map((habit) => (
-            <HabitCard {...habit} weight={0.5} linked={false}></HabitCard>
+            <HabitCard
+              {...habit}
+              weight={0.5}
+              linked={false}
+              key={habit.id}
+            ></HabitCard>
           ))}
         </>
       </div>

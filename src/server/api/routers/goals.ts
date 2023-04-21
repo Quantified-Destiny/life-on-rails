@@ -2,47 +2,21 @@ import {
   Goal,
   Habit,
   HabitMeasuresGoal,
+  HabitTag,
   LinkedMetric,
   Metric,
   MetricMeasuresGoal,
+  MetricTag,
 } from "@prisma/client";
 import { id } from "date-fns/locale";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { subDays } from "date-fns";
 
-function targetCount(h: Habit) {
-  if (h.frequencyHorizon == "DAY") {
-    return h.frequency * 14;
-  } else if (h.frequencyHorizon == "WEEK") {
-    return h.frequency * 2;
-  } else return h.frequency / 2;
-}
-
-type Ret = Goal & {
-  habits: {
-    habit: Habit;
-  }[];
-  metrics: {
-    metric: Metric;
-  }[];
-};
+import { prisma as prismaClient } from "../../db";
+import { getMetrics, getHabits } from "../../queries";
 
 const score = () => Math.random();
-
-function flatten(data: Ret) {
-  return {
-    goal: { name: data.name, score: score() },
-    habits: data.habits.map((it) => ({
-      name: it.habit.description,
-      score: score(),
-    })),
-    subjectives: data.metrics.map((it) => ({
-      name: it.metric.prompt,
-      score: score(),
-    })),
-  };
-}
 
 export const goalsRouter = createTRPCRouter({
   getGoal: protectedProcedure
@@ -72,74 +46,15 @@ export const goalsRouter = createTRPCRouter({
   getGoals: protectedProcedure
     .input(z.object({ date: z.date() }))
     .query(async ({ input, ctx }) => {
-      let metrics: (Metric & { completionMetric: LinkedMetric[] })[] =
-        await ctx.prisma.metric.findMany({
-          where: {
-            ownerId: ctx.session.user.id,
-          },
-          include: {
-            completionMetric: true,
-          },
-        });
-
-      let metricAnswers = await ctx.prisma.metricAnswer.groupBy({
-        by: ["metricId"],
-        _avg: {
-          value: true,
-        },
-        where: {
-          createdAt: { gt: subDays(new Date(), 14) },
-        },
-      });
-
-      let metricScores = new Map<string, number>(
-        metricAnswers.map((a) => [a.metricId, a._avg.value ?? 0])
-      );
-      let metricsMap = new Map<string, Metric>(metrics.map((m) => [m.id, m]));
-
-      let habits: (Habit & { metrics: LinkedMetric[] })[] =
-        await ctx.prisma.habit.findMany({
-          where: {
-            ownerId: ctx.session.user.id,
-          },
-          include: {
-            metrics: true,
-          },
-        });
-
-      let habitsMap = new Map<string, Habit>(habits.map((h) => [h.id, h]));
-      let habitCompletions = await ctx.prisma.habitCompletion.groupBy({
-        by: ["habitId"],
-        _count: {
-          _all: true,
-        },
-        where: {
-          Habit: { ownerId: ctx.session.user.id },
-          date: { gt: subDays(new Date(), 14) },
-        },
-      });
-      let habitCompletionsCount = new Map<String, number>(
-        habitCompletions.map((it) => {
-          console.log(it.habitId);
-          return [it.habitId, it._count._all];
-        })
-      );
-      let habitScores = new Map<String, number>(
-        habitCompletions.map((it) => {
-          console.log(it.habitId);
-          return [
-            it.habitId,
-            it._count._all / targetCount(habitsMap.get(it.habitId)!),
-          ];
-        })
+      let [metrics, metricsMap, metricScores] = await getMetrics(
+        ctx.prisma,
+        ctx.session.user.id
       );
 
-      let goals: (Goal & {
-        habits: (HabitMeasuresGoal & {
-          habit: Habit & { metrics: LinkedMetric[] };
-        })[];
-        metrics: MetricMeasuresGoal[];
-      })[] = await ctx.prisma.goal.findMany({
+      let [habits, habitsMap, habitCompletionsCount, habitScores] =
+        await getHabits(ctx.prisma, ctx.session.user.id);
+
+      let goals = await ctx.prisma.goal.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
@@ -148,6 +63,7 @@ export const goalsRouter = createTRPCRouter({
             include: { habit: { include: { metrics: true } } },
           },
           metrics: true,
+          GoalTag: { include: { tag: true } },
         },
       });
 
@@ -179,11 +95,14 @@ export const goalsRouter = createTRPCRouter({
                   (1 - h.habit.completionWeight) *
                     (linkedMetricScores / linkedMetrics.length);
 
+            let tags = g.GoalTag.map((it) => it.tag.name);
+
             return {
               ...h.habit,
               completions: habitCompletionsCount.get(h.id) ?? 0,
               score,
               metrics: linkedMetrics,
+              tags: tags,
             };
           }),
           metrics: g.metrics.map((m) => ({
