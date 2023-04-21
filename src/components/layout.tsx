@@ -12,7 +12,7 @@ import {
 
 function SideBar() {
   return (
-    <div className="flex h-full w-fit flex-col bg-gray-800 px-4 py-8">
+    <div className="flex h-full w-fit flex-col bg-gray-800/80 px-4 py-8 shadow-[inset_-25px_-15px_80px_#46464620] backdrop-blur-md">
       <h1 className="mb-8 text-2xl font-bold text-white">Navigation</h1>
       <ul className="flex flex-col space-y-2">
         <li>

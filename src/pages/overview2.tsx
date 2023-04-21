@@ -619,7 +619,7 @@ function OverviewPage() {
   let data = goalsQuery.data;
   console.log(data.goals);
   return (
-    <div className="bg-gray-100">
+    <div className="bg-slate-50 h-full">
       <CreateLinkedHabitModal
         visible={store.modal?.state === State.CreateLinkedHabit}
       ></CreateLinkedHabitModal>
