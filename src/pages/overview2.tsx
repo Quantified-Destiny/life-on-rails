@@ -6,9 +6,10 @@ import classNames from "classnames";
 import { useCombobox } from "downshift";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Arrow, useLayer } from "react-laag";
-import { create } from "zustand";
+import { CreateMenu } from "../components/createMenu";
 import Layout from "../components/layout";
+import { CreateLinkedHabitModal } from "../components/modals";
+import { State, useOverviewStore } from "../components/overviewState";
 import { ExpandedHabit, ExpandedMetric } from "../server/queries";
 import { api } from "../utils/api";
 
@@ -20,34 +21,6 @@ const textcolor = (score: number | undefined) => {
     ? "text-yellow-500"
     : "text-green-400";
 };
-
-enum State {
-  None,
-  CreateLinkedHabit,
-}
-
-interface CreateLinkedHabit {
-  state: State.CreateLinkedHabit;
-  habitId: string;
-  desc: string;
-}
-interface OverviewStore {
-  modal: CreateLinkedHabit | undefined;
-  openCreateLinkedModal: (habitId: string, desc: string) => void;
-  reset: () => void;
-}
-
-const useStore = create<OverviewStore>()((set) => ({
-  modal: undefined,
-  openCreateLinkedModal: (habitId, desc) => {
-    set((_state) => ({
-      modal: { state: State.CreateLinkedHabit, habitId, desc },
-    }));
-  },
-  reset: () => {
-    set((_) => ({ modal: undefined }));
-  },
-}));
 
 const bgcolor = (score: number | undefined) => {
   if (!score) return "text-black";
@@ -111,163 +84,6 @@ const SelectType = () => (
     </Select.Portal>
   </Select.Root>
 );
-
-interface FormData {
-  prompt: string;
-  type: "FIVE_POINT|NUMBER";
-}
-
-function CreateLinkedHabitModal({ visible }: { visible: boolean }) {
-  let reset = useStore((store) => store.reset);
-  let modal = useStore((store) => store.modal);
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<FormData>();
-  const onSubmit = (data: FormData) => {
-    reset();
-    console.log(data);
-  };
-
-  return (
-    <div
-      className={classNames(
-        "fixed inset-0 z-50 flex h-screen w-screen items-center justify-center overflow-y-auto overflow-x-hidden backdrop-blur-sm backdrop-brightness-50",
-        { hidden: !visible }
-      )}
-      onKeyDown={(it) => {
-        console.log(it);
-        if (it.key == "Escape") reset();
-      }}
-    >
-      <div className="relative max-h-full w-full max-w-md">
-        {/* Modal content */}
-        <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
-          <button
-            type="button"
-            className="absolute right-2.5 top-3 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
-            onClick={reset}
-          >
-            <svg
-              className="h-5 w-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-          <div className="px-6 py-6 lg:px-8">
-            <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-              Create a metric linked to {modal?.desc}
-            </h3>
-            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-              <div>
-                <label
-                  htmlFor="prompt"
-                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Prompt
-                </label>
-                <input
-                  type="text"
-                  id="prompt"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
-                  placeholder="name@company.com"
-                  required
-                  {...register("prompt")}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="type"
-                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Metric type
-                </label>
-                <select
-                  id="type"
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
-                  {...register("type")}
-                >
-                  <option value="FIVE_POINT">5-point</option>
-                  <option value="number">number</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                Create
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CreateMenu() {
-  const [isOpen, setOpen] = useState(false);
-
-  const { renderLayer, triggerProps, layerProps, arrowProps } = useLayer({
-    isOpen,
-    placement: "bottom-end",
-    arrowOffset: 4,
-    onOutsideClick: () => setOpen(false),
-  });
-  console.log(isOpen);
-
-  return (
-    <>
-      <button {...triggerProps} onClick={() => setOpen(!isOpen)}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="h-6 w-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 4.5v15m7.5-7.5h-15"
-          />
-        </svg>
-      </button>
-      {isOpen &&
-        renderLayer(
-          <div
-            {...layerProps}
-            className="mt-2 h-fit w-fit"
-            style={{ ...layerProps.style, zIndex: 50 }}
-          >
-            <ul className="z-10 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-slate-200">
-                New Goal
-              </li>
-              <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-slate-200">
-                New Habit
-              </li>
-              <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-slate-200">
-                New Metric
-              </li>
-            </ul>
-            <Arrow {...arrowProps} size={10} roundness={2} />
-          </div>
-        )}
-    </>
-  );
-}
 
 function Header() {
   return (
@@ -726,7 +542,7 @@ function HabitCard({
   linkedGoal: string | undefined;
 }) {
   let [createHabitActive, setCreateHabitActive] = useState<boolean>(false);
-  let openModal = useStore((store) => store.openCreateLinkedModal);
+  let openModal = useOverviewStore((store) => store.openCreateLinkedModal);
 
   let context = api.useContext();
   let linkHabit = api.tags.linkHabit.useMutation({
@@ -916,7 +732,7 @@ function LinkedMetric({
 let today = new Date();
 
 function OverviewPage() {
-  let store = useStore();
+  let store = useOverviewStore();
   let goalsQuery = api.goals.getGoals.useQuery();
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
