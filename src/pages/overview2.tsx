@@ -345,7 +345,7 @@ function CreateTag({ commit }: { commit: (name: string) => void }) {
   let [text, setText] = useState<string>("");
   return (
     <div
-      className="rounded-r-full bg-gray-200 px-2 py-1 text-xs hover:bg-gray-200"
+      className="cursor-pointer rounded-r-full bg-gray-200 px-2 py-1 text-xs hover:bg-gray-200"
       onClick={() => setActive(true)}
     >
       {active ? (
@@ -514,6 +514,7 @@ function HabitCard({
   weight: number | undefined;
   linked: boolean;
 }) {
+  let [createHabitActive, setCreateHabitActive] = useState<boolean>(false);
   let openModal = useStore((store) => store.openCreateLinkedModal);
 
   let context = api.useContext();
@@ -549,12 +550,19 @@ function HabitCard({
       {metrics.map((m) => (
         <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>
       ))}
-      <button
-        className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200"
-        onClick={() => openModal(id, description)}
-      >
-        + Create a new Linked Metric
-      </button>
+      {createHabitActive ? (
+        <CreateLinkedMetricInline
+          habitId={id}
+          closeEdit={() => setCreateHabitActive(false)}
+        ></CreateLinkedMetricInline>
+      ) : (
+        <button
+          className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200"
+          onClick={() => setCreateHabitActive(true)}
+        >
+          + Create a new Linked Metric
+        </button>
+      )}
       <HabitFooter
         id={id}
         tags={tags}
@@ -562,6 +570,92 @@ function HabitCard({
         linkHabit={linkHabit.mutate}
         unlinkHabit={unlinkHabit.mutate}
       ></HabitFooter>
+    </div>
+  );
+}
+
+type CreateLinkedMetric = {
+  prompt: string;
+  type: "FIVE_POINT" | "number";
+};
+
+function CreateLinkedMetricInline({
+  habitId,
+  closeEdit,
+}: {
+  habitId: string;
+  closeEdit: () => void;
+}) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreateLinkedMetric>();
+
+  let context = api.useContext();
+
+  let createLinkedMetric = api.metrics.createLinkedMetric.useMutation({
+    onSuccess() {
+      context.goals.getGoals.invalidate();
+    },
+  });
+
+  const onSubmit = (formData: CreateLinkedMetric) => {
+    let data = { habitId, prompt: formData.prompt };
+    console.log(data);
+    return createLinkedMetric.mutate(data);
+  };
+
+  return (
+    <div className="mt-2 rounded-lg bg-gray-100 p-4">
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <label
+            htmlFor="prompt"
+            className="mb-2 block text-sm font-medium text-gray-900"
+          >
+            Prompt
+          </label>
+          <input
+            type="text"
+            id="prompt"
+            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
+            placeholder="Prompt"
+            required
+            {...register("prompt")}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="type"
+            className="mb-2 block text-sm font-medium text-gray-900"
+          >
+            Metric type
+          </label>
+          <select
+            id="type"
+            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
+            {...register("type")}
+          >
+            <option value="FIVE_POINT">5-point</option>
+            <option value="number">number</option>
+          </select>
+        </div>
+        <div className="flex flex-row gap-5">
+          <button
+            className="w-full rounded-lg bg-gray-400 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
+            onClick={closeEdit}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          >
+            Create
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -619,7 +713,7 @@ function OverviewPage() {
   let data = goalsQuery.data;
   console.log(data.goals);
   return (
-    <div className="bg-slate-50 h-full">
+    <div className="h-full bg-slate-50">
       <CreateLinkedHabitModal
         visible={store.modal?.state === State.CreateLinkedHabit}
       ></CreateLinkedHabitModal>

@@ -37,8 +37,12 @@ export const goalsRouter = createTRPCRouter({
         ctx.session.user.id
       );
 
+      console.log("Fetched metrics");
+
       let [habits, habitsMap, habitCompletionsCount, habitScores] =
         await getHabits(ctx.prisma, metricsMap, ctx.session.user.id);
+
+      console.log("Fetched habits");
 
       let goals = await ctx.prisma.goal.findMany({
         where: {
@@ -46,12 +50,23 @@ export const goalsRouter = createTRPCRouter({
         },
         include: {
           habits: {
-            include: { habit: { include: { metrics: true, goals: true } } },
+            include: {
+              habit: {
+                include: {
+                  metrics: true,
+                  goals: true,
+                  HabitTag: { include: { tag: true } },
+                },
+              },
+            },
           },
           metrics: true,
           GoalTag: { include: { tag: true } },
         },
       });
+
+      console.log("Fetched goals");
+
       let goalsData = goals.map((g) => {
         let m: number[] = g.metrics.map(
           (it) => metricScores.get(it.metricId) ?? 0
@@ -63,34 +78,36 @@ export const goalsRouter = createTRPCRouter({
         let score = m.reduce((a, b) => a + b, 0) + h.reduce((a, b) => a + b, 0);
         score = score / (m.length + h.length);
 
+        let linkedHabits = g.habits.map((h) => {
+          let linkedMetrics = h.habit.metrics.map(
+            (m) => metricsMap.get(m.metricId)!
+          );
+          // console.log(`Wanted metrics: ${h.habit.metrics.map((m) => m.metricId)}`);
+          // console.log(metricsMap);
+          let linkedMetricScores = linkedMetrics
+            .map((m) => metricScores.get(m.id)!)
+            .reduce((a, b) => a + b, 0);
+
+          let score: number =
+            linkedMetrics.length == 0
+              ? habitScores.get(h.id) ?? 0
+              : h.habit.completionWeight * (habitScores.get(h.id) ?? 0) +
+                (1 - h.habit.completionWeight) *
+                  (linkedMetricScores / linkedMetrics.length);
+          // console.log(`Computed linked metrics for ${h.habitId}`);
+
+          return {
+            ...h.habit,
+            completions: habitCompletionsCount.get(h.id) ?? 0,
+            score,
+            goals: h.habit.goals.map((g) => g.goalId),
+            metrics: linkedMetrics,
+            tags: h.habit.HabitTag.map((t) => t.tag.name),
+          };
+        });
         return {
-          goal: { ...g, score },
-          habits: g.habits.map((h) => {
-            let linkedMetrics = h.habit.metrics.map(
-              (m) => metricsMap.get(m.id)!
-            );
-            let linkedMetricScores = linkedMetrics
-              .map((m) => metricScores.get(m.id)!)
-              .reduce((a, b) => a + b, 0);
-
-            let score: number =
-              linkedMetrics.length == 0
-                ? habitScores.get(h.id) ?? 0
-                : h.habit.completionWeight * (habitScores.get(h.id) ?? 0) +
-                  (1 - h.habit.completionWeight) *
-                    (linkedMetricScores / linkedMetrics.length);
-
-            let tags = g.GoalTag.map((it) => it.tag.name);
-
-            return {
-              ...h.habit,
-              completions: habitCompletionsCount.get(h.id) ?? 0,
-              score,
-              goals: h.habit.goals.map((g) => g.goalId),
-              metrics: linkedMetrics,
-              tags: tags,
-            };
-          }),
+          goal: { ...g, score, tags: g.GoalTag.map((it) => it.tag.name) },
+          habits: linkedHabits,
           metrics: g.metrics.map((m) => ({
             ...metricsMap.get(m.metricId)!,
           })),
