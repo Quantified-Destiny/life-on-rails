@@ -29,6 +29,26 @@ export const habitsRouter = createTRPCRouter({
         return existingLink;
       }
     }),
+  editHabit: protectedProcedure
+    .input(
+      z.object({
+        habitId: z.string(),
+        description: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      console.log(
+        `Editing habit ${input.habitId} in db with description ${input.description}`
+      );
+      return await ctx.prisma.habit.update({
+        where: {
+          id: input.habitId,
+        },
+        data: {
+          description: input.description,
+        },
+      });
+    }),
 
   unlinkHabit: protectedProcedure
     .input(z.object({ habitId: z.string(), goalId: z.string() }))

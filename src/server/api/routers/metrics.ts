@@ -21,4 +21,13 @@ export const metricsRouter = createTRPCRouter({
         },
       });
     }),
+
+  editMetric: protectedProcedure
+    .input(z.object({ metricId: z.string(), prompt: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.metric.update({
+        where: { id: input.metricId },
+        data: { prompt: input.prompt },
+      });
+    }),
 });

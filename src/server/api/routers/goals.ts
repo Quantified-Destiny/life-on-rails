@@ -92,6 +92,27 @@ export const goalsRouter = createTRPCRouter({
     };
   }),
 
+  editGoal: protectedProcedure
+    .input(
+      z.object({
+        goalId: z.string(),
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      console.log(
+        `Editing goal ${input.goalId} in db with description ${input.name}`
+      );
+      return await ctx.prisma.goal.update({
+        where: {
+          id: input.goalId,
+        },
+        data: {
+          name: input.name,
+        },
+      });
+    }),
+
   getGoalOnly: protectedProcedure.query(async ({ ctx }) => {
     let data = await ctx.prisma.goal.findMany({
       where: {

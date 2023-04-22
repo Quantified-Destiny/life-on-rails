@@ -12,6 +12,7 @@ import { CreateLinkedHabitModal } from "../components/modals";
 import { State, useOverviewStore } from "../components/overviewState";
 import { ExpandedHabit, ExpandedMetric } from "../server/queries";
 import { api } from "../utils/api";
+import { EditableField } from "../components/inlineEdit";
 
 const textcolor = (score: number | undefined) => {
   if (typeof score === "undefined") return "text-black";
@@ -128,18 +129,27 @@ function Header() {
 }
 
 function HabitHeaderLine({
+  id,
   weight,
   description,
   frequency,
   frequencyHorizon,
   score,
 }: {
+  id: string;
   weight: number | undefined;
   description: string;
   frequency: number;
   frequencyHorizon: string;
   score: number;
 }) {
+  let context = api.useContext();
+  let mutation = api.habits.editHabit.useMutation({
+    onSuccess: () => {
+      context.goals.getGoals.invalidate();
+    },
+  });
+
   return (
     <>
       <div className="mb-1">
@@ -154,7 +164,14 @@ function HabitHeaderLine({
       </div>
       <div className="mb-2 flex items-center justify-between">
         <span className="whitespace-nowrap">
-          <span className="mr-1 text-lg font-bold">{description}</span>
+          <div className="mr-1 text-lg font-bold">
+            <EditableField
+              initialText={description}
+              commit={(text) =>
+                mutation.mutate({ habitId: id, description: text })
+              }
+            ></EditableField>
+          </div>
           <span className="text-sm lowercase text-gray-500">
             {frequency}x per {frequencyHorizon}
           </span>
@@ -246,18 +263,6 @@ function CreateTag({ commit }: { commit: (name: string) => void }) {
   );
 }
 
-const books = [
-  { author: "Harper Lee", title: "To Kill a Mockingbird" },
-  { author: "Lev Tolstoy", title: "War and Peace" },
-  { author: "Fyodor Dostoyevsy", title: "The Idiot" },
-  { author: "Oscar Wilde", title: "A Picture of Dorian Gray" },
-  { author: "George Orwell", title: "1984" },
-  { author: "Jane Austen", title: "Pride and Prejudice" },
-  { author: "Marcus Aurelius", title: "Meditations" },
-  { author: "Fyodor Dostoevsky", title: "The Brothers Karamazov" },
-  { author: "Lev Tolstoy", title: "Anna Karenina" },
-  { author: "Fyodor Dostoevsky", title: "Crime and Punishment" },
-];
 function getGoalsFilter(
   inputValue: string | undefined
 ): (goal: Goal) => boolean {
@@ -490,6 +495,13 @@ function GoalCard({
   })[];
   metrics: (Metric & { score: number })[];
 }) {
+  let context = api.useContext();
+  let mutation = api.goals.editGoal.useMutation({
+    onSuccess: () => {
+      context.goals.getGoals.invalidate();
+    },
+  });
+
   return (
     <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
       <div className="mb-1">
@@ -498,7 +510,12 @@ function GoalCard({
         </span>
       </div>
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-bold">{name}</h2>
+        <h2 className="text-xl font-bold">
+          <EditableField
+            initialText={name}
+            commit={(name) => mutation.mutate({ goalId: id, name })}
+          ></EditableField>
+        </h2>
         <div className="flex items-center space-x-2">
           <div className="rounded-lg bg-gray-100 p-2 text-xl font-bold text-yellow-500">
             {score.toFixed(2)}
@@ -539,7 +556,7 @@ function HabitCard({
   tags,
 }: ExpandedHabit & {
   weight: number | undefined;
-  linkedGoal: string | undefined;
+  linkedGoal?: string | undefined;
 }) {
   let [createHabitActive, setCreateHabitActive] = useState<boolean>(false);
   let openModal = useOverviewStore((store) => store.openCreateLinkedModal);
@@ -563,6 +580,7 @@ function HabitCard({
   return (
     <div className={classes}>
       <HabitHeaderLine
+        id={id}
         weight={weight}
         description={description}
         frequency={frequency}
@@ -688,14 +706,23 @@ function CreateLinkedMetricInline({
 }
 
 function LinkedMetric({
+  id,
   weight,
   prompt,
   score,
 }: {
+  id: string;
   weight: number;
   prompt: string;
   score: number;
 }) {
+  let context = api.useContext();
+  let mutation = api.metrics.editMetric.useMutation({
+    onSuccess: () => {
+      context.goals.getGoals.invalidate();
+    },
+  });
+
   return (
     <div className="mt-2 rounded-lg bg-gray-100 p-4">
       <div className="mb-2">
@@ -708,7 +735,14 @@ function LinkedMetric({
       </div>
       <div className="flex w-full justify-between space-x-2">
         <div className="mb-2">
-          <h3 className="text-sm font-bold">{prompt}</h3>
+          <h3 className="text-sm font-bold">
+            <EditableField
+              initialText={prompt}
+              commit={(text) => {
+                mutation.mutate({ metricId: id, prompt: text });
+              }}
+            ></EditableField>
+          </h3>
         </div>
         <div className="bg-white px-2">
           <span
@@ -760,13 +794,17 @@ function OverviewPage() {
             Unlinked Items
           </h1>
           {data.habits.map((habit) => (
-            <HabitCard
-              {...habit}
-              weight={0.5}
-              key={habit.id}
-              linkedGoal={undefined}
-            ></HabitCard>
+            <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
           ))}
+          {data.metrics.map((metric) => {
+            return (
+              <LinkedMetric
+                {...metric}
+                weight={0.5}
+                key={metric.id}
+              ></LinkedMetric>
+            );
+          })}
         </>
       </div>
     </div>
