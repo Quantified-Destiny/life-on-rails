@@ -1,19 +1,16 @@
-import { Goal, Habit, Metric } from "@prisma/client";
-import classNames from "classnames";
-import Layout from "../components/layout";
-import { api } from "../utils/api";
-import { create } from "zustand";
-import { combine } from "zustand/middleware";
+import { Goal, Metric } from "@prisma/client";
+import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from "@radix-ui/react-icons";
 import { SelectItem } from "@radix-ui/react-select";
-import { useForm } from "react-hook-form";
-import { ExpandedHabit, ExpandedMetric } from "../server/queries";
+import classNames from "classnames";
+import { useCombobox } from "downshift";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Arrow, useLayer } from "react-laag";
+import { create } from "zustand";
+import Layout from "../components/layout";
+import { ExpandedHabit, ExpandedMetric } from "../server/queries";
+import { api } from "../utils/api";
 
 const textcolor = (score: number | undefined) => {
   if (typeof score === "undefined") return "text-black";
@@ -151,7 +148,7 @@ function CreateLinkedHabitModal({ visible }: { visible: boolean }) {
         <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
           <button
             type="button"
-            className="absolute top-3 right-2.5 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
+            className="absolute right-2.5 top-3 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
             onClick={reset}
           >
             <svg
@@ -218,6 +215,60 @@ function CreateLinkedHabitModal({ visible }: { visible: boolean }) {
   );
 }
 
+function CreateMenu() {
+  const [isOpen, setOpen] = useState(false);
+
+  const { renderLayer, triggerProps, layerProps, arrowProps } = useLayer({
+    isOpen,
+    placement: "bottom-end",
+    arrowOffset: 4,
+    onOutsideClick: () => setOpen(false),
+  });
+  console.log(isOpen);
+
+  return (
+    <>
+      <button {...triggerProps} onClick={() => setOpen(!isOpen)}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="h-6 w-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 4.5v15m7.5-7.5h-15"
+          />
+        </svg>
+      </button>
+      {isOpen &&
+        renderLayer(
+          <div
+            {...layerProps}
+            className="mt-2 h-fit w-fit"
+            style={{ ...layerProps.style, zIndex: 50 }}
+          >
+            <ul className="z-10 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-slate-200">
+                New Goal
+              </li>
+              <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-slate-200">
+                New Habit
+              </li>
+              <li className="block cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-slate-200">
+                New Metric
+              </li>
+            </ul>
+            <Arrow {...arrowProps} size={10} roundness={2} />
+          </div>
+        )}
+    </>
+  );
+}
+
 function Header() {
   return (
     <div className="mb-4 flex w-full items-end justify-between">
@@ -227,13 +278,13 @@ function Header() {
         </h1>
       </div>
       <div className="flex">
-        <button className="rounded py-2 px-2 text-gray-500 hover:bg-gray-200">
+        <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
           Filter
         </button>
-        <button className="rounded py-2 px-2 text-gray-500 hover:bg-gray-200">
+        <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
           Sort
         </button>
-        <button className="rounded py-2 px-2 text-gray-500 hover:bg-gray-200">
+        <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -249,7 +300,10 @@ function Header() {
             />
           </svg>
         </button>
-        <button className="rounded stroke-gray-500 py-2 px-2 hover:bg-gray-200">
+        <button className="rounded  stroke-gray-500 px-2 py-2 text-gray-500  hover:bg-gray-200">
+          <CreateMenu></CreateMenu>
+        </button>
+        <button className="rounded stroke-gray-500 px-2 py-2 hover:bg-gray-200">
           ...
         </button>
       </div>
@@ -376,68 +430,224 @@ function CreateTag({ commit }: { commit: (name: string) => void }) {
   );
 }
 
+const books = [
+  { author: "Harper Lee", title: "To Kill a Mockingbird" },
+  { author: "Lev Tolstoy", title: "War and Peace" },
+  { author: "Fyodor Dostoyevsy", title: "The Idiot" },
+  { author: "Oscar Wilde", title: "A Picture of Dorian Gray" },
+  { author: "George Orwell", title: "1984" },
+  { author: "Jane Austen", title: "Pride and Prejudice" },
+  { author: "Marcus Aurelius", title: "Meditations" },
+  { author: "Fyodor Dostoevsky", title: "The Brothers Karamazov" },
+  { author: "Lev Tolstoy", title: "Anna Karenina" },
+  { author: "Fyodor Dostoevsky", title: "Crime and Punishment" },
+];
+function getGoalsFilter(
+  inputValue: string | undefined
+): (goal: Goal) => boolean {
+  if (inputValue === undefined) {
+    return (_: Goal) => true;
+  }
+  const lowerCasedInputValue = inputValue.toLowerCase();
+
+  return function goalsFilter(goal: Goal) {
+    return (
+      !inputValue || goal.name.toLowerCase().includes(lowerCasedInputValue)
+    );
+  };
+}
+
+function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
+  let context = api.useContext();
+
+  let goalsData = api.goals.getGoals.useQuery();
+  let linkHabit = api.habits.linkHabit.useMutation({
+    onSuccess() {
+      context.goals.getGoals.invalidate();
+    },
+  });
+
+  let goals = goalsData.data?.goals.map((it) => it.goal) ?? [];
+
+  const [items, setItems] = useState<Goal[]>(goals);
+
+  const {
+    isOpen,
+    getToggleButtonProps,
+    getLabelProps,
+    getMenuProps,
+    getInputProps,
+    highlightedIndex,
+    getItemProps,
+    selectedItem,
+  } = useCombobox({
+    onInputValueChange({ inputValue }) {
+      setItems(goals.filter(getGoalsFilter(inputValue)));
+    },
+    items,
+    itemToString(item) {
+      return item ? item.name : "";
+    },
+  });
+  return (
+    <div>
+      <div className="flex w-72 flex-row">
+        <div className="flex gap-0.5 bg-white shadow-sm">
+          <input
+            placeholder="Choose a goal"
+            className="w-full p-1.5"
+            {...getInputProps()}
+          />
+          {/* <button
+            aria-label="toggle menu"
+            className="px-2"
+            type="button"
+            {...getToggleButtonProps()}
+          >
+            {isOpen ? <>&#8593;</> : <>&#8595;</>}
+          </button> */}
+        </div>
+        <div className="flex flex-row gap-2">
+          {selectedItem ? (
+            <button
+              className="rounded-md bg-blue-500 px-2 font-bold text-white hover:bg-blue-700"
+              onClick={() => {
+                //alert(`Linked habit ${id} to goal ${selectedItem.name}`);
+                linkHabit.mutate({ habitId: id, goalId: selectedItem.id });
+                closeBox();
+              }}
+            >
+              Link
+            </button>
+          ) : (
+            <button className="cursor-not-allowed rounded bg-blue-500 px-4 py-2 font-bold text-white opacity-50">
+              Link
+            </button>
+          )}
+          <button
+            className="rounded-md bg-red-600 px-2 font-bold text-white hover:bg-red-700"
+            onClick={closeBox}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+      <ul
+        className={`absolute mt-1 max-h-80 w-72 overflow-scroll bg-white p-0 shadow-md ${
+          !(isOpen && items.length) && "hidden"
+        }`}
+        {...getMenuProps()}
+      >
+        {isOpen &&
+          items.map((item, index) => (
+            <li
+              className={classNames(
+                {
+                  "bg-blue-300": highlightedIndex === index,
+                  "font-bold": selectedItem === item,
+                },
+                "flex flex-col px-3 py-2 shadow-sm"
+              )}
+              key={`${item.name}${index}`}
+              {...getItemProps({ item, index })}
+            >
+              <span>{item.name}</span>
+              <span className="text-sm text-gray-700">
+                {item.createdAt?.toISOString() ?? "Loading..."}
+              </span>
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+}
+
+function LinkHabit({ id }: { id: string }) {
+  let [active, setActive] = useState<boolean>(false);
+  if (!active) {
+    return (
+      <button
+        className="font-bold text-blue-500 hover:underline"
+        onClick={() => setActive(true)}
+      >
+        Link to Goal
+      </button>
+    );
+  } else {
+    return (
+      <LinkHabitBox id={id} closeBox={() => setActive(false)}></LinkHabitBox>
+    );
+  }
+}
+
 function HabitFooter({
   id,
   tags,
-  linked,
+  linkedGoal,
   linkHabit,
   unlinkHabit,
 }: {
   id: string;
   tags: string[];
-  linked: boolean;
+  linkedGoal: string | undefined;
   linkHabit: (args: { habitId: string; tagName: string }) => void;
   unlinkHabit: (args: { habitId: string; tagName: string }) => void;
 }) {
+  let context = api.useContext();
+  let unlinkHabitFromGoal = api.habits.unlinkHabit.useMutation({
+    onSuccess() {
+      context.goals.getGoals.invalidate();
+    },
+  });
+
   return (
     <div className="mt-6">
       <div className="flex justify-between">
-        <div>
-          <div className="flex items-center space-x-2">
-            {tags.map((tag) => (
-              <div
-                key={tag}
-                className="hover:bg-slate:300 flex flex-row flex-nowrap divide-x-0 divide-gray-800 whitespace-nowrap rounded-r-full bg-slate-200 px-2 py-1"
+        <div className="flex items-center space-x-2">
+          {tags.map((tag) => (
+            <div
+              key={tag}
+              className="hover:bg-slate:300 flex flex-row flex-nowrap divide-x-0 divide-gray-800 whitespace-nowrap rounded-r-full bg-slate-200 px-2 py-1"
+            >
+              <span>{tag}</span>
+              <span
+                className=" hover:stroke-red-300"
+                onClick={() => unlinkHabit({ habitId: id, tagName: tag })}
               >
-                <span>{tag}</span>
-                <span
-                  className=" hover:stroke-red-300"
-                  onClick={() => unlinkHabit({ habitId: id, tagName: tag })}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-6 w-6 cursor-pointer hover:stroke-red-300"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="h-6 w-6 cursor-pointer hover:stroke-red-300"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            ))}
-            {/* TODO add combobox features */}
-            <CreateTag
-              commit={(name: string) =>
-                linkHabit({ habitId: id, tagName: name })
-              }
-            ></CreateTag>
-          </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </span>
+            </div>
+          ))}
+          {/* TODO add combobox features */}
+          <CreateTag
+            commit={(name: string) => linkHabit({ habitId: id, tagName: name })}
+          ></CreateTag>
         </div>
         <div className="flex items-center space-x-4">
-          {linked ? (
-            <button className="font-bold text-blue-500 hover:underline">
+          {linkedGoal ? (
+            <button
+              className="font-bold text-blue-500 hover:underline"
+              onClick={() =>
+                unlinkHabitFromGoal.mutate({ habitId: id, goalId: linkedGoal })
+              }
+            >
               Unlink from Goal
             </button>
           ) : (
-            <button className="font-bold text-blue-500 hover:underline">
-              Link to Goal
-            </button>
+            <LinkHabit id={id}></LinkHabit>
           )}
 
           <button className="font-bold text-gray-500 hover:text-gray-700">
@@ -450,6 +660,7 @@ function HabitFooter({
 }
 
 function GoalCard({
+  id,
   name,
   score,
   habits,
@@ -491,7 +702,7 @@ function GoalCard({
         <HabitCard
           {...habit}
           weight={0.4}
-          linked={true}
+          linkedGoal={id}
           key={habit.id}
         ></HabitCard>
       ))}
@@ -501,7 +712,7 @@ function GoalCard({
 
 function HabitCard({
   id,
-  linked = false,
+  linkedGoal,
   score,
   weight,
   description,
@@ -512,7 +723,7 @@ function HabitCard({
   tags,
 }: ExpandedHabit & {
   weight: number | undefined;
-  linked: boolean;
+  linkedGoal: string | undefined;
 }) {
   let [createHabitActive, setCreateHabitActive] = useState<boolean>(false);
   let openModal = useStore((store) => store.openCreateLinkedModal);
@@ -529,7 +740,7 @@ function HabitCard({
     },
   });
 
-  let classes = linked
+  let classes = linkedGoal
     ? "mb-6 rounded-sm border-l-4 p-6"
     : "mb-6 rounded-lg bg-white p-6 shadow-md";
 
@@ -566,7 +777,7 @@ function HabitCard({
       <HabitFooter
         id={id}
         tags={tags}
-        linked={linked}
+        linkedGoal={linkedGoal}
         linkHabit={linkHabit.mutate}
         unlinkHabit={unlinkHabit.mutate}
       ></HabitFooter>
@@ -706,7 +917,7 @@ let today = new Date();
 
 function OverviewPage() {
   let store = useStore();
-  let goalsQuery = api.goals.getGoals.useQuery({ date: today });
+  let goalsQuery = api.goals.getGoals.useQuery();
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
 
@@ -736,8 +947,8 @@ function OverviewPage() {
             <HabitCard
               {...habit}
               weight={0.5}
-              linked={false}
               key={habit.id}
+              linkedGoal={undefined}
             ></HabitCard>
           ))}
         </>
