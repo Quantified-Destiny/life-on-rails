@@ -1,17 +1,18 @@
-import {
-  Goal,
+import type {
   Habit,
   HabitMeasuresGoal,
   HabitTag,
   LinkedMetric,
   Metric,
-  MetricMeasuresGoal,
   MetricTag,
-  Tag,
+  Tag} from "@prisma/client";
+import {
+  Goal,
+  MetricMeasuresGoal
 } from "@prisma/client";
 import { subDays } from "date-fns";
 
-import { prisma as prismaClient } from "./db";
+import type { prisma as prismaClient } from "./db";
 
 function targetCount(h: Habit) {
   if (h.frequencyHorizon == "DAY") {
@@ -41,7 +42,7 @@ export async function getHabits(
     Map<string, number>
   ]
 > {
-  let habits: (Habit & {
+  const habits: (Habit & {
     metrics: LinkedMetric[];
     HabitTag: (HabitTag & { tag: Tag })[];
     goals: HabitMeasuresGoal[];
@@ -55,9 +56,9 @@ export async function getHabits(
       goals: true,
     },
   });
-  let habitsMap = new Map<string, Habit>(habits.map((h) => [h.id, h]));
+  const habitsMap = new Map<string, Habit>(habits.map((h) => [h.id, h]));
 
-  let habitCompletions = await prisma.habitCompletion.groupBy({
+  const habitCompletions = await prisma.habitCompletion.groupBy({
     by: ["habitId"],
     _count: {
       _all: true,
@@ -67,13 +68,13 @@ export async function getHabits(
       date: { gt: subDays(new Date(), 14) },
     },
   });
-  let habitCompletionsCount = new Map<string, number>(
+  const habitCompletionsCount = new Map<string, number>(
     habitCompletions.map((it) => {
       console.log(it.habitId);
       return [it.habitId, it._count._all];
     })
   );
-  let habitScores = new Map<string, number>(
+  const habitScores = new Map<string, number>(
     habitCompletions.map((it) => {
       console.log(it.habitId);
       return [
@@ -82,7 +83,7 @@ export async function getHabits(
       ];
     })
   );
-  let expandedHabits = habits.map((h) => ({
+  const expandedHabits = habits.map((h) => ({
     ...h,
     score: habitScores.get(h.id) ?? 0,
     goals: h.goals.map((it) => it.goalId),
@@ -90,7 +91,7 @@ export async function getHabits(
     metrics: h.metrics.map((it) => metricsMap.get(it.metricId)!),
     completions: habitCompletionsCount.get(h.id) ?? 0,
   }));
-  let expandedHabitsMap = new Map<string, ExpandedHabit>(
+  const expandedHabitsMap = new Map<string, ExpandedHabit>(
     expandedHabits.map((h) => [h.id, h])
   );
 
@@ -114,7 +115,7 @@ export async function getMetrics(
 ): Promise<
   [ExpandedMetric[], Map<string, ExpandedMetric>, Map<string, number>]
 > {
-  let metrics: (Metric & {
+  const metrics: (Metric & {
     completionMetric: LinkedMetric[];
     MetricTag: (MetricTag & { tag: Tag })[];
   })[] = await prisma.metric.findMany({
@@ -129,7 +130,7 @@ export async function getMetrics(
     },
   });
 
-  let metricAnswers = await prisma.metricAnswer.groupBy({
+  const metricAnswers = await prisma.metricAnswer.groupBy({
     by: ["metricId"],
     _avg: {
       value: true,
@@ -139,18 +140,18 @@ export async function getMetrics(
     },
   });
 
-  let metricScores = new Map<string, number>(
+  const metricScores = new Map<string, number>(
     metricAnswers.map((a) => [a.metricId, a._avg.value ?? 0])
   );
 
-  let expandedMetrics = metrics.map((m) => ({
+  const expandedMetrics = metrics.map((m) => ({
     ...m,
     linkedHabits: m.completionMetric.map((it) => it.habitId),
     tags: m.MetricTag.map((mt) => mt.tag),
     score: metricScores.get(m.id) ?? 0,
   }));
 
-  let metricsMap = new Map<string, ExpandedMetric>();
+  const metricsMap = new Map<string, ExpandedMetric>();
   expandedMetrics.forEach((m) => {
     console.log(`Tried to set metric ${m.id} to ${JSON.stringify(m)}`);
     metricsMap.set(m.id, m);

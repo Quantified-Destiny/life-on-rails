@@ -73,7 +73,7 @@ function GoalPage() {
     return <span>error</span>;
   }
 
-  let query = api.goals.getGoal.useQuery({ id });
+  const query = api.goals.getGoal.useQuery({ id });
   if (query.isLoading) {
     return <span>loading...</span>;
   } else if (query.error) {

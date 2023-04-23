@@ -280,4 +280,6 @@ export function Home() {
   );
 }
 
-export default () => <Layout main={Home}></Layout>;
+const DashboardPage = () => <Layout main={Home}></Layout>;
+
+export default DashboardPage;

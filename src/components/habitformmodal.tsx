@@ -91,13 +91,13 @@ function HabitForm({ goals, onClose, createHabit }: HabitFormProps) {
 
 
 const HabitFormModal = ({ onClose }: { onClose: () => void }) => {
-  let createHabit = api.create.createHabit.useMutation();
-  let createLinkedHabit = api.create.createLinkedHabit.useMutation();
+  const createHabit = api.create.createHabit.useMutation();
+  const createLinkedHabit = api.create.createLinkedHabit.useMutation();
 
-  let query = api.goals.getGoalOnly.useQuery();
+  const query = api.goals.getGoalOnly.useQuery();
   if (query.isLoading) return <p>loading...</p>;
   else if (query.isError) return <p>error</p>;
-  let goals = query.data.goalData;
+  const goals = query.data.goalData;
 
   const createHabitFn = (habitName: string, goalId: string | undefined) => {
     if (goalId == undefined) {

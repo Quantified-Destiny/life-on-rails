@@ -6,7 +6,7 @@ export const habitsRouter = createTRPCRouter({
   linkHabit: protectedProcedure
     .input(z.object({ habitId: z.string(), goalId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      let existingLink = await ctx.prisma.habitMeasuresGoal.findFirst({
+      const existingLink = await ctx.prisma.habitMeasuresGoal.findFirst({
         where: {
           habitId: input.habitId,
           goalId: input.goalId,

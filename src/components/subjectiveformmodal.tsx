@@ -84,17 +84,17 @@ function SubjectiveForm({ goals, onClose, createSubjective }: SubjectiveFormProp
       </div>
     </div>
   );
-};
+}
 
 
 const SubjectiveFormModal = ({ onClose }: { onClose: () => void }) => {
-  let createSubjective = api.create.createSubjective.useMutation();
-  let createLinkedSubjective = api.create.createLinkedSubjective.useMutation();
+  const createSubjective = api.create.createSubjective.useMutation();
+  const createLinkedSubjective = api.create.createLinkedSubjective.useMutation();
 
-  let query = api.goals.getGoalOnly.useQuery();
+  const query = api.goals.getGoalOnly.useQuery();
   if (query.isLoading) return <p>loading...</p>;
   else if (query.isError) return <p>error</p>;
-  let goals = query.data.goalData;
+  const goals = query.data.goalData;
 
   const createSubjectiveFn = (subjectiveName: string, goalId: string | undefined) => {
     if (goalId == undefined) {

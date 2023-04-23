@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { useForm } from "react-hook-form";
 import { useOverviewStore } from "./overviewState";
 import classNames from "classnames";
@@ -8,15 +9,10 @@ interface FormData {
 }
 
 export function CreateLinkedHabitModal({ visible }: { visible: boolean }) {
-  let reset = useOverviewStore((store) => store.reset);
-  let modal = useOverviewStore((store) => store.modal);
+  const reset = useOverviewStore((store) => store.reset);
+  const modal = useOverviewStore((store) => store.modal);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<FormData>();
+  const { register, handleSubmit } = useForm<FormData>();
   const onSubmit = (data: FormData) => {
     reset();
     console.log(data);

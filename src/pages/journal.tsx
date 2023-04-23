@@ -15,7 +15,8 @@ import { api } from "../utils/api";
 // fixes zoomed in icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { addDays, subDays } from "date-fns";
-import { LinkedMetric, Metric } from "@prisma/client";
+import type { Metric } from "@prisma/client";
+import { LinkedMetric } from "@prisma/client";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
@@ -72,10 +73,10 @@ const Habit = ({
   edit,
   deleteHabit,
 }: HabitProps): JSX.Element => {
-  let [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   // FIXME this state really should belong to the edit part of this component
-  let [text, setText] = useState(description);
+  const [text, setText] = useState(description);
   if (editMode)
     return (
       <div>
@@ -215,8 +216,8 @@ const InlineEdit = ({
   initialText: string;
   commit: (text: string) => void;
 }) => {
-  let [isActive, setActive] = useState<boolean>(false);
-  let [text, setText] = useState<string>(initialText);
+  const [isActive, setActive] = useState<boolean>(false);
+  const [text, setText] = useState<string>(initialText);
   if (!isActive) {
     return (
       <div className="bg-slate-100">
@@ -253,8 +254,8 @@ const InlineEdit = ({
 };
 
 const InlineCreateSubjective = () => {
-  let context = api.useContext();
-  let addSubjective = api.journal.addSubjective.useMutation({
+  const context = api.useContext();
+  const addSubjective = api.journal.addSubjective.useMutation({
     onSuccess() {
       context.journal.getMetrics.invalidate();
     },
@@ -270,8 +271,8 @@ const InlineCreateSubjective = () => {
 };
 
 function InlineCreateHabit() {
-  let context = api.useContext();
-  let addHabit = api.journal.addHabit.useMutation({
+  const context = api.useContext();
+  const addHabit = api.journal.addHabit.useMutation({
     onSuccess() {
       context.journal.getHabits.invalidate();
     },
@@ -309,23 +310,23 @@ function Journal({
   habits,
   metrics: subjectives,
 }: JournalProps) {
-  let context = api.useContext();
-  let setHabitCompletion = api.journal.setCompletion.useMutation({
+  const context = api.useContext();
+  const setHabitCompletion = api.journal.setCompletion.useMutation({
     onSuccess() {
       context.journal.getHabits.invalidate();
     },
   });
-  let setScore = api.journal.setSubjectiveScore.useMutation({
+  const setScore = api.journal.setSubjectiveScore.useMutation({
     onSuccess() {
       context.journal.getMetrics.invalidate();
     },
   });
-  let deleteHabit = api.journal.deleteHabit.useMutation({
+  const deleteHabit = api.journal.deleteHabit.useMutation({
     onSuccess() {
       context.journal.getHabits.invalidate();
     },
   });
-  let editHabit = api.journal.editHabit.useMutation({
+  const editHabit = api.journal.editHabit.useMutation({
     onSuccess() {
       context.journal.getHabits.invalidate();
     },
@@ -392,20 +393,20 @@ function Journal({
   );
 }
 
-let today = new Date();
+const today = new Date();
 
 const JournalPage = () => {
   const [date, setDate] = useState(today);
 
-  let habits = api.journal.getHabits.useQuery({ date });
-  let metrics = api.journal.getMetrics.useQuery({ date });
+  const habits = api.journal.getHabits.useQuery({ date });
+  const metrics = api.journal.getMetrics.useQuery({ date });
   if (habits.isLoading || metrics.isLoading) return <p>Loading...</p>;
   if (habits.isError || metrics.isError) return <p>Query error</p>;
-  let habitsData = habits.data.habits.map((habit) => ({
+  const habitsData = habits.data.habits.map((habit) => ({
     editable: true,
     ...habit,
   }));
-  let metricsData = metrics.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
+  const metricsData = metrics.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
   console.log(`Got subjectives ${JSON.stringify(metricsData)}`);
   return (
     <Journal

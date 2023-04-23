@@ -44,9 +44,9 @@ const AuthShowcase: React.FC = () => {
     { enabled: sessionData?.user !== undefined },
   );
 
-  let session = useSession();
+  const session = useSession();
   if (session.status=="authenticated") {
-    let router = useRouter();
+    const router = useRouter();
     router.push("/journal");
   }
 

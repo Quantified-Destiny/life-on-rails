@@ -197,14 +197,14 @@ function Overview({ goals, habits, subjectives }: OverviewProps) {
   );
 }
 
-let today = new Date();
+const today = new Date();
 
 function OverviewPage() {
-  let goalsQuery = api.goals.getGoals.useQuery();
+  const goalsQuery = api.goals.getGoals.useQuery();
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
 
-  let data = goalsQuery.data;
+  const data = goalsQuery.data;
   console.log(data);
 
   return (

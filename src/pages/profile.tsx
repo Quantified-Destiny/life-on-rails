@@ -4,12 +4,12 @@ import { api } from "../utils/api";
 
 
 const ProfilePage = () => {
-  let query = api.profile.getProfile.useQuery();
+  const query = api.profile.getProfile.useQuery();
 
   if (query.isLoading) return <p>Loading</p>;
   if (query.isError) return <p>Error</p>;
 
-  let profile = query.data;
+  const profile = query.data;
 
   return (<>
     <div className="flex min-h-screen justify-center ">

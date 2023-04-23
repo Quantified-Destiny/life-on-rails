@@ -1,4 +1,4 @@
-import { Goal } from "@prisma/client";
+import type { Goal } from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -8,14 +8,14 @@ export const goalsRouter = createTRPCRouter({
   getGoal: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      let goal: Goal = await ctx.prisma.goal.findFirstOrThrow({
+      const goal: Goal = await ctx.prisma.goal.findFirstOrThrow({
         where: {
           id: input.id,
           ownerId: ctx.session.user.id,
         },
       });
 
-      let habits = await ctx.prisma.habitMeasuresGoal.findMany({
+      const habits = await ctx.prisma.habitMeasuresGoal.findMany({
         where: {
           goalId: goal.id,
         },
@@ -30,19 +30,19 @@ export const goalsRouter = createTRPCRouter({
     }),
 
   getGoals: protectedProcedure.query(async ({ input, ctx }) => {
-    let [metrics, metricsMap, metricScores] = await getMetrics(
+    const [metrics, metricsMap, metricScores] = await getMetrics(
       ctx.prisma,
       ctx.session.user.id
     );
 
     console.log("Fetched metrics");
 
-    let [habits, habitsMap, habitCompletionsCount, habitScores] =
+    const [habits, habitsMap, habitCompletionsCount, habitScores] =
       await getHabits(ctx.prisma, metricsMap, ctx.session.user.id);
 
     console.log("Fetched habits");
 
-    let goals = await ctx.prisma.goal.findMany({
+    const goals = await ctx.prisma.goal.findMany({
       where: {
         ownerId: ctx.session.user.id,
       },
@@ -65,16 +65,16 @@ export const goalsRouter = createTRPCRouter({
 
     console.log("Fetched goals");
 
-    let goalsData = goals.map((g) => {
-      let m: number[] = g.metrics.map(
+    const goalsData = goals.map((g) => {
+      const m: number[] = g.metrics.map(
         (it) => metricScores.get(it.metricId) ?? 0
       );
-      let h: number[] = g.habits.map((it) => habitScores.get(it.habitId) ?? 0);
+      const h: number[] = g.habits.map((it) => habitScores.get(it.habitId) ?? 0);
 
       let score = m.reduce((a, b) => a + b, 0) + h.reduce((a, b) => a + b, 0);
       score = score / (m.length + h.length);
 
-      let linkedHabits = g.habits.map((h) => habitsMap.get(h.habitId)!);
+      const linkedHabits = g.habits.map((h) => habitsMap.get(h.habitId)!);
 
       return {
         goal: { ...g, score, tags: g.GoalTag.map((it) => it.tag.name) },
@@ -114,7 +114,7 @@ export const goalsRouter = createTRPCRouter({
     }),
 
   getGoalOnly: protectedProcedure.query(async ({ ctx }) => {
-    let data = await ctx.prisma.goal.findMany({
+    const data = await ctx.prisma.goal.findMany({
       where: {
         ownerId: ctx.session.user.id,
       },
@@ -123,7 +123,7 @@ export const goalsRouter = createTRPCRouter({
         name: true,
       },
     });
-    let goalData = data.map(({ id, name }) => ({
+    const goalData = data.map(({ id, name }) => ({
       id,
       name,
     }));

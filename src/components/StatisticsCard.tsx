@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export function StatisticsCard({
   color,

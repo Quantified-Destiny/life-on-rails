@@ -1,11 +1,12 @@
-import { HabitCompletion, LinkedMetric, Metric } from "@prisma/client";
+import type { HabitCompletion, Metric } from "@prisma/client";
+import { LinkedMetric } from "@prisma/client";
 import { endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 
 const onDay = (date: Date) => {
-  let startDate = startOfDay(date);
-  let endDate = endOfDay(startDate);
+  const startDate = startOfDay(date);
+  const endDate = endOfDay(startDate);
   return {
     gte: startDate,
     lte: endDate,
@@ -40,7 +41,7 @@ export const journalRouter = createTRPCRouter({
       z.object({ date: z.date(), habitId: z.string(), completed: z.boolean() })
     )
     .mutation(async ({ input, ctx }) => {
-      let existingCompletion = await ctx.prisma.habitCompletion.findFirst({
+      const existingCompletion = await ctx.prisma.habitCompletion.findFirst({
         where: {
           habitId: input.habitId,
           date: onDay(input.date),
@@ -119,7 +120,7 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      let existing = await ctx.prisma.metricAnswer.findFirst({
+      const existing = await ctx.prisma.metricAnswer.findFirst({
         where: {
           metricId: input.metricId,
           createdAt: onDay(input.date),
@@ -151,7 +152,7 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      let data: {
+      const data: {
         id: string;
         metrics: {
           metric: Metric;
@@ -177,7 +178,7 @@ export const journalRouter = createTRPCRouter({
           },
         },
       });
-      let habitsData = data.map(
+      const habitsData = data.map(
         ({ id, description, metrics, completions }) => ({
           id,
           description,
@@ -199,7 +200,7 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      let data = await ctx.prisma.metric.findMany({
+      const data = await ctx.prisma.metric.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
@@ -214,7 +215,7 @@ export const journalRouter = createTRPCRouter({
         },
       });
 
-      let metrics = data.map(({ id, prompt, metricAnswers }) => ({
+      const metrics = data.map(({ id, prompt, metricAnswers }) => ({
         id,
         prompt,
         score: metricAnswers[0]?.value,

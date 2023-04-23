@@ -10,12 +10,12 @@ export const taggingRouter = createTRPCRouter({
   linkHabit: protectedProcedure
     .input(z.object({ habitId: z.string(), tagName: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      let existingTag = await ctx.prisma.tag.findFirst({
+      const existingTag = await ctx.prisma.tag.findFirst({
         where: { name: input.tagName },
         select: { id: true, name: true },
       });
 
-      let tagId =
+      const tagId =
         existingTag?.id ??
         (
           await ctx.prisma.tag.create({
@@ -23,7 +23,7 @@ export const taggingRouter = createTRPCRouter({
           })
         ).id;
 
-      let existingLink = await ctx.prisma.habitTag.findFirst({
+      const existingLink = await ctx.prisma.habitTag.findFirst({
         where: {
           habitId: input.habitId,
           tagId: tagId,

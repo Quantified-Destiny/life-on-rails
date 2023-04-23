@@ -4,7 +4,7 @@ import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 export const profileRouter = createTRPCRouter({
   getProfile: protectedProcedure
     .query(async ({ ctx }) => {
-      let data = await ctx.prisma.user.findFirstOrThrow({
+      const data = await ctx.prisma.user.findFirstOrThrow({
         where: {
           id: ctx.session.user.id,
         },

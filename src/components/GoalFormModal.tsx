@@ -68,7 +68,7 @@ function GoalForm({ onClose, createGoal }: GoalFormProps) {
 }
 
 const GoalFormModal = ({ onClose }: { onClose: () => void }) => {
-  let createGoal = api.create.createGoal.useMutation();
+  const createGoal = api.create.createGoal.useMutation();
 
   const createGoalFn = (goalName: string) => {
     createGoal.mutate({ name: goalName });

@@ -1,4 +1,6 @@
-import { Goal, Metric } from "@prisma/client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+import type { Goal, Metric } from "@prisma/client";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
 import { SelectItem } from "@radix-ui/react-select";
@@ -10,7 +12,7 @@ import { CreateMenu } from "../components/createMenu";
 import Layout from "../components/layout";
 import { CreateLinkedHabitModal } from "../components/modals";
 import { State, useOverviewStore } from "../components/overviewState";
-import { ExpandedHabit, ExpandedMetric } from "../server/queries";
+import type { ExpandedHabit, ExpandedMetric } from "../server/queries";
 import { api } from "../utils/api";
 import { EditableField } from "../components/inlineEdit";
 
@@ -31,60 +33,6 @@ const bgcolor = (score: number | undefined) => {
     ? "bg-yellow-500"
     : "bg-green-400";
 };
-
-const SelectType = () => (
-  <Select.Root>
-    <Select.Trigger className="SelectTrigger" aria-label="Food">
-      <Select.Value placeholder="Select a fruit…" />
-      <Select.Icon className="SelectIcon">
-        <ChevronDownIcon />
-      </Select.Icon>
-    </Select.Trigger>
-    <Select.Portal>
-      <Select.Content className="SelectContent">
-        <Select.ScrollUpButton className="SelectScrollButton">
-          <ChevronUpIcon />
-        </Select.ScrollUpButton>
-        <Select.Viewport className="SelectViewport">
-          <Select.Group>
-            <Select.Label className="SelectLabel">Fruits</Select.Label>
-            <SelectItem value="apple">Apple</SelectItem>
-            <SelectItem value="banana">Banana</SelectItem>
-            <SelectItem value="blueberry">Blueberry</SelectItem>
-            <SelectItem value="grapes">Grapes</SelectItem>
-            <SelectItem value="pineapple">Pineapple</SelectItem>
-          </Select.Group>
-
-          <Select.Separator className="SelectSeparator" />
-
-          <Select.Group>
-            <Select.Label className="SelectLabel">Vegetables</Select.Label>
-            <SelectItem value="aubergine">Aubergine</SelectItem>
-            <SelectItem value="broccoli">Broccoli</SelectItem>
-            <SelectItem value="carrot" disabled>
-              Carrot
-            </SelectItem>
-            <SelectItem value="courgette">Courgette</SelectItem>
-            <SelectItem value="leek">Leek</SelectItem>
-          </Select.Group>
-
-          <Select.Separator className="SelectSeparator" />
-
-          <Select.Group>
-            <Select.Label className="SelectLabel">Meat</Select.Label>
-            <SelectItem value="beef">Beef</SelectItem>
-            <SelectItem value="chicken">Chicken</SelectItem>
-            <SelectItem value="lamb">Lamb</SelectItem>
-            <SelectItem value="pork">Pork</SelectItem>
-          </Select.Group>
-        </Select.Viewport>
-        <Select.ScrollDownButton className="SelectScrollButton">
-          <ChevronDownIcon />
-        </Select.ScrollDownButton>
-      </Select.Content>
-    </Select.Portal>
-  </Select.Root>
-);
 
 function Header() {
   return (
@@ -141,10 +89,10 @@ function HabitHeaderLine({
   frequencyHorizon: string;
   score: number;
 }) {
-  let context = api.useContext();
-  let mutation = api.habits.editHabit.useMutation({
+  const context = api.useContext();
+  const mutation = api.habits.editHabit.useMutation({
     onSuccess: () => {
-      context.goals.getGoals.invalidate();
+      void context.goals.getGoals.invalidate();
     },
   });
 
@@ -192,7 +140,7 @@ function HabitHeaderLine({
               "h-2 rounded-full bg-green-500",
               bgcolor(score)
             )}
-            style={{ width: score * 100 + "%" }}
+            style={{ width: `%{score * 100}%` }}
           />
         </div>
       </div>
@@ -226,8 +174,8 @@ function HabitStatusBlock({
 }
 
 function CreateTag({ commit }: { commit: (name: string) => void }) {
-  let [active, setActive] = useState<boolean>(false);
-  let [text, setText] = useState<string>("");
+  const [active, setActive] = useState<boolean>(false);
+  const [text, setText] = useState<string>("");
   return (
     <div
       className="cursor-pointer rounded-r-full bg-gray-200 px-2 py-1 text-xs hover:bg-gray-200"
@@ -265,7 +213,7 @@ function getGoalsFilter(
   inputValue: string | undefined
 ): (goal: Goal) => boolean {
   if (inputValue === undefined) {
-    return (_: Goal) => true;
+    return (_goal: Goal) => true;
   }
   const lowerCasedInputValue = inputValue.toLowerCase();
 
@@ -277,16 +225,16 @@ function getGoalsFilter(
 }
 
 function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
-  let context = api.useContext();
+  const context = api.useContext();
 
-  let goalsData = api.goals.getGoals.useQuery();
-  let linkHabit = api.habits.linkHabit.useMutation({
+  const goalsData = api.goals.getGoals.useQuery();
+  const linkHabit = api.habits.linkHabit.useMutation({
     onSuccess() {
-      context.goals.getGoals.invalidate();
+      void context.goals.getGoals.invalidate();
     },
   });
 
-  let goals = goalsData.data?.goals.map((it) => it.goal) ?? [];
+  const goals = goalsData.data?.goals.map((it) => it.goal) ?? [];
 
   const [items, setItems] = useState<Goal[]>(goals);
 
@@ -353,7 +301,7 @@ function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
       </div>
       <ul
         className={`absolute mt-1 max-h-80 w-72 overflow-scroll bg-white p-0 shadow-md ${
-          !(isOpen && items.length) && "hidden"
+          isOpen && items.length ? "" : "hidden"
         }`}
         {...getMenuProps()}
       >
@@ -382,7 +330,7 @@ function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
 }
 
 function LinkHabit({ id }: { id: string }) {
-  let [active, setActive] = useState<boolean>(false);
+  const [active, setActive] = useState<boolean>(false);
   if (!active) {
     return (
       <button
@@ -412,10 +360,10 @@ function HabitFooter({
   linkHabit: (args: { habitId: string; tagName: string }) => void;
   unlinkHabit: (args: { habitId: string; tagName: string }) => void;
 }) {
-  let context = api.useContext();
-  let unlinkHabitFromGoal = api.habits.unlinkHabit.useMutation({
+  const context = api.useContext();
+  const unlinkHabitFromGoal = api.habits.unlinkHabit.useMutation({
     onSuccess() {
-      context.goals.getGoals.invalidate();
+      void context.goals.getGoals.invalidate();
     },
   });
 
@@ -493,10 +441,10 @@ function GoalCard({
   })[];
   metrics: (Metric & { score: number })[];
 }) {
-  let context = api.useContext();
-  let mutation = api.goals.editGoal.useMutation({
+  const context = api.useContext();
+  const mutation = api.goals.editGoal.useMutation({
     onSuccess: () => {
-      context.goals.getGoals.invalidate();
+      void context.goals.getGoals.invalidate();
     },
   });
 
@@ -556,22 +504,22 @@ function HabitCard({
   weight: number | undefined;
   linkedGoal?: string | undefined;
 }) {
-  let [createHabitActive, setCreateHabitActive] = useState<boolean>(false);
-  let openModal = useOverviewStore((store) => store.openCreateLinkedModal);
+  const [createHabitActive, setCreateHabitActive] = useState<boolean>(false);
+  const openModal = useOverviewStore((store) => store.openCreateLinkedModal);
 
-  let context = api.useContext();
-  let linkHabit = api.tags.linkHabit.useMutation({
+  const context = api.useContext();
+  const linkHabit = api.tags.linkHabit.useMutation({
     onSuccess() {
-      context.goals.getGoals.invalidate();
+      void context.goals.getGoals.invalidate();
     },
   });
-  let unlinkHabit = api.tags.unlinkHabit.useMutation({
+  const unlinkHabit = api.tags.unlinkHabit.useMutation({
     onSuccess() {
-      context.goals.getGoals.invalidate();
+      void context.goals.getGoals.invalidate();
     },
   });
 
-  let classes = linkedGoal
+  const classes = linkedGoal
     ? "mb-6 rounded-sm border-l-4 p-6"
     : "mb-6 rounded-lg bg-white p-6 shadow-md";
 
@@ -635,16 +583,16 @@ function CreateLinkedMetricInline({
     formState: { errors },
   } = useForm<CreateLinkedMetric>();
 
-  let context = api.useContext();
+  const context = api.useContext();
 
-  let createLinkedMetric = api.metrics.createLinkedMetric.useMutation({
+  const createLinkedMetric = api.metrics.createLinkedMetric.useMutation({
     onSuccess() {
-      context.goals.getGoals.invalidate();
+      void context.goals.getGoals.invalidate();
     },
   });
 
   const onSubmit = (formData: CreateLinkedMetric) => {
-    let data = { habitId, prompt: formData.prompt };
+    const data = { habitId, prompt: formData.prompt };
     console.log(data);
     return createLinkedMetric.mutate(data);
   };
@@ -714,10 +662,10 @@ function LinkedMetric({
   prompt: string;
   score: number;
 }) {
-  let context = api.useContext();
-  let mutation = api.metrics.editMetric.useMutation({
+  const context = api.useContext();
+  const mutation = api.metrics.editMetric.useMutation({
     onSuccess: () => {
-      context.goals.getGoals.invalidate();
+      void context.goals.getGoals.invalidate();
     },
   });
 
@@ -761,15 +709,13 @@ function LinkedMetric({
   );
 }
 
-let today = new Date();
-
 function OverviewPage() {
-  let store = useOverviewStore();
-  let goalsQuery = api.goals.getGoals.useQuery();
+  const store = useOverviewStore();
+  const goalsQuery = api.goals.getGoals.useQuery();
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
 
-  let data = goalsQuery.data;
+  const data = goalsQuery.data;
   console.log(data.goals);
   return (
     <div className="h-full bg-slate-50">

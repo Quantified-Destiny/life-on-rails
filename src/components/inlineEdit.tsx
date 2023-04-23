@@ -1,4 +1,5 @@
-import { ChangeEvent, KeyboardEvent, useState } from "react";
+import type { ChangeEvent, KeyboardEvent} from "react";
+import { useState } from "react";
 import { api } from "../utils/api";
 
 export const useInlineEdit = ({
@@ -10,13 +11,13 @@ export const useInlineEdit = ({
   initialText: string;
   commit: (text: string) => void;
 }) => {
-  let [isActive, setActive] = useState<boolean>(false);
-  let [text, setText] = useState<string>(initialText);
+  const [isActive, setActive] = useState<boolean>(false);
+  const [text, setText] = useState<string>(initialText);
 
-  let triggerProps = {
+  const triggerProps = {
     onClick: () => setActive(true),
   };
-  let editProps = {
+  const editProps = {
     placeholder,
     value: text,
     onChange: (e: ChangeEvent<HTMLInputElement>) => setText(e.target.value),
@@ -48,7 +49,7 @@ export const EditableField = ({
   initialText: string;
   commit: (text: string) => void;
 }) => {
-  let { isActive, triggerProps, editProps } = useInlineEdit({
+  const { isActive, triggerProps, editProps } = useInlineEdit({
     placeholder: placeholder ?? "No placeholder",
     initialText,
     commit,

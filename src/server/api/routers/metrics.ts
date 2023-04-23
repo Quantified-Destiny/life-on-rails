@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import type { Metric } from "@prisma/client";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const metricsRouter = createTRPCRouter({
   createLinkedMetric: protectedProcedure
@@ -11,9 +13,10 @@ export const metricsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      let metric = await ctx.prisma.metric.create({
+      const metric: Metric = await ctx.prisma.metric.create({
         data: { prompt: input.prompt, ownerId: ctx.session.user.id },
       });
+
       await ctx.prisma.linkedMetric.create({
         data: {
           metricId: metric.id,
@@ -25,7 +28,7 @@ export const metricsRouter = createTRPCRouter({
   editMetric: protectedProcedure
     .input(z.object({ metricId: z.string(), prompt: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.metric.update({
+      await ctx.prisma.metric.update({
         where: { id: input.metricId },
         data: { prompt: input.prompt },
       });
