@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import type { Goal, Metric } from "@prisma/client";
-import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-import * as Select from "@radix-ui/react-select";
-import { SelectItem } from "@radix-ui/react-select";
 import classNames from "classnames";
 import { useCombobox } from "downshift";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CreateMenu } from "../components/createMenu";
+import { EditableField } from "../components/inlineEdit";
 import Layout from "../components/layout";
-import { CreateLinkedHabitModal } from "../components/modals";
+import {
+  CreateGoalModal,
+  CreateHabitModal,
+  CreateMetricModal,
+} from "../components/modals";
 import { State, useOverviewStore } from "../components/overviewState";
 import type { ExpandedHabit, ExpandedMetric } from "../server/queries";
 import { api } from "../utils/api";
-import { EditableField } from "../components/inlineEdit";
 
 const textcolor = (score: number | undefined) => {
   if (typeof score === "undefined") return "text-black";
@@ -36,7 +37,7 @@ const bgcolor = (score: number | undefined) => {
 
 function Header() {
   return (
-    <div className="mb-4 flex w-full items-end justify-between">
+    <div className="mb-2 flex w-full items-center justify-between">
       <div>
         <h1 className="ml-2 text-xl font-semibold uppercase text-gray-800">
           Overview
@@ -49,14 +50,14 @@ function Header() {
         <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
           Sort
         </button>
-        <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
+        <button className="rounded px-2 py-2 hover:bg-gray-200">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.7}
             stroke="currentColor"
-            className="h-6 w-6"
+            className="h-6 w-6 stroke-gray-400"
           >
             <path
               strokeLinecap="round"
@@ -81,6 +82,7 @@ function HabitHeaderLine({
   frequency,
   frequencyHorizon,
   score,
+  completions,
 }: {
   id: string;
   weight: number | undefined;
@@ -88,6 +90,7 @@ function HabitHeaderLine({
   frequency: number;
   frequencyHorizon: string;
   score: number;
+  completions: number;
 }) {
   const context = api.useContext();
   const mutation = api.habits.editHabit.useMutation({
@@ -98,30 +101,38 @@ function HabitHeaderLine({
 
   return (
     <>
-      <div className="mb-1">
-        <span className="mb-2 inline-block rounded-full bg-blue-500 px-2 py-1 text-xs font-bold text-white">
-          Habit
-        </span>
-        {weight && (
-          <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
-            Weight: {weight.toFixed(2)}
-          </span>
-        )}
-      </div>
-      <div className="mb-2 flex items-center justify-between">
-        <span className="whitespace-nowrap">
-          <div className="mr-1 text-lg font-bold">
+      <div className="mb-2 flex flex-row items-center justify-between">
+        <div className="flex flex-col">
+          <div className="">
+            <span className="mb-2 inline-block rounded-full bg-blue-500 px-2 py-1 text-xs font-bold text-white">
+              Habit
+            </span>
+            {weight && (
+              <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
+                Weight: {weight.toFixed(2)}
+              </span>
+            )}
+          </div>
+          <div className="mr-1 items-baseline text-lg font-bold">
             <EditableField
               initialText={description}
               commit={(text) =>
                 mutation.mutate({ habitId: id, description: text })
               }
             ></EditableField>
+            <span className="text-sm lowercase text-gray-500">
+              <span className="space-x-1 text-sm">
+                <span className="text-md font-bold">{completions}</span>
+                <span className="">/</span>
+                <span className="text-md font-bold">{frequency}</span>
+                <span>
+                  completions this{" "}
+                  <span className="text-md font-bold">{frequencyHorizon}</span>
+                </span>
+              </span>
+            </span>
           </div>
-          <span className="text-sm lowercase text-gray-500">
-            {frequency}x per {frequencyHorizon}
-          </span>
-        </span>
+        </div>
         <div className="flex items-center space-x-2">
           <div
             className={classNames(
@@ -133,43 +144,7 @@ function HabitHeaderLine({
           </div>
         </div>
       </div>
-      <div className="my-4">
-        <div className="h-2 rounded-full bg-gray-200">
-          <div
-            className={classNames(
-              "h-2 rounded-full bg-green-500",
-              bgcolor(score)
-            )}
-            style={{ width: `%{score * 100}%` }}
-          />
-        </div>
-      </div>
     </>
-  );
-}
-
-function HabitStatusBlock({
-  currentCompletions,
-  target,
-  weight,
-}: {
-  currentCompletions: number;
-  target: number;
-  weight: number;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between text-sm font-bold text-gray-500">
-        <span>Completions (Current Period)</span>
-        <span>
-          {currentCompletions} out of {target}
-        </span>
-      </div>
-      <div className="flex items-center justify-between text-sm font-bold text-gray-500">
-        <span>Completions Weight</span>
-        <span>{weight}</span>
-      </div>
-    </div>
   );
 }
 
@@ -211,7 +186,7 @@ function CreateTag({ commit }: { commit: (name: string) => void }) {
 
 function getGoalsFilter(
   inputValue: string | undefined
-): (goal: Goal) => boolean {
+): (_goal: Goal) => boolean {
   if (inputValue === undefined) {
     return (_goal: Goal) => true;
   }
@@ -240,8 +215,6 @@ function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
 
   const {
     isOpen,
-    getToggleButtonProps,
-    getLabelProps,
     getMenuProps,
     getInputProps,
     highlightedIndex,
@@ -450,41 +423,32 @@ function GoalCard({
 
   return (
     <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
-      <div className="mb-1">
-        <span className="mb-2 inline-block rounded-full bg-yellow-500 px-2 py-1 text-xs font-bold text-white">
-          Goal
-        </span>
-      </div>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-bold">
-          <EditableField
-            initialText={name}
-            commit={(name) => mutation.mutate({ goalId: id, name })}
-          ></EditableField>
-        </h2>
-        <div className="flex items-center space-x-2">
-          <div className="rounded-lg bg-gray-100 p-2 text-xl font-bold text-yellow-500">
-            {score.toFixed(2)}
+      <div className="mb-1 flex flex-row justify-between">
+        <div className="mb-2 flex flex-col">
+          <span className="mb-2 inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs font-bold text-white">
+            Goal
+          </span>
+          <div className="mb-2 flex items-center justify-between text-xl font-bold">
+            <EditableField
+              initialText={name}
+              commit={(name) => mutation.mutate({ goalId: id, name })}
+            ></EditableField>
           </div>
         </div>
-      </div>
-
-      <div className="mb-4">
-        <div className="h-5 rounded-full bg-gray-200">
-          <div
-            className="h-5 rounded-full bg-yellow-600"
-            style={{ width: "65%" }}
-          />
+        <div className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl font-bold text-yellow-500">
+          {score.toFixed(2)}
         </div>
       </div>
-      {habits.map((habit) => (
-        <HabitCard
-          {...habit}
-          weight={0.4}
-          linkedGoal={id}
-          key={habit.id}
-        ></HabitCard>
-      ))}
+      <div className=" gap-x-10 space-y-2">
+        {habits.map((habit) => (
+          <HabitCard
+            {...habit}
+            weight={0.4}
+            linkedGoal={id}
+            key={habit.id}
+          ></HabitCard>
+        ))}
+      </div>
     </div>
   );
 }
@@ -505,7 +469,6 @@ function HabitCard({
   linkedGoal?: string | undefined;
 }) {
   const [createHabitActive, setCreateHabitActive] = useState<boolean>(false);
-  const openModal = useOverviewStore((store) => store.openCreateLinkedModal);
 
   const context = api.useContext();
   const linkHabit = api.tags.linkHabit.useMutation({
@@ -520,8 +483,8 @@ function HabitCard({
   });
 
   const classes = linkedGoal
-    ? "mb-6 rounded-sm border-l-4 p-6"
-    : "mb-6 rounded-lg bg-white p-6 shadow-md";
+    ? "rounded-sm p-6 shadow-md"
+    : "rounded-lg bg-white p-6 shadow-md";
 
   return (
     <div className={classes}>
@@ -532,15 +495,16 @@ function HabitCard({
         frequency={frequency}
         frequencyHorizon={frequencyHorizon}
         score={score}
+        completions={completions}
       ></HabitHeaderLine>
-      <HabitStatusBlock
-        currentCompletions={completions}
-        target={frequency}
-        weight={0.76}
-      ></HabitStatusBlock>
-      {metrics.map((m) => (
-        <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>
-      ))}
+      <div className="ml-2 mt-2">
+        <span className=" text-xs font-bold uppercase">Metrics</span>
+      </div>
+      <div className="flex flex-col flex-wrap">
+        {metrics.map((m) => (
+          <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>
+        ))}
+      </div>
       {createHabitActive ? (
         <CreateLinkedMetricInline
           habitId={id}
@@ -585,7 +549,7 @@ function CreateLinkedMetricInline({
 
   const context = api.useContext();
 
-  const createLinkedMetric = api.metrics.createLinkedMetric.useMutation({
+  const createLinkedMetric = api.metrics.createMetric.useMutation({
     onSuccess() {
       void context.goals.getGoals.invalidate();
     },
@@ -670,41 +634,32 @@ function LinkedMetric({
   });
 
   return (
-    <div className="mt-2 rounded-lg bg-gray-100 p-4">
-      <div className="mb-2">
-        <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs font-bold text-white">
-          Linked Metric
-        </span>
-        <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
-          Weight: {weight.toFixed(2)}
-        </span>
-      </div>
-      <div className="flex w-full justify-between space-x-2">
+    <div className="mt-2 flex min-h-[100px] flex-row justify-between rounded-lg bg-gray-100 p-4">
+      <div className="flex flex-col">
         <div className="mb-2">
-          <h3 className="text-sm font-bold">
-            <EditableField
-              initialText={prompt}
-              commit={(text) => {
-                mutation.mutate({ metricId: id, prompt: text });
-              }}
-            ></EditableField>
-          </h3>
-        </div>
-        <div className="bg-white px-2">
-          <span
-            className={classNames(
-              "min-w-fit text-xs font-bold",
-              textcolor(score)
-            )}
-          >
-            {score}
+          <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs font-bold text-white">
+            Linked Metric
+          </span>
+          <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
+            Weight: {weight.toFixed(2)}
           </span>
         </div>
+        <div className="ml-2 font-semibold">
+          <EditableField
+            initialText={prompt}
+            commit={(text) => {
+              mutation.mutate({ metricId: id, prompt: text });
+            }}
+          ></EditableField>
+        </div>
       </div>
-      {/* <div class="mt-2">
-<div class="h-2 rounded-full bg-gray-200">
-<div class="h-2 rounded-full bg-green-500" style="width: 75%"></div>
-</div> */}
+      <div className="h-fit bg-white px-2">
+        <span
+          className={classNames("h-fit text-lg font-bold", textcolor(score))}
+        >
+          {score}
+        </span>
+      </div>
     </div>
   );
 }
@@ -719,37 +674,41 @@ function OverviewPage() {
   console.log(data.goals);
   return (
     <div className="h-full bg-slate-50">
-      <CreateLinkedHabitModal
-        visible={store.modal?.state === State.CreateLinkedHabit}
-      ></CreateLinkedHabitModal>
-      <div className="container mx-auto py-8">
-        <>
-          <Header></Header>
-          {data.goals.map((goal) => (
-            <GoalCard
-              {...goal.goal}
-              habits={goal.habits}
-              metrics={goal.metrics}
-              key={goal.goal.id}
-            ></GoalCard>
-          ))}
-          {/* Habit Card with Progress Bar */}
-          <h1 className="mb-4 ml-2 text-lg font-semibold uppercase text-slate-600">
-            Unlinked Items
-          </h1>
-          {data.habits.map((habit) => (
-            <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
-          ))}
-          {data.metrics.map((metric) => {
-            return (
-              <LinkedMetric
-                {...metric}
-                weight={0.5}
-                key={metric.id}
-              ></LinkedMetric>
-            );
-          })}
-        </>
+      {store.modal?.state === State.CreateGoal && (
+        <CreateGoalModal></CreateGoalModal>
+      )}
+      {store.modal?.state === State.CreateHabit && (
+        <CreateHabitModal></CreateHabitModal>
+      )}
+      {store.modal?.state === State.CreateMetric && (
+        <CreateMetricModal></CreateMetricModal>
+      )}
+      <div className="container mx-auto mb-10 py-2">
+        <Header></Header>
+        {data.goals.map((goal) => (
+          <GoalCard
+            {...goal.goal}
+            habits={goal.habits}
+            metrics={goal.metrics}
+            key={goal.goal.id}
+          ></GoalCard>
+        ))}
+        {/* Habit Card with Progress Bar */}
+        <h1 className="mb-4 ml-2 text-lg font-semibold uppercase text-slate-600">
+          Unlinked Items
+        </h1>
+        {data.habits.map((habit) => (
+          <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
+        ))}
+        {data.metrics.map((metric) => {
+          return (
+            <LinkedMetric
+              {...metric}
+              weight={0.5}
+              key={metric.id}
+            ></LinkedMetric>
+          );
+        })}
       </div>
     </div>
   );
