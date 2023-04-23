@@ -14,7 +14,11 @@ export function CreateMenu() {
 
   return (
     <>
-      <button {...triggerProps} onClick={() => setOpen(!isOpen)}>
+      <button
+        {...triggerProps}
+        onClick={() => setOpen(!isOpen)}
+        className="rounded stroke-gray-500 px-2 py-2 hover:bg-gray-200"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

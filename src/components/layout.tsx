@@ -17,6 +17,15 @@ function SideBar() {
       <ul className="flex flex-col space-y-2">
         <li>
           <Link
+            href="/dashboard"
+            className="flex items-center text-white opacity-75 hover:opacity-100"
+          >
+            <FontAwesomeIcon icon={faHome} className="mr-2" />
+            <span>Dashboard</span>
+          </Link>
+        </li>
+        <li>
+          <Link
             href="/overview2"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >

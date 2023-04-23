@@ -117,9 +117,7 @@ function Header() {
             />
           </svg>
         </button>
-        <button className="rounded  stroke-gray-500 px-2 py-2 text-gray-500  hover:bg-gray-200">
-          <CreateMenu></CreateMenu>
-        </button>
+        <CreateMenu></CreateMenu>
         <button className="rounded stroke-gray-500 px-2 py-2 hover:bg-gray-200">
           ...
         </button>
