@@ -1,8 +1,7 @@
-import type { HabitCompletion, Metric } from "@prisma/client";
-import { LinkedMetric } from "@prisma/client";
+import type { HabitCompletion, Metric, MetricAnswer } from "@prisma/client";
 import { endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 const onDay = (date: Date) => {
   const startDate = startOfDay(date);
@@ -152,14 +151,7 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      const data: {
-        id: string;
-        metrics: {
-          metric: Metric;
-        }[];
-        completions: HabitCompletion[];
-        description: string;
-      }[] = await ctx.prisma.habit.findMany({
+      const data = await ctx.prisma.habit.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
@@ -168,7 +160,20 @@ export const journalRouter = createTRPCRouter({
           description: true,
           metrics: {
             select: {
-              metric: true,
+              metric: {
+                select: {
+                  id: true,
+                  prompt: true,
+                  metricAnswers: {
+                    select: {
+                      value: true,
+                    },
+                    where: {
+                      createdAt: onDay(input.date),
+                    },
+                  },
+                },
+              },
             },
           },
           completions: {
@@ -200,7 +205,11 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      const data = await ctx.prisma.metric.findMany({
+      const data: {
+        id: string;
+        prompt: string;
+        metricAnswers: MetricAnswer[];
+      }[] = await ctx.prisma.metric.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
@@ -210,6 +219,9 @@ export const journalRouter = createTRPCRouter({
           metricAnswers: {
             where: {
               createdAt: onDay(input.date),
+            },
+            orderBy: {
+              createdAt: "desc",
             },
           },
         },

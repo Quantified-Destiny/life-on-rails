@@ -3,8 +3,6 @@ import {
   faChevronLeft,
   faChevronRight,
   faPlus,
-  faPencil,
-  faSquareMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
@@ -14,9 +12,8 @@ import { api } from "../utils/api";
 
 // fixes zoomed in icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { addDays, subDays } from "date-fns";
 import type { Metric } from "@prisma/client";
-import { LinkedMetric } from "@prisma/client";
+import { addDays, subDays } from "date-fns";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
@@ -55,6 +52,7 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
 interface HabitProps {
   id: string;
   description: string;
+  date: Date;
   completed: boolean;
   metrics: Metric[];
   editable: boolean;
@@ -65,6 +63,7 @@ interface HabitProps {
 
 const Habit = ({
   id,
+  date,
   description,
   editable,
   completed,
@@ -98,6 +97,21 @@ const Habit = ({
         ></input>
       </div>
     );
+
+  const context = api.useContext();
+  const mutation = api.journal.setSubjectiveScore.useMutation({
+    onSuccess() {
+      void context.journal.getMetrics.invalidate();
+    },
+  });
+
+  const setScore = (subjectiveId: string, score: number) =>
+    mutation.mutate({
+      metricId: subjectiveId,
+      date: date,
+      score: score,
+    });
+
   return (
     <div className="my-2" key={id}>
       <div className="flex flex-row">
@@ -144,8 +158,28 @@ const Habit = ({
             d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
           />
         </svg>
-        {JSON.stringify(metrics)}
       </div>
+      {metrics.length != 0 && (
+        <div className="ml-4 py-2 pl-2 shadow-md">
+          {metrics.map((metric) => (
+            <>
+              <span className="">{metric.prompt}</span>
+              <br></br>
+              <div className="inline-flex gap-2">
+                {[...Array(5).keys()].map((score) => (
+                  <button
+                    className="rounded-l bg-gray-300 px-2 font-semibold text-gray-800 hover:bg-gray-400"
+                    onClick={() => setScore(metric.id, 0)}
+                    key={score}
+                  >
+                    {score}
+                  </button>
+                ))}
+              </div>
+            </>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -304,12 +338,7 @@ interface JournalProps {
   }[];
 }
 
-function Journal({
-  date,
-  setDate,
-  habits,
-  metrics: subjectives,
-}: JournalProps) {
+function Journal({ date, setDate, habits, metrics }: JournalProps) {
   const context = api.useContext();
   const setHabitCompletion = api.journal.setCompletion.useMutation({
     onSuccess() {
@@ -338,7 +367,7 @@ function Journal({
       <h1 className="m-auto mt-2 text-center font-sans text-xl font-bold">
         Journal
       </h1>
-      <h2 className="font-semibold">Today&poss Habits</h2>
+      <h2 className="font-semibold">Today{"'"}s Habits</h2>
       {habits.map((habit) => {
         console.log(
           `habit ${habit.id}, completed=${habit.completed.toString()}`
@@ -346,6 +375,7 @@ function Journal({
         return (
           <Habit
             id={habit.id}
+            date={date}
             key={habit.id}
             description={habit.description}
             metrics={habit.metrics}
@@ -375,7 +405,7 @@ function Journal({
       <InlineCreateHabit></InlineCreateHabit>
       <h2 className="pt-8 font-semibold">Today{"'"}s Questions</h2>
 
-      {subjectives.map((subjective) => (
+      {metrics.map((subjective) => (
         <Subjective
           id={subjective.id}
           key={subjective.id}

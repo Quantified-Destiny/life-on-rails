@@ -122,12 +122,12 @@ function HabitHeaderLine({
             ></EditableField>
             <span className="text-sm lowercase text-gray-500">
               <span className="space-x-1 text-sm">
+                <span className="text-md font-bold">Completed</span>
                 <span className="text-md font-bold">{completions}</span>
                 <span className="">/</span>
                 <span className="text-md font-bold">{frequency}</span>
-                <span>
-                  completions this{" "}
-                  <span className="text-md font-bold">{frequencyHorizon}</span>
+                <span className="text-md font-bold">
+                  times this {frequencyHorizon}
                 </span>
               </span>
             </span>
@@ -384,7 +384,7 @@ function HabitFooter({
                 unlinkHabitFromGoal.mutate({ habitId: id, goalId: linkedGoal })
               }
             >
-              Unlink from Goal
+              Unlink
             </button>
           ) : (
             <LinkHabit id={id}></LinkHabit>
@@ -392,6 +392,9 @@ function HabitFooter({
 
           <button className="font-bold text-gray-500 hover:text-gray-700">
             Edit
+          </button>
+          <button className="font-bold text-gray-500 hover:text-red-300">
+            Delete
           </button>
         </div>
       </div>
