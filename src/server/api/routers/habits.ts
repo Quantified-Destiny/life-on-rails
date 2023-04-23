@@ -69,4 +69,14 @@ export const habitsRouter = createTRPCRouter({
         },
       });
     }),
+    
+    deleteHabit: protectedProcedure
+    .input(z.object({ habitId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.habit.deleteMany({
+        where: {
+          id: input.habitId,
+        },
+      });
+    }),
 });

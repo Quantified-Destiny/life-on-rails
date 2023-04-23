@@ -340,6 +340,12 @@ function HabitFooter({
     },
   });
 
+  const deleteHabit = api.habits.deleteHabit.useMutation({
+    onSuccess() {
+      void context.goals.getGoals.invalidate();
+    },
+  });
+
   return (
     <div className="mt-6">
       <div className="flex justify-between">
