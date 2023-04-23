@@ -36,7 +36,7 @@ export default function SignIn({
               aria-label={`Continue with ${provider.name}`}
               role="button"
               className="mt-8 flex w-full items-center rounded-lg border border-gray-700 py-3.5 px-4 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-1"
-              onClick={() => signIn(provider.id)}
+              onClick={() => void signIn(provider.id)}
             >
               <img
                 src="/discord-circle-blue-logo-16640.png" className="w-7"
