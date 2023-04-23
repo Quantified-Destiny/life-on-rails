@@ -20,7 +20,7 @@ model Tag {
   name    String
   ownerId String
 
-  owner     User        @relation(fields: [ownerId], references: [id])
+  owner     User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   GoalTag   GoalTag[]
   HabitTag  HabitTag[]
   MetricTag MetricTag[]
@@ -33,8 +33,8 @@ model GoalTag {
   id     String @id @default(cuid())
   goalId String
   tagId  String
-  goal   Goal   @relation(fields: [goalId], references: [id])
-  tag    Tag    @relation(fields: [tagId], references: [id])
+  goal   Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@index([goalId])
   @@index([tagId])
@@ -44,8 +44,8 @@ model HabitTag {
   id      String @id @default(cuid())
   habitId String
   tagId   String
-  habit   Habit  @relation(fields: [habitId], references: [id])
-  tag     Tag    @relation(fields: [tagId], references: [id])
+  habit   Habit  @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@index([habitId])
   @@index([tagId])
@@ -55,8 +55,8 @@ model MetricTag {
   id       String @id @default(cuid())
   metricId String @map("metricTag")
   tagId    String
-  metric   Metric @relation(fields: [metricId], references: [id])
-  tag      Tag    @relation(fields: [tagId], references: [id])
+  metric   Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@index([metricId])
   @@index([tagId])
@@ -68,7 +68,7 @@ model Goal {
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
   ownerId   String
-  owner     User                 @relation(fields: [ownerId], references: [id])
+  owner     User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   habits    HabitMeasuresGoal[]
   metrics   MetricMeasuresGoal[]
   GoalTag   GoalTag[]
@@ -79,7 +79,6 @@ model Goal {
 enum FrequencyHorizon {
   DAY
   WEEK
-  MONTH
 }
 
 model Habit {
@@ -90,7 +89,7 @@ model Habit {
   ownerId          String
   frequencyHorizon FrequencyHorizon    @default(DAY)
   frequency        Int                 @default(1)
-  owner            User                @relation(fields: [ownerId], references: [id])
+  owner            User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   // the weight for completions in calculating score. Should be 0-1
   completionWeight Float               @default(1)
   completions      HabitCompletion[]
@@ -106,9 +105,9 @@ model LinkedMetric {
   id       String   @id @default(cuid())
   date     DateTime @default(now())
   habitId  String
-  habit    Habit    @relation(fields: [habitId], references: [id])
+  habit    Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
   metricId String
-  metric   Metric   @relation(fields: [metricId], references: [id])
+  metric   Metric   @relation(fields: [metricId], references: [id], onDelete: Cascade)
 
   @@index([habitId])
   @@index([metricId])
@@ -119,7 +118,7 @@ model HabitCompletion {
   date          DateTime       @default(now())
   habitId       String
   isCompleted   Boolean        @default(true)
-  Habit         Habit          @relation(fields: [habitId], references: [id])
+  Habit         Habit          @relation(fields: [habitId], references: [id], onDelete: Cascade)
   linkedAnswers MetricAnswer[]
 
   @@index([date])
@@ -132,7 +131,7 @@ model HabitMeasuresGoal {
   habitId String
 
   goal  Goal  @relation(fields: [goalId], references: [id])
-  habit Habit @relation(fields: [habitId], references: [id])
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
   @@index([goalId])
   @@index([habitId])
@@ -143,8 +142,8 @@ model MetricMeasuresGoal {
   goalId   String
   metricId String
 
-  goal   Goal   @relation(fields: [goalId], references: [id])
-  metric Metric @relation(fields: [metricId], references: [id])
+  goal   Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  metric Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
 
   @@index([goalId])
   @@index([metricId])

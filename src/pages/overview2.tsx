@@ -389,10 +389,6 @@ function HabitFooter({
           ) : (
             <LinkHabit id={id}></LinkHabit>
           )}
-
-          <button className="font-bold text-gray-500 hover:text-gray-700">
-            Edit
-          </button>
           <button className="font-bold text-gray-500 hover:text-red-300">
             Delete
           </button>

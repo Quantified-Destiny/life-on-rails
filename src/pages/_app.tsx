@@ -5,6 +5,7 @@ import { api } from "../utils/api";
 
 import "../styles/globals.css";
 import "@fontsource/raleway";
+//import "@fontsource/raleway/600.css";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
