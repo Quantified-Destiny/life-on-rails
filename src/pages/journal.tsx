@@ -257,7 +257,7 @@ const InlineCreateSubjective = () => {
   const context = api.useContext();
   const addSubjective = api.journal.addSubjective.useMutation({
     onSuccess() {
-      context.journal.getMetrics.invalidate();
+      void context.journal.getMetrics.invalidate();
     },
   });
 
@@ -274,7 +274,7 @@ function InlineCreateHabit() {
   const context = api.useContext();
   const addHabit = api.journal.addHabit.useMutation({
     onSuccess() {
-      context.journal.getHabits.invalidate();
+      void context.journal.getHabits.invalidate();
     },
   });
 
@@ -313,22 +313,22 @@ function Journal({
   const context = api.useContext();
   const setHabitCompletion = api.journal.setCompletion.useMutation({
     onSuccess() {
-      context.journal.getHabits.invalidate();
+      void context.journal.getHabits.invalidate();
     },
   });
   const setScore = api.journal.setSubjectiveScore.useMutation({
     onSuccess() {
-      context.journal.getMetrics.invalidate();
+      void context.journal.getMetrics.invalidate();
     },
   });
   const deleteHabit = api.journal.deleteHabit.useMutation({
     onSuccess() {
-      context.journal.getHabits.invalidate();
+      void context.journal.getHabits.invalidate();
     },
   });
   const editHabit = api.journal.editHabit.useMutation({
     onSuccess() {
-      context.journal.getHabits.invalidate();
+      void context.journal.getHabits.invalidate();
     },
   });
 
@@ -338,9 +338,11 @@ function Journal({
       <h1 className="m-auto mt-2 text-center font-sans text-xl font-bold">
         Journal
       </h1>
-      <h2 className="font-semibold">Today's Habits</h2>
+      <h2 className="font-semibold">Today&poss Habits</h2>
       {habits.map((habit) => {
-        console.log(`habit ${habit.id}, completed=${habit.completed}`);
+        console.log(
+          `habit ${habit.id}, completed=${habit.completed.toString()}`
+        );
         return (
           <Habit
             id={habit.id}
@@ -371,7 +373,7 @@ function Journal({
         );
       })}
       <InlineCreateHabit></InlineCreateHabit>
-      <h2 className="pt-8 font-semibold">Today's Questions</h2>
+      <h2 className="pt-8 font-semibold">Today{"'"}s Questions</h2>
 
       {subjectives.map((subjective) => (
         <Subjective

@@ -69,7 +69,9 @@ export const goalsRouter = createTRPCRouter({
       const m: number[] = g.metrics.map(
         (it) => metricScores.get(it.metricId) ?? 0
       );
-      const h: number[] = g.habits.map((it) => habitScores.get(it.habitId) ?? 0);
+      const h: number[] = g.habits.map(
+        (it) => habitScores.get(it.habitId) ?? 0
+      );
 
       let score = m.reduce((a, b) => a + b, 0) + h.reduce((a, b) => a + b, 0);
       score = score / (m.length + h.length);
@@ -132,4 +134,16 @@ export const goalsRouter = createTRPCRouter({
       goalData: goalData,
     };
   }),
+
+  createGoal: protectedProcedure
+    .input(z.object({ name: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const goal = await ctx.prisma.goal.create({
+        data: {
+          name: input.name,
+          ownerId: ctx.session.user.id,
+        },
+      });
+      return goal;
+    }),
 });

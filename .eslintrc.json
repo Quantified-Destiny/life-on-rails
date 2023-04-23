@@ -27,10 +27,17 @@
   "rules": {
     "@typescript-eslint/consistent-type-imports": "warn",
     "no-unused-vars": [
+      "off",
+      {
+        "varsIgnorePattern": "_",
+        "argsIgnorePattern": "_"
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
       "warn",
       {
-        "argsIgnorePattern": "_",
-        "varsIgnorePattern": "_"
+        "varsIgnorePattern": "_",
+        "argsIgnorePattern": "_"
       }
     ]
   }

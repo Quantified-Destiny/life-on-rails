@@ -57,7 +57,7 @@ export const EditableField = ({
   return (
     <>
       {isActive ? (
-        <input {...editProps} autoFocus />
+        <input {...editProps} autoFocus className="font-bold" />
       ) : (
         <div
           className="group flex flex-row flex-nowrap gap-1 whitespace-nowrap"
