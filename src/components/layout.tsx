@@ -1,12 +1,10 @@
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import TopNav from "../components/topnav";
 import Link from "next/link";
-const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
+import TopNav from "../components/topnav";
 
 import {
-  faHome,
   faBook,
+  faHome,
   faPlusCircle,
 } from "@fortawesome/free-solid-svg-icons";
 

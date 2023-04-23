@@ -1,6 +1,5 @@
-import type { ChangeEvent, KeyboardEvent} from "react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 import { useState } from "react";
-import { api } from "../utils/api";
 
 export const useInlineEdit = ({
   placeholder,

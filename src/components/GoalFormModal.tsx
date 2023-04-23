@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { api } from "../utils/api";
 
 interface GoalFormProps {

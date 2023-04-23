@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import type { ReactNode } from "react";
 
 export function StatisticsCard({
