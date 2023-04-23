@@ -395,7 +395,9 @@ function HabitFooter({
           ) : (
             <LinkHabit id={id}></LinkHabit>
           )}
-          <button className="font-bold text-gray-500 hover:text-red-300">
+          <button className="font-bold text-gray-500 hover:text-red-300"
+            onClick={() => deleteHabit.mutate({habitId: id})}
+          >
             Delete
           </button>
         </div>
