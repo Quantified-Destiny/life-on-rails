@@ -78,7 +78,7 @@ function SideBar() {
 
 const Layout = ({ main }: { main: () => JSX.Element }) => {
   return (
-    <div className="font-roboto relative inset-0">
+    <div className="relative inset-0">
       <div className="relative z-50 grid grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
         <div id="topbar" className="col-span-2 col-start-1 row-start-1">
           <TopNav></TopNav>
