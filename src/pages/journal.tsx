@@ -1,53 +1,22 @@
 import { Button, Stack } from "@chakra-ui/react";
+
+
+import classNames from "classnames";
+import { useState } from "react";
+import Layout from "../components/layout";
+import { api } from "../utils/api";
+import TimePicker from "../components/time-picker";
+import type { Metric } from "@prisma/client";
+
+
 import {
   faChevronLeft,
   faChevronRight,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import classNames from "classnames";
-import { useState } from "react";
-import Layout from "../components/layout";
-import { api } from "../utils/api";
-
 // fixes zoomed in icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import type { Metric } from "@prisma/client";
-import { addDays, subDays } from "date-fns";
-
-const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
-const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
-
-interface TimePickerProps {
-  date: Date;
-  setDate: (date: Date) => void;
-}
-
-const TimePicker = ({ date, setDate }: TimePickerProps) => {
-  const handlePrevDay = () => {
-    setDate(subDays(date, 1));
-  };
-
-  const handleNextDay = () => {
-    setDate(addDays(date, 1));
-  };
-  return (
-    <div
-      id="time-selector"
-      className="mt-3 flex h-10 w-full flex-col items-center"
-    >
-      <div id="selector-controls">
-        <button onClick={handlePrevDay} className="bg-white bg-opacity-20 ">
-          <LeftChevron></LeftChevron>
-        </button>
-        <span className="mx-4">{date.toDateString()}</span>
-        <button onClick={handleNextDay} className="bg-white bg-opacity-20">
-          <RightChevron></RightChevron>
-        </button>
-      </div>
-    </div>
-  );
-};
 
 interface HabitProps {
   id: string;
