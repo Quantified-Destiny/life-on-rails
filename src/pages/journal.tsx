@@ -10,8 +10,6 @@ import type { Metric } from "@prisma/client";
 
 
 import {
-  faChevronLeft,
-  faChevronRight,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
