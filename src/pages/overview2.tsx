@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import type { Goal, Metric } from "@prisma/client";
+import type { FrequencyHorizon, Goal, Metric } from "@prisma/client";
 import classNames from "classnames";
 import { useCombobox } from "downshift";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CreateMenu } from "../components/createMenu";
-import { EditableField, EditableNumberField } from "../components/inlineEdit";
+import { DropDown, EditableField, EditableNumberField } from "../components/inlineEdit";
 import Layout from "../components/layout";
 import {
   CreateGoalModal,
@@ -22,8 +22,8 @@ const textcolor = (score: number | undefined) => {
   return score < 0.25
     ? "text-red-500"
     : score < 0.7
-    ? "text-yellow-500"
-    : "text-green-400";
+      ? "text-yellow-500"
+      : "text-green-400";
 };
 
 const bgcolor = (score: number | undefined) => {
@@ -31,8 +31,8 @@ const bgcolor = (score: number | undefined) => {
   return score < 0.25
     ? "bg-red-500"
     : score < 0.7
-    ? "bg-yellow-500"
-    : "bg-green-400";
+      ? "bg-yellow-500"
+      : "bg-green-400";
 };
 
 function Header() {
@@ -88,7 +88,7 @@ function HabitHeaderLine({
   weight: number | undefined;
   description: string;
   frequency: number;
-  frequencyHorizon: string;
+  frequencyHorizon: FrequencyHorizon;
   score: number;
   completions: number;
 }) {
@@ -133,7 +133,7 @@ function HabitHeaderLine({
             <span className="text-sm lowercase text-gray-500">
               <span className="space-x-1 text-sm">
                 <span className="text-md font-bold">Completed</span>
-                
+
                 <span className="text-md font-bold">{completions}</span>
                 <span className="">/</span>
                 <EditableNumberField
@@ -143,8 +143,9 @@ function HabitHeaderLine({
                   }
                 ></EditableNumberField>
                 <span className="text-md font-bold">
-                  times this {frequencyHorizon}
+                  times this
                 </span>
+                <DropDown frequencyHorizon={frequencyHorizon} commit={(freq) => editFrequencyHorizon.mutate({habitId: id, frequencyHorizon: freq })}></DropDown>
               </span>
             </span>
           </div>
@@ -289,9 +290,8 @@ function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
         </div>
       </div>
       <ul
-        className={`absolute mt-1 max-h-80 w-72 overflow-scroll bg-white p-0 shadow-md ${
-          isOpen && items.length ? "" : "hidden"
-        }`}
+        className={`absolute mt-1 max-h-80 w-72 overflow-scroll bg-white p-0 shadow-md ${isOpen && items.length ? "" : "hidden"
+          }`}
         {...getMenuProps()}
       >
         {isOpen &&
@@ -412,7 +412,7 @@ function HabitFooter({
             <LinkHabit id={id}></LinkHabit>
           )}
           <button className="font-bold text-gray-500 hover:text-red-300"
-            onClick={() => deleteHabit.mutate({habitId: id})}
+            onClick={() => deleteHabit.mutate({ habitId: id })}
           >
             Delete
           </button>

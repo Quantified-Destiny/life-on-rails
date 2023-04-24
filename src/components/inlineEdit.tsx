@@ -1,3 +1,4 @@
+import { FrequencyHorizon } from "@prisma/client";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import { useState } from "react";
 
@@ -118,6 +119,43 @@ export const EditableField = ({
     </>
   );
 };
+
+type DropDownProps = {
+  frequencyHorizon: FrequencyHorizon;
+  commit: (freq: FrequencyHorizon) => void;
+}
+
+export const DropDown = ({ frequencyHorizon, commit }: DropDownProps) => {
+
+  const [showDropdown, setShowDropdown] = useState(false);
+
+
+  if (showDropdown) {
+    return (<select defaultValue={frequencyHorizon}
+      onChange={(event) => {
+        commit(event.target.value as FrequencyHorizon);
+        setShowDropdown(false);
+      }}
+      onKeyDown={(event: KeyboardEvent<HTMLSelectElement>) => {
+        if (event.key == "Enter") {
+          commit(event.currentTarget.value as FrequencyHorizon);
+          setShowDropdown(false);
+        } else if (event.key == "Escape") {
+          setShowDropdown(false);
+        }
+        
+      }}>
+      <option value="DAY">Day</option>
+      <option value="WEEK">Week</option>
+    </select>)
+  } else
+    return (
+      <span onClick={() => setShowDropdown(true)}>
+        {frequencyHorizon}
+      </span>
+    );
+};
+
 
 export const EditableNumberField = ({
   initial,
