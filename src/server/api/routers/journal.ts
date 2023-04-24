@@ -1,4 +1,7 @@
-import type { HabitCompletion, Metric, MetricAnswer } from "@prisma/client";
+import type {
+  LinkedMetric,
+  MetricAnswer
+} from "@prisma/client";
 import { endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -46,12 +49,12 @@ export const journalRouter = createTRPCRouter({
           date: onDay(input.date),
         },
       });
-      console.log(
-        `Found completion: ${existingCompletion} for habit ${input.habitId}`
-      );
+      // console.log(
+      //   `Found completion: ${existingCompletion} for habit ${input.habitId}`
+      // );
 
       if (existingCompletion) {
-        console.log(`Marking ${existingCompletion.id} as ${input.completed}`);
+        // console.log(`Marking ${existingCompletion.id} as ${input.completed}`);
         return await ctx.prisma.habitCompletion.update({
           where: {
             id: existingCompletion.id,
@@ -62,9 +65,9 @@ export const journalRouter = createTRPCRouter({
           },
         });
       } else {
-        console.log(
-          `Creating new completion for ${input.habitId} as ${input.completed}`
-        );
+        // console.log(
+        //   `Creating new completion for ${input.habitId} as ${input.completed}`
+        // );
         return await ctx.prisma.habitCompletion.create({
           data: {
             date: input.date,
@@ -209,6 +212,7 @@ export const journalRouter = createTRPCRouter({
         id: string;
         prompt: string;
         metricAnswers: MetricAnswer[];
+        completionMetric: LinkedMetric[];
       }[] = await ctx.prisma.metric.findMany({
         where: {
           ownerId: ctx.session.user.id,
@@ -216,6 +220,7 @@ export const journalRouter = createTRPCRouter({
         select: {
           id: true,
           prompt: true,
+          completionMetric: true,
           metricAnswers: {
             where: {
               createdAt: onDay(input.date),
@@ -227,11 +232,14 @@ export const journalRouter = createTRPCRouter({
         },
       });
 
-      const metrics = data.map(({ id, prompt, metricAnswers }) => ({
-        id,
-        prompt,
-        score: metricAnswers[0]?.value,
-      }));
+      const metrics = data.map(
+        ({ id, prompt, metricAnswers, completionMetric }) => ({
+          id,
+          prompt,
+          score: metricAnswers[0]?.value,
+          habits: completionMetric.map((m) => m.habitId),
+        })
+      );
 
       return {
         metrics: metrics,

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { FrequencyHorizon } from "@prisma/client";
+import { getHabits, getMetrics } from "../../queries";
 
 export const habitsRouter = createTRPCRouter({
   linkHabit: protectedProcedure
@@ -70,7 +71,7 @@ export const habitsRouter = createTRPCRouter({
         },
       });
     }),
-    
+
   deleteHabit: protectedProcedure
     .input(z.object({ habitId: z.string() }))
     .mutation(async ({ input, ctx }) => {
@@ -98,6 +99,13 @@ export const habitsRouter = createTRPCRouter({
         },
       });
     }),
+
+  getHabits: protectedProcedure.query(async ({ ctx }) => {
+    const [_, metricsMap] = await getMetrics(ctx.prisma, ctx.session.user.id);
+
+    const [habits, _habitsMap] =  await getHabits(ctx.prisma, metricsMap, ctx.session.user.id);
+    return habits;
+  }),
 
   editFrequencyHorizon: protectedProcedure
     .input(

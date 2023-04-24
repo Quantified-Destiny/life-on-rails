@@ -2,7 +2,7 @@ import type { Goal } from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
-import { getHabits, getMetrics } from "../../queries";
+import { getHabits, getMetrics, getGoals } from "../../queries";
 
 export const goalsRouter = createTRPCRouter({
   getGoal: protectedProcedure
@@ -30,62 +30,27 @@ export const goalsRouter = createTRPCRouter({
     }),
 
   getGoals: protectedProcedure.query(async ({ input, ctx }) => {
-    const [metrics, metricsMap, metricScores] = await getMetrics(
+    const [metrics, metricsMap] = await getMetrics(
       ctx.prisma,
       ctx.session.user.id
     );
 
     console.log("Fetched metrics");
 
-    const [habits, habitsMap, habitCompletionsCount, habitScores] =
-      await getHabits(ctx.prisma, metricsMap, ctx.session.user.id);
+    const [habits, habitsMap] = await getHabits(
+      ctx.prisma,
+      metricsMap,
+      ctx.session.user.id
+    );
 
     console.log("Fetched habits");
 
-    const goals = await ctx.prisma.goal.findMany({
-      where: {
-        ownerId: ctx.session.user.id,
-      },
-      include: {
-        habits: {
-          include: {
-            habit: {
-              include: {
-                metrics: true,
-                goals: true,
-                HabitTag: { include: { tag: true } },
-              },
-            },
-          },
-        },
-        metrics: true,
-        GoalTag: { include: { tag: true } },
-      },
-    });
-
-    console.log("Fetched goals");
-
-    const goalsData = goals.map((g) => {
-      const m: number[] = g.metrics.map(
-        (it) => metricScores.get(it.metricId) ?? 0
-      );
-      const h: number[] = g.habits.map(
-        (it) => habitScores.get(it.habitId) ?? 0
-      );
-
-      let score = m.reduce((a, b) => a + b, 0) + h.reduce((a, b) => a + b, 0);
-      score = score / (m.length + h.length);
-
-      const linkedHabits = g.habits.map((h) => habitsMap.get(h.habitId)!);
-
-      return {
-        goal: { ...g, score, tags: g.GoalTag.map((it) => it.tag.name) },
-        habits: linkedHabits,
-        metrics: g.metrics.map((m) => ({
-          ...metricsMap.get(m.metricId)!,
-        })),
-      };
-    });
+    const goalsData = await getGoals(
+      ctx.prisma,
+      ctx.session.user.id,
+      metricsMap,
+      habitsMap
+    );
 
     return {
       goals: goalsData,

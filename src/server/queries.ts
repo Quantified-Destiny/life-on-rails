@@ -5,11 +5,9 @@ import type {
   LinkedMetric,
   Metric,
   MetricTag,
-  Tag} from "@prisma/client";
-import {
-  Goal,
-  MetricMeasuresGoal
+  Tag,
 } from "@prisma/client";
+import { Goal, MetricMeasuresGoal } from "@prisma/client";
 import { subDays } from "date-fns";
 
 import type { prisma as prismaClient } from "./db";
@@ -34,14 +32,7 @@ export async function getHabits(
   prisma: typeof prismaClient,
   metricsMap: Map<string, ExpandedMetric>,
   userId: string
-): Promise<
-  [
-    ExpandedHabit[],
-    Map<string, ExpandedHabit>,
-    Map<string, number>,
-    Map<string, number>
-  ]
-> {
+): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
   const habits: (Habit & {
     metrics: LinkedMetric[];
     HabitTag: (HabitTag & { tag: Tag })[];
@@ -95,12 +86,7 @@ export async function getHabits(
     expandedHabits.map((h) => [h.id, h])
   );
 
-  return [
-    expandedHabits,
-    expandedHabitsMap,
-    habitCompletionsCount,
-    habitScores,
-  ];
+  return [expandedHabits, expandedHabitsMap];
 }
 
 export interface ExpandedMetric extends Metric {
@@ -112,9 +98,7 @@ export interface ExpandedMetric extends Metric {
 export async function getMetrics(
   prisma: typeof prismaClient,
   userId: string
-): Promise<
-  [ExpandedMetric[], Map<string, ExpandedMetric>, Map<string, number>]
-> {
+): Promise<[ExpandedMetric[], Map<string, ExpandedMetric>]> {
   const metrics: (Metric & {
     completionMetric: LinkedMetric[];
     MetricTag: (MetricTag & { tag: Tag })[];
@@ -159,5 +143,69 @@ export async function getMetrics(
 
   //console.log(metricsMap);
 
-  return [expandedMetrics, metricsMap, metricScores];
+  return [expandedMetrics, metricsMap];
+}
+
+export interface ExpandedGoal extends Goal {
+  tags: string[];
+  score: number;
+}
+
+export interface GoalsReturnType {
+  goal: ExpandedGoal;
+  metrics: ExpandedMetric[];
+  habits: ExpandedHabit[];
+}
+
+export async function getGoals(
+  prisma: typeof prismaClient,
+  userId: string,
+  metricsMap: Map<string, ExpandedMetric>,
+  habitsMap: Map<string, ExpandedHabit>
+): Promise<GoalsReturnType[]> {
+  const goals = await prisma.goal.findMany({
+    where: {
+      ownerId: userId,
+    },
+    include: {
+      habits: {
+        include: {
+          habit: {
+            include: {
+              metrics: true,
+              goals: true,
+              HabitTag: { include: { tag: true } },
+            },
+          },
+        },
+      },
+      metrics: true,
+      GoalTag: { include: { tag: true } },
+    },
+  });
+
+  console.log("Fetched goals");
+
+  const goalsData = goals.map((g) => {
+    const m: number[] = g.metrics.map(
+      (it) => metricsMap.get(it.metricId)?.score ?? 0
+    );
+    const h: number[] = g.habits.map(
+      (it) => habitsMap.get(it.habitId)?.score ?? 0
+    );
+
+    let score = m.reduce((a, b) => a + b, 0) + h.reduce((a, b) => a + b, 0);
+    score = score / (m.length + h.length);
+
+    const linkedHabits = g.habits.map((h) => habitsMap.get(h.habitId)!);
+
+    return {
+      goal: { ...g, score, tags: g.GoalTag.map((it) => it.tag.name) },
+      habits: linkedHabits,
+      metrics: g.metrics.map((m) => ({
+        ...metricsMap.get(m.metricId)!,
+      })),
+    };
+  });
+  return goalsData;
 }

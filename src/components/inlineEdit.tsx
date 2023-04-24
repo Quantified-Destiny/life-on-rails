@@ -55,7 +55,8 @@ export const useInlineNumberEdit = ({
   };
   const editProps = {
     value: number,
-    onChange: (e: ChangeEvent<HTMLInputElement>) => setNumber(parseInt(e.target.value)),
+    onChange: (e: ChangeEvent<HTMLInputElement>) =>
+      setNumber(parseInt(e.target.value)),
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
       if (event.key == "Enter") {
         commit(number);
@@ -106,7 +107,7 @@ export const EditableField = ({
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="invisible h-6 w-6 group-hover:visible"
+            className="hidden h-6 w-6 group-hover:inline-block"
           >
             <path
               strokeLinecap="round"
@@ -123,39 +124,55 @@ export const EditableField = ({
 type DropDownProps = {
   frequencyHorizon: FrequencyHorizon;
   commit: (freq: FrequencyHorizon) => void;
-}
+};
 
 export const DropDown = ({ frequencyHorizon, commit }: DropDownProps) => {
-
   const [showDropdown, setShowDropdown] = useState(false);
 
-
   if (showDropdown) {
-    return (<select defaultValue={frequencyHorizon}
-      onChange={(event) => {
-        commit(event.target.value as FrequencyHorizon);
-        setShowDropdown(false);
-      }}
-      onKeyDown={(event: KeyboardEvent<HTMLSelectElement>) => {
-        if (event.key == "Enter") {
-          commit(event.currentTarget.value as FrequencyHorizon);
+    return (
+      <select
+        defaultValue={frequencyHorizon}
+        onChange={(event) => {
+          commit(event.target.value as FrequencyHorizon);
           setShowDropdown(false);
-        } else if (event.key == "Escape") {
-          setShowDropdown(false);
-        }
-        
-      }}>
-      <option value="DAY">Day</option>
-      <option value="WEEK">Week</option>
-    </select>)
+        }}
+        onKeyDown={(event: KeyboardEvent<HTMLSelectElement>) => {
+          if (event.key == "Enter") {
+            commit(event.currentTarget.value as FrequencyHorizon);
+            setShowDropdown(false);
+          } else if (event.key == "Escape") {
+            setShowDropdown(false);
+          }
+        }}
+      >
+        <option value="DAY">Day</option>
+        <option value="WEEK">Week</option>
+      </select>
+    );
   } else
     return (
-      <span onClick={() => setShowDropdown(true)}>
-        {frequencyHorizon}
+      <span className="group">
+        <span onClick={() => setShowDropdown(true)}>{frequencyHorizon}</span>
+        <span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="hidden h-6 w-6 group-hover:inline-block"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+            />
+          </svg>
+        </span>
       </span>
     );
 };
-
 
 export const EditableNumberField = ({
   initial,
@@ -166,16 +183,21 @@ export const EditableNumberField = ({
 }) => {
   const { isActive, triggerProps, editProps } = useInlineNumberEdit({
     initial,
-    commit: number => commit(number),
+    commit: (number) => commit(number),
   });
 
   return (
     <>
       {isActive ? (
-        <input type="number" {...editProps} autoFocus className="font-bold w-7" />
+        <input
+          type="number"
+          {...editProps}
+          autoFocus
+          className="w-7 font-bold"
+        />
       ) : (
         <div
-          className="group flex-row flex-nowrap gap-1 whitespace-nowrap inline-flex"
+          className="group inline-flex flex-row flex-nowrap gap-1 whitespace-nowrap"
           {...triggerProps}
         >
           <span>{initial}</span>

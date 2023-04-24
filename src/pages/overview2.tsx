@@ -411,7 +411,8 @@ function HabitFooter({
           ) : (
             <LinkHabit id={id}></LinkHabit>
           )}
-          <button className="font-bold text-gray-500 hover:text-red-300"
+          <button
+            className="font-bold text-gray-500 hover:text-red-300"
             onClick={() => deleteHabit.mutate({ habitId: id })}
           >
             Delete
@@ -585,19 +586,13 @@ function CreateLinkedMetricInline({
   };
 
   return (
-    <div className="mt-2 rounded-lg bg-gray-100 p-4">
+    <div className="mt-2 rounded-lg p-4">
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label
-            htmlFor="prompt"
-            className="mb-2 block text-sm font-medium text-gray-900"
-          >
-            Prompt
-          </label>
           <input
             type="text"
             id="prompt"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
+            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             placeholder="Prompt"
             required
             {...register("prompt")}
@@ -612,7 +607,7 @@ function CreateLinkedMetricInline({
           </label>
           <select
             id="type"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
+            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             {...register("type")}
           >
             <option value="FIVE_POINT">5-point</option>
@@ -696,7 +691,7 @@ function OverviewPage() {
   const data = goalsQuery.data;
   console.log(data.goals);
   return (
-    <div className="h-full bg-slate-50">
+    <div className="h-full bg-slate-50/10">
       {store.modal?.state === State.CreateGoal && (
         <CreateGoalModal></CreateGoalModal>
       )}
@@ -706,7 +701,7 @@ function OverviewPage() {
       {store.modal?.state === State.CreateMetric && (
         <CreateMetricModal></CreateMetricModal>
       )}
-      <div className="container mx-auto mb-10 py-2">
+      <div className="px-10 mx-auto mb-10 py-2">
         <Header></Header>
         {data.goals.map((goal) => (
           <GoalCard

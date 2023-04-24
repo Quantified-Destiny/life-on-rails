@@ -5,13 +5,11 @@ export function StatisticsCard({
   icon,
   title,
   value,
-  footer,
 }: {
   color: string;
   icon: ReactNode;
   title: ReactNode;
   value: ReactNode;
-  footer: ReactNode;
 }) {
   return (
     <div className="relative flex flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
@@ -28,7 +26,7 @@ export function StatisticsCard({
           {value}
         </h4>
       </div>
-      <div className="border-blue-gray-50 border-t p-4">{footer}</div>
+      <div className="border-blue-gray-50 border-t p-4">Footer</div>
     </div>
   );
 }
