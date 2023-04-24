@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { FrequencyHorizon } from "@prisma/client";
 
 export const habitsRouter = createTRPCRouter({
   linkHabit: protectedProcedure
@@ -70,12 +71,48 @@ export const habitsRouter = createTRPCRouter({
       });
     }),
     
-    deleteHabit: protectedProcedure
+  deleteHabit: protectedProcedure
     .input(z.object({ habitId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.habit.deleteMany({
         where: {
           id: input.habitId,
+        },
+      });
+    }),
+
+  editFrequency: protectedProcedure
+    .input(
+      z.object({
+        habitId: z.string(),
+        frequency: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.habit.update({
+        where: {
+          id: input.habitId,
+        },
+        data: {
+          frequency: input.frequency,
+        },
+      });
+    }),
+
+  editFrequencyHorizon: protectedProcedure
+    .input(
+      z.object({
+        habitId: z.string(),
+        frequencyHorizon: z.enum([FrequencyHorizon.DAY, FrequencyHorizon.WEEK]),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.habit.update({
+        where: {
+          id: input.habitId,
+        },
+        data: {
+          frequencyHorizon: input.frequencyHorizon,
         },
       });
     }),

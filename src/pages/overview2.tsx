@@ -6,7 +6,7 @@ import { useCombobox } from "downshift";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { CreateMenu } from "../components/createMenu";
-import { EditableField } from "../components/inlineEdit";
+import { EditableField, EditableNumberField } from "../components/inlineEdit";
 import Layout from "../components/layout";
 import {
   CreateGoalModal,
@@ -98,6 +98,16 @@ function HabitHeaderLine({
       void context.goals.getGoals.invalidate();
     },
   });
+  const editFrequency = api.habits.editFrequency.useMutation({
+    onSuccess: () => {
+      void context.goals.getGoals.invalidate();
+    },
+  });
+  const editFrequencyHorizon = api.habits.editFrequencyHorizon.useMutation({
+    onSuccess: () => {
+      void context.goals.getGoals.invalidate();
+    },
+  });
 
   return (
     <>
@@ -123,9 +133,15 @@ function HabitHeaderLine({
             <span className="text-sm lowercase text-gray-500">
               <span className="space-x-1 text-sm">
                 <span className="text-md font-bold">Completed</span>
+                
                 <span className="text-md font-bold">{completions}</span>
                 <span className="">/</span>
-                <span className="text-md font-bold">{frequency}</span>
+                <EditableNumberField
+                  initial={frequency}
+                  commit={(number) =>
+                    editFrequency.mutate({ habitId: id, frequency: number })
+                  }
+                ></EditableNumberField>
                 <span className="text-md font-bold">
                   times this {frequencyHorizon}
                 </span>
