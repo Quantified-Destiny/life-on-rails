@@ -6,6 +6,7 @@ import {
   faBook,
   faHome,
   faPlusCircle,
+  faChartSimple
 } from "@fortawesome/free-solid-svg-icons";
 
 function SideBar() {
@@ -18,7 +19,7 @@ function SideBar() {
             href="/dashboard"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >
-            <FontAwesomeIcon icon={faHome} className="mr-2" />
+            <FontAwesomeIcon icon={faChartSimple} className="mr-2" />
             <span>Dashboard</span>
           </Link>
         </li>
@@ -79,14 +80,14 @@ function SideBar() {
 const Layout = ({ main }: { main: () => JSX.Element }) => {
   return (
     <div className="relative inset-0">
-      <div className="relative z-50 grid grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
+      <div className="relative z-50 grid grid-cols-[10em_1fr] grid-rows-[3em_1fr] min-h-screen">
         <div id="topbar" className="col-span-2 col-start-1 row-start-1">
           <TopNav></TopNav>
         </div>
         <div className="col-start-1 row-span-2 row-start-2 bg-gray-100">
           <SideBar></SideBar>
         </div>
-        <div className="col-start-2 row-start-2 min-h-screen">{main()}</div>
+        <div className="col-start-2 row-start-2">{main()}</div>
       </div>
     </div>
   );
