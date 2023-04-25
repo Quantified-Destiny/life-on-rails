@@ -1,4 +1,5 @@
 import type {
+  Goal,
   Habit,
   HabitMeasuresGoal,
   HabitTag,
@@ -7,7 +8,6 @@ import type {
   MetricTag,
   Tag,
 } from "@prisma/client";
-import { Goal, MetricMeasuresGoal } from "@prisma/client";
 import { subDays } from "date-fns";
 
 import type { prisma as prismaClient } from "./db";

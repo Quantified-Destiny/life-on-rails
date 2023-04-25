@@ -1,6 +1,6 @@
+import type { Metric } from "@prisma/client";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { Metric } from "@prisma/client";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const createRouter = createTRPCRouter({
   createGoal: protectedProcedure

@@ -3,7 +3,6 @@
 
 import Layout from "../components/layout";
 
-
 import { ClockIcon } from "@heroicons/react/24/outline";
 
 import dynamic from "next/dynamic";
@@ -14,9 +13,6 @@ const StatisticsChart = dynamic(
   },
   { ssr: false }
 );
-
-// import { StatisticsCard } from "@/widgets/cards";
-// import { StatisticsChart } from "@/widgets/charts";
 
 import { statisticsChartsData } from "../data";
 import type { ExpandedHabit } from "../server/queries";
@@ -66,7 +62,6 @@ function StatsCardRow() {
 }
 
 function HabitTableRow({
-  id,
   description,
   frequency,
   frequencyHorizon,
