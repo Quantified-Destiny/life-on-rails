@@ -6,7 +6,7 @@ import {
   faBook,
   faHome,
   faPlusCircle,
-  faChartSimple
+  faChartSimple,
 } from "@fortawesome/free-solid-svg-icons";
 
 function SideBar() {
@@ -19,7 +19,7 @@ function SideBar() {
             href="/dashboard"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >
-            <FontAwesomeIcon icon={faChartSimple} className="mr-2" />
+            <FontAwesomeIcon icon={faChartSimple} className="mr-2 h-6 w-6" />
             <span>Dashboard</span>
           </Link>
         </li>
@@ -28,7 +28,7 @@ function SideBar() {
             href="/overview2"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >
-            <FontAwesomeIcon icon={faHome} className="mr-2" />
+            <FontAwesomeIcon icon={faHome} className="mr-2 h-6 w-6" />
             <span>Overview</span>
           </Link>
         </li>
@@ -37,7 +37,7 @@ function SideBar() {
             href="/journal"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >
-            <FontAwesomeIcon icon={faBook} className="mr-2" />
+            <FontAwesomeIcon icon={faBook} className="mr-2 h-6 w-6" />
             <span>Journal</span>
           </Link>
         </li>
@@ -46,7 +46,7 @@ function SideBar() {
             href="/create"
             className="flex items-center text-white opacity-75 hover:opacity-100"
           >
-            <FontAwesomeIcon icon={faPlusCircle} className="mr-2" />
+            <FontAwesomeIcon icon={faPlusCircle} className="mr-2 h-6 w-6" />
             <span>Create</span>
           </Link>
         </li>
@@ -80,7 +80,7 @@ function SideBar() {
 const Layout = ({ main }: { main: () => JSX.Element }) => {
   return (
     <div className="relative inset-0">
-      <div className="relative z-50 grid grid-cols-[10em_1fr] grid-rows-[3em_1fr] min-h-screen">
+      <div className="relative z-50 grid min-h-screen grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
         <div id="topbar" className="col-span-2 col-start-1 row-start-1">
           <TopNav></TopNav>
         </div>
