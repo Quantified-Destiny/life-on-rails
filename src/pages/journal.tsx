@@ -335,13 +335,9 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
         );
         return (
           <Habit
-            id={habit.id}
+            {...habit}
             date={date}
             key={habit.id}
-            description={habit.description}
-            metrics={habit.metrics}
-            completed={habit.completed}
-            editable={habit.editable}
             setCompletion={(completed) =>
               setHabitCompletion.mutate({
                 date: date,
