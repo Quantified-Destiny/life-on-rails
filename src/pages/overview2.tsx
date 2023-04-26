@@ -5,8 +5,12 @@ import classNames from "classnames";
 import { useCombobox } from "downshift";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { CreateMenu } from "../components/createMenu";
-import { DropDown, EditableField, EditableNumberField } from "../components/inlineEdit";
+import { CreateMenu, DropdownMenu } from "../components/createMenu";
+import {
+  DropDown,
+  EditableField,
+  EditableNumberField,
+} from "../components/inlineEdit";
 import Layout from "../components/layout";
 import {
   CreateGoalModal,
@@ -14,7 +18,11 @@ import {
   CreateMetricModal,
 } from "../components/modals";
 import { State, useOverviewStore } from "../components/overviewState";
-import type { ExpandedHabit, ExpandedMetric } from "../server/queries";
+import type {
+  ExpandedGoal,
+  ExpandedHabit,
+  ExpandedMetric,
+} from "../server/queries";
 import { api } from "../utils/api";
 
 const textcolor = (score: number | undefined) => {
@@ -22,8 +30,8 @@ const textcolor = (score: number | undefined) => {
   return score < 0.25
     ? "text-red-500"
     : score < 0.7
-      ? "text-yellow-500"
-      : "text-green-400";
+    ? "text-yellow-500"
+    : "text-green-400";
 };
 
 const bgcolor = (score: number | undefined) => {
@@ -31,8 +39,8 @@ const bgcolor = (score: number | undefined) => {
   return score < 0.25
     ? "bg-red-500"
     : score < 0.7
-      ? "bg-yellow-500"
-      : "bg-green-400";
+    ? "bg-yellow-500"
+    : "bg-green-400";
 };
 
 function Header() {
@@ -68,7 +76,7 @@ function Header() {
         </button>
         <CreateMenu></CreateMenu>
         <button className="rounded stroke-gray-500 px-2 py-2 hover:bg-gray-200">
-          ...
+          <EllipsisIcon></EllipsisIcon>
         </button>
       </div>
     </div>
@@ -142,10 +150,16 @@ function HabitHeaderLine({
                     editFrequency.mutate({ habitId: id, frequency: number })
                   }
                 ></EditableNumberField>
-                <span className="text-md font-bold">
-                  times this
-                </span>
-                <DropDown frequencyHorizon={frequencyHorizon} commit={(freq) => editFrequencyHorizon.mutate({habitId: id, frequencyHorizon: freq })}></DropDown>
+                <span className="text-md font-bold">times this</span>
+                <DropDown
+                  frequencyHorizon={frequencyHorizon}
+                  commit={(freq) =>
+                    editFrequencyHorizon.mutate({
+                      habitId: id,
+                      frequencyHorizon: freq,
+                    })
+                  }
+                ></DropDown>
               </span>
             </span>
           </div>
@@ -290,8 +304,9 @@ function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
         </div>
       </div>
       <ul
-        className={`absolute mt-1 max-h-80 w-72 overflow-scroll bg-white p-0 shadow-md ${isOpen && items.length ? "" : "hidden"
-          }`}
+        className={`absolute mt-1 max-h-80 w-72 overflow-scroll bg-white p-0 shadow-md ${
+          isOpen && items.length ? "" : "hidden"
+        }`}
         {...getMenuProps()}
       >
         {isOpen &&
@@ -336,6 +351,46 @@ function LinkHabit({ id }: { id: string }) {
   }
 }
 
+function TagList(props: {
+  tags: string[];
+  unlink: (tagName: string) => void;
+  link: (tagName: string) => void;
+}) {
+  return (
+    <div className="flex items-center space-x-2 pt-2">
+      {props.tags.map((tag) => (
+        <div
+          key={tag}
+          className="hover:bg-slate:300 flex flex-row flex-nowrap divide-x-0 divide-gray-800 whitespace-nowrap rounded-r-full bg-slate-200 px-2 py-1"
+        >
+          <span>{tag}</span>
+          <span
+            className=" hover:stroke-red-300"
+            onClick={() => props.unlink(tag)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-6 w-6 cursor-pointer hover:stroke-red-300"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </span>
+        </div>
+      ))}
+      {/* TODO add combobox features */}
+      <CreateTag commit={(name: string) => props.link(name)}></CreateTag>
+    </div>
+  );
+}
+
 function HabitFooter({
   id,
   tags,
@@ -363,41 +418,13 @@ function HabitFooter({
   });
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 border-t-2 border-gray-200/50 pt-4">
       <div className="flex justify-between">
-        <div className="flex items-center space-x-2">
-          {tags.map((tag) => (
-            <div
-              key={tag}
-              className="hover:bg-slate:300 flex flex-row flex-nowrap divide-x-0 divide-gray-800 whitespace-nowrap rounded-r-full bg-slate-200 px-2 py-1"
-            >
-              <span>{tag}</span>
-              <span
-                className=" hover:stroke-red-300"
-                onClick={() => unlinkHabit({ habitId: id, tagName: tag })}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="h-6 w-6 cursor-pointer hover:stroke-red-300"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </span>
-            </div>
-          ))}
-          {/* TODO add combobox features */}
-          <CreateTag
-            commit={(name: string) => linkHabit({ habitId: id, tagName: name })}
-          ></CreateTag>
-        </div>
+        <TagList
+          tags={tags}
+          link={(tag) => linkHabit({ habitId: id, tagName: tag })}
+          unlink={(tag) => unlinkHabit({ habitId: id, tagName: tag })}
+        ></TagList>
         <div className="flex items-center space-x-4">
           {linkedGoal ? (
             <button
@@ -429,7 +456,8 @@ function GoalCard({
   score,
   habits,
   metrics,
-}: Goal & {
+  tags,
+}: ExpandedGoal & {
   score: number;
   habits: (ExpandedHabit & {
     completions: number;
@@ -440,7 +468,17 @@ function GoalCard({
 }) {
   const context = api.useContext();
   const mutation = api.goals.editGoal.useMutation({
-    onSuccess: () => {
+    onSettled: () => {
+      void context.goals.getGoals.invalidate();
+    },
+  });
+  const linkGoal = api.tags.linkGoal.useMutation({
+    onSettled: () => {
+      void context.goals.getGoals.invalidate();
+    },
+  });
+  const unlinkGoal = api.tags.linkGoal.useMutation({
+    onSettled: () => {
       void context.goals.getGoals.invalidate();
     },
   });
@@ -473,6 +511,15 @@ function GoalCard({
           ></HabitCard>
         ))}
       </div>
+      <TagList
+        tags={tags}
+        link={() => {
+          (tag: string) => linkGoal.mutate({ goalId: id, tagName: tag });
+        }}
+        unlink={() => {
+          (tag: string) => unlinkGoal.mutate({ goalId: id, tagName: tag });
+        }}
+      ></TagList>
     </div>
   );
 }
@@ -524,24 +571,26 @@ function HabitCard({
       <div className="ml-2 mt-2">
         <span className=" text-xs font-bold uppercase">Metrics</span>
       </div>
-      <div className="flex flex-col flex-wrap">
-        {metrics.map((m) => (
-          <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>
-        ))}
+      <div className="my-2">
+        <div className="flex flex-col flex-wrap">
+          {metrics.map((m) => (
+            <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>
+          ))}
+        </div>
+        {createHabitActive ? (
+          <CreateLinkedMetricInline
+            habitId={id}
+            closeEdit={() => setCreateHabitActive(false)}
+          ></CreateLinkedMetricInline>
+        ) : (
+          <button
+            className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200"
+            onClick={() => setCreateHabitActive(true)}
+          >
+            + Create a new Linked Metric
+          </button>
+        )}
       </div>
-      {createHabitActive ? (
-        <CreateLinkedMetricInline
-          habitId={id}
-          closeEdit={() => setCreateHabitActive(false)}
-        ></CreateLinkedMetricInline>
-      ) : (
-        <button
-          className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200"
-          onClick={() => setCreateHabitActive(true)}
-        >
-          + Create a new Linked Metric
-        </button>
-      )}
       <HabitFooter
         id={id}
         tags={tags}
@@ -633,6 +682,24 @@ function CreateLinkedMetricInline({
   );
 }
 
+function EllipsisIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      role="presentation"
+      className={className ?? "fill-current text-gray-300"}
+    >
+      <g fill="currentColor" fill-rule="evenodd">
+        <circle cx="5" cy="12" r="2"></circle>
+        <circle cx="12" cy="12" r="2"></circle>
+        <circle cx="19" cy="12" r="2"></circle>
+      </g>
+    </svg>
+  );
+}
+
 function LinkedMetric({
   id,
   weight,
@@ -650,9 +717,14 @@ function LinkedMetric({
       void context.goals.getGoals.invalidate();
     },
   });
+  const deleteMetric = api.metrics.deleteMetric.useMutation({
+    onSuccess: () => {
+      void context.goals.getGoals.invalidate();
+    },
+  });
 
   return (
-    <div className="mt-2 flex min-h-[100px] flex-row justify-between rounded-lg bg-gray-100 p-4">
+    <div className="m-2 flex min-h-[100px] flex-row justify-between rounded-lg bg-gray-100 p-4">
       <div className="flex flex-col">
         <div className="mb-2">
           <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs font-bold text-white">
@@ -671,12 +743,28 @@ function LinkedMetric({
           ></EditableField>
         </div>
       </div>
-      <div className="h-fit bg-white px-2">
-        <span
-          className={classNames("h-fit text-lg font-bold", textcolor(score))}
-        >
-          {score}
-        </span>
+
+      <div className="flex h-full w-fit flex-row space-x-3">
+        <div className=" h-fit bg-white px-2">
+          <span
+            className={classNames("h-fit text-lg font-bold", textcolor(score))}
+          >
+            {score}
+          </span>
+        </div>
+        <button>
+          <DropdownMenu
+            options={[
+              {
+                name: "Delete",
+                onClick: () => deleteMetric.mutate({ metricId: id }),
+              },
+            ]}
+            trigger={
+              <EllipsisIcon className="fill-current text-gray-400 hover:text-gray-700"></EllipsisIcon>
+            }
+          ></DropdownMenu>
+        </button>
       </div>
     </div>
   );
@@ -701,7 +789,7 @@ function OverviewPage() {
       {store.modal?.state === State.CreateMetric && (
         <CreateMetricModal></CreateMetricModal>
       )}
-      <div className="px-10 mx-auto mb-10 py-2">
+      <div className="mx-auto mb-10 px-10 py-2">
         <Header></Header>
         {data.goals.map((goal) => (
           <GoalCard
