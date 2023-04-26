@@ -34,7 +34,7 @@ function isSameDay(a, b) {
   return differenceInCalendarDays(a, b) === 0;
 }
 
-const all_event_dates = ['04-22-2023', '04-23-2023']  
+const all_event_dates = ['04-22-2023', '04-23-2023', '4-25-2023']  
 const highlightedDates = all_event_dates.map((dateString) => new Date(dateString));
 
 function tileClassName({ date, view }) {
@@ -59,15 +59,26 @@ const value = [
 ];
 
 function HabitsPage() {
-  const events = ['04-03-2023', '04-15-2023'];
+  const events = ['04-03-2023', '04-15-2023', '4-25-2023'];
   const [tgl, setTgl] = useState("");
-
+  const linkedGoal = {
+    id: "123",
+    name: "Exercise every day",
+    link: "/goals/123",
+  };
   return (
     <div className="container mx-auto px-4 py-8 max-w-screen-md">
       <h1 className="text-2xl text-center font-bold mb-4">Go jogging for 1 hour</h1>
-      <p className="text-center mb-4 text-gray-500">Created on December 1st, 2022</p>
+      <p className="text-center text-gray-500">Created on December 1st, 2022</p>
       
       <div className="flex flex-col items-center justify-center">
+        {linkedGoal && (
+          <a className="text-center my-4" href={linkedGoal.link}>
+            <button className="bg-yellow-500 text-white font-bold py-2 px-4 rounded mt-2">
+              Linked Goal: {linkedGoal.name}
+            </button>
+          </a>
+        )}
         <Calendar 
           className="w-full md:w-auto"
           onChange={(value, event) => setTgl(value)} 
