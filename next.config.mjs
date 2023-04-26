@@ -1,3 +1,5 @@
+
+
 // @ts-check
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
@@ -20,4 +22,19 @@ const config = {
     ignoreDuringBuilds: true,
   },
 };
-export default config;
+
+// export default config;
+
+import removeImports from 'next-remove-imports'
+
+/** @type {function(import("next").NextConfig): import("next").NextConfig}} */
+const removeImportsFun = removeImports({
+  // test: /node_modules([\s\S]*?)\.(tsx|ts|js|mjs|jsx)$/,
+  // matchImports: "\\.(less|css|scss|sass|styl)$"
+});
+
+export default removeImportsFun({
+  webpack(config, options) {
+    return config
+  },
+});
