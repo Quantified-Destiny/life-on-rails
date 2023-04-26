@@ -34,4 +34,10 @@ export const metricsRouter = createTRPCRouter({
         data: { prompt: input.prompt },
       });
     }),
+    
+  deleteMetric: protectedProcedure
+    .input(z.object({ metricId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.metric.delete({ where: { id: input.metricId } });
+    }),
 });

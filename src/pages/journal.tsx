@@ -1,6 +1,5 @@
 import { Button, Stack } from "@chakra-ui/react";
 
-
 import classNames from "classnames";
 import { useState } from "react";
 import Layout from "../components/layout";
@@ -8,10 +7,7 @@ import { api } from "../utils/api";
 import TimePicker from "../components/time-picker";
 import type { Metric } from "@prisma/client";
 
-
-import {
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // fixes zoomed in icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -415,6 +411,6 @@ const JournalPage = () => {
   );
 };
 
-export default function () {
+export default function Page() {
   return <Layout main={JournalPage}></Layout>;
 }

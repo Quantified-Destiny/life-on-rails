@@ -36,6 +36,7 @@ model GoalTag {
   goal   Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
   tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
+  @@unique([tagId, goalId]) 
   @@index([goalId])
   @@index([tagId])
 }
@@ -47,6 +48,7 @@ model HabitTag {
   habit   Habit  @relation(fields: [habitId], references: [id], onDelete: Cascade)
   tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
+  @@unique([tagId, habitId])
   @@index([habitId])
   @@index([tagId])
 }
@@ -58,6 +60,7 @@ model MetricTag {
   metric   Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
   tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
+  @@unique([tagId, metricId])
   @@index([metricId])
   @@index([tagId])
 }

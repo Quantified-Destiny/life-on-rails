@@ -1,6 +1,8 @@
 import type {
+  HabitCompletion,
   LinkedMetric,
-  MetricAnswer
+  Metric,
+  MetricAnswer,
 } from "@prisma/client";
 import { endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
@@ -154,7 +156,16 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      const data = await ctx.prisma.habit.findMany({
+      type QueryType = {
+        id: string;
+        metrics: {
+          metric: Metric;
+        }[];
+        completions: HabitCompletion[];
+        description: string;
+      }[];
+
+      const data: QueryType = await ctx.prisma.habit.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
@@ -164,13 +175,8 @@ export const journalRouter = createTRPCRouter({
           metrics: {
             select: {
               metric: {
-                select: {
-                  id: true,
-                  prompt: true,
+                include: {
                   metricAnswers: {
-                    select: {
-                      value: true,
-                    },
                     where: {
                       createdAt: onDay(input.date),
                     },

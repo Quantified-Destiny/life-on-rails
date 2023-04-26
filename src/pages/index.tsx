@@ -39,15 +39,16 @@ export default Home;
 const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
 
+  const router = useRouter();
+
   const { data: secretMessage } = api.example.getSecretMessage.useQuery(
     undefined, // no input
-    { enabled: sessionData?.user !== undefined },
+    { enabled: sessionData?.user !== undefined }
   );
 
   const session = useSession();
-  if (session.status=="authenticated") {
-    const router = useRouter();
-    router.push("/journal");
+  if (session.status == "authenticated") {
+    void router.push("/journal");
   }
 
   return (
