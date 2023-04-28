@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { ExpandedHabit } from "../server/queries";
 
 export enum State {
   None,
@@ -6,6 +7,7 @@ export enum State {
   CreateGoal,
   CreateHabit,
   CreateMetric,
+  HabitPanel,
 }
 
 interface CreateGoal {
@@ -17,12 +19,17 @@ interface CreateHabit {
 interface CreateMetric {
   state: State.CreateMetric;
 }
+interface HabitPanel {
+  state: State.HabitPanel;
+  habitId: string;
+}
 
 interface OverviewStore {
-  modal: CreateGoal | CreateHabit | CreateMetric | undefined;
+  modal: CreateGoal | CreateHabit | CreateMetric | HabitPanel | undefined;
   openCreateGoalModal: () => void;
   openCreateHabitModal: () => void;
   openCreateMetricModal: () => void;
+  openHabitPanel: (habitId: string) => void;
   reset: () => void;
 }
 
@@ -41,6 +48,11 @@ export const useOverviewStore = create<OverviewStore>()((set) => ({
   openCreateMetricModal() {
     set(() => ({
       modal: { state: State.CreateMetric },
+    }));
+  },
+  openHabitPanel(habitId) {
+    set(() => ({
+      modal: { state: State.HabitPanel, habitId },
     }));
   },
   reset: () => {
