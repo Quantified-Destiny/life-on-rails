@@ -5,14 +5,13 @@ import classNames from "classnames";
 import { useCombobox } from "downshift";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type {
-  ExpandedHabit
-} from "../../server/queries";
+import type { ExpandedHabit } from "../../server/queries";
 import { api } from "../../utils/api";
 import { DropDown, EditableField, EditableNumberField } from "../inlineEdit";
 import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";
 import { TagList } from "./tags";
+import { useOverviewStore } from "../overviewState";
 
 function getGoalsFilter(
   inputValue: string | undefined
@@ -278,6 +277,8 @@ export function HabitFooter({
     },
   });
 
+  const openHabitPanel = useOverviewStore((store) => store.openHabitPanel);
+
   return (
     <div className="mt-6 border-t-2 border-gray-200/50 pt-4">
       <div className="flex justify-between">
@@ -304,6 +305,12 @@ export function HabitFooter({
             onClick={() => deleteHabit.mutate({ habitId: id })}
           >
             Delete
+          </button>
+          <button
+            className="font-bold text-gray-500 hover:text-red-300"
+            onClick={() => openHabitPanel(id)}
+          >
+            Configure
           </button>
         </div>
       </div>
