@@ -15,8 +15,11 @@ const Home: NextPage = () => {
         <title>Life on Rails</title>
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
+        <style>
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,700;1,900&display=swap');
+</style>
+
       </Head>
-      
 
       <section className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#5ef4ca5a] to-[#4389faab] bg-white dark:bg-gray-900">
   <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
