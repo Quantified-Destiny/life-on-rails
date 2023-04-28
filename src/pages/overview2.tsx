@@ -24,6 +24,7 @@ import type {
   ExpandedMetric,
 } from "../server/queries";
 import { api } from "../utils/api";
+import React from "react";
 
 const textcolor = (score: number | undefined) => {
   if (typeof score === "undefined") return "text-black";
