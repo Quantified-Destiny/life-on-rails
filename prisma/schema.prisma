@@ -36,7 +36,7 @@ model GoalTag {
   goal   Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
   tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
-  @@unique([tagId, goalId]) 
+  @@unique([tagId, goalId])
   @@index([goalId])
   @@index([tagId])
 }
@@ -192,19 +192,21 @@ model MetricAnswer {
 
 // Necessary for Next auth
 model Account {
-  id                String  @id @default(cuid())
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?  @db.Text
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -222,6 +224,8 @@ model Session {
 
 model User {
   id            String    @id @default(cuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
   name          String?
   email         String?   @unique
   emailVerified DateTime?
