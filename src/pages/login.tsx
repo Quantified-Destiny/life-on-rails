@@ -26,52 +26,45 @@ export default function SignIn({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
+    
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#5215a8] to-[#2b33d7]">
-      <div className="mt-16 w-full rounded bg-gray-50 p-10 shadow md:w-1/2 lg:w-1/3">
-        <p className="text-center text-xl font-extrabold leading-6 text-gray-800 focus:outline-none">
-          Life on Rails
-        </p>
-        <div key='Discord'>
-            <button
-              aria-label={`Continue with Discord`}
-              role="button"
-              className="mt-8 flex w-full items-center rounded-lg border border-gray-700 py-3.5 px-4 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-1"
-              onClick={() => void signIn('discord')}
-            >
-              <BsDiscord></BsDiscord>
-              <p className="ml-4 text-base font-medium text-gray-700">
-                Continue with Discord
-              </p>
-            </button>
-          </div>
-          <div key="Google">
-            <button
-              aria-label={`Continue with Google`}
-              role="button"
-              className="mt-8 flex w-full items-center rounded-lg border border-gray-700 py-3.5 px-4 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-1"
-              onClick={() => void signIn('google')}
-            >
-              <BsGoogle></BsGoogle>
-              <p className="ml-4 text-base font-medium text-gray-700">
-                Continue with Google
-              </p>
-            </button>
-          </div>
-        {/* {Object.values(providers).map((provider) => (
-          <div key={provider.name}>
-            <button
-              aria-label={`Continue with ${provider.name}`}
-              role="button"
-              className="mt-8 flex w-full items-center rounded-lg border border-gray-700 py-3.5 px-4 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-1"
-              onClick={() => void signIn(provider.id)}
-            >
-              <p className="ml-4 text-base font-medium text-gray-700">
-                Continue with {provider.name}
-              </p>
-            </button>
-          </div>
-        ))} */}
-      </div>
+      <div className="w-full max-w-sm p-6 m-auto mx-auto bg-white rounded-lg shadow-md dark:bg-gray-800">
+  <div className="flex justify-center mx-auto my-4 text-xl font-extrabold font-sans">
+    Life on Rails
+  </div>
+  <div className="flex justify-center mx-auto my-2">
+    Sign Up or Log In
+  </div>
+  <hr className="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded dark:bg-gray-700"/>
+
+  <div className="flex flex-col items-center mt-6">
+    <button
+      type="button"
+      aria-label={`Continue with Google`}
+      role="button"
+      className="flex items-center justify-center w-3/4 px-6 py-2 m-2 text-sm font-medium text-white transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:bg-blue-400 focus:outline-none"
+      onClick={() => void signIn('google')}
+      
+    >
+      <BsGoogle className="w-4 h-4 mx-2 fill-current"></BsGoogle>
+      <span className="hidden mx-2 sm:inline">Continue with Google</span>
+    </button>
+
+    <button
+      type="button"
+      aria-label={`Continue with Discord`}
+      role="button"
+      className="flex items-center justify-center w-3/4 px-6 py-2 m-2 text-sm font-medium text-white transition-colors duration-300 transform bg-gray-500 rounded-lg hover:bg-gray-400 focus:bg-gray-400 focus:outline-none"
+      onClick={() => void signIn('discord')}
+    >
+    <BsDiscord className="w-4 h-4 mx-2 fill-current"></BsDiscord>
+      <span className="hidden mx-2 sm:inline">Continue with Discord</span>
+    </button>
+
+  </div>
+  
+</div>
+
     </div>
   );
 }
