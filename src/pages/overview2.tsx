@@ -64,7 +64,7 @@ function OverviewPage() {
   const data = goalsQuery.data;
   console.log(data.goals);
   return (
-    <div className="h-full bg-slate-50/10">
+    <div className="container h-full">
       {store.modal?.state === State.CreateGoal && (
         <CreateGoalModal></CreateGoalModal>
       )}
@@ -89,18 +89,20 @@ function OverviewPage() {
         <h1 className="mb-4 ml-2 text-lg font-semibold uppercase text-slate-600">
           Unlinked Items
         </h1>
-        {data.habits.map((habit) => (
-          <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
-        ))}
-        {data.metrics.map((metric) => {
-          return (
-            <LinkedMetric
-              {...metric}
-              weight={0.5}
-              key={metric.id}
-            ></LinkedMetric>
-          );
-        })}
+        <div className="space-y-2">
+          {data.habits.map((habit) => (
+            <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
+          ))}
+          {data.metrics.map((metric) => {
+            return (
+              <LinkedMetric
+                {...metric}
+                weight={0.5}
+                key={metric.id}
+              ></LinkedMetric>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

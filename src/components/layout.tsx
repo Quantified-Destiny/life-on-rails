@@ -8,10 +8,13 @@ import {
   faPlusCircle,
   faChartSimple,
 } from "@fortawesome/free-solid-svg-icons";
+import { useIsFetching } from "@tanstack/react-query";
+import { Progress } from "./ui/progress";
+import classNames from "classnames";
 
 function SideBar() {
   return (
-    <div className="flex h-full flex-col bg-gray-800/80 px-4 py-8 shadow-[inset_-25px_-15px_80px_#46464620] backdrop-blur-md">
+    <div className="fixed flex h-full flex-col bg-gray-800/80 px-4 py-8 shadow-[inset_-25px_-15px_80px_#46464620] backdrop-blur-md">
       <h1 className="mb-8 text-2xl font-bold text-white">Navigation</h1>
       <ul className="flex flex-col space-y-2">
         <li>
@@ -78,16 +81,30 @@ function SideBar() {
 }
 
 const Layout = ({ main }: { main: () => JSX.Element }) => {
+  const isFetching = useIsFetching();
+  console.log(isFetching);
+
   return (
     <div className="relative inset-0">
-      <div className="relative z-50 grid min-h-screen grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
-        <div id="topbar" className="col-span-2 col-start-1 row-start-1">
+      <div className="z-50 grid min-h-screen grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
+        <div
+          id="topbar"
+          className="fixed z-50 col-span-2 col-start-1 row-start-1 w-full bg-white"
+        >
           <TopNav></TopNav>
+          <div
+            className={classNames("absolute left-0 bottom-0 z-10 h-1 w-full", {
+              hidden: isFetching === 0,
+              "animate-pulse bg-green-400": isFetching > 0,
+            })}
+          ></div>
         </div>
         <div className="col-start-1 row-span-2 row-start-2 bg-gray-100">
           <SideBar></SideBar>
         </div>
-        <div className="col-start-2 row-start-2">{main()}</div>
+        <div className="relative col-start-2 row-start-2 bg-slate-50">
+          {main()}
+        </div>
       </div>
     </div>
   );

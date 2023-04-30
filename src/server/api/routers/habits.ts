@@ -103,9 +103,27 @@ export const habitsRouter = createTRPCRouter({
   getHabits: protectedProcedure.query(async ({ ctx }) => {
     const [_, metricsMap] = await getMetrics(ctx.prisma, ctx.session.user.id);
 
-    const [habits, _habitsMap] =  await getHabits(ctx.prisma, metricsMap, ctx.session.user.id);
+    const [habits, _habitsMap] = await getHabits(
+      ctx.prisma,
+      metricsMap,
+      ctx.session.user.id
+    );
     return habits;
   }),
+
+  getHabit: protectedProcedure
+    .input(z.object({ habitId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      //TODO fix this
+      const [_, metricsMap] = await getMetrics(ctx.prisma, ctx.session.user.id);
+
+      const [habits, _habitsMap] = await getHabits(
+        ctx.prisma,
+        metricsMap,
+        ctx.session.user.id
+      );
+      return habits.find((habit) => habit.id === input.habitId);
+    }),
 
   editFrequencyHorizon: protectedProcedure
     .input(

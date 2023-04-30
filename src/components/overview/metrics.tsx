@@ -35,9 +35,9 @@ export function LinkedMetric({
           <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs font-bold text-white">
             Linked Metric
           </span>
-          <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
+          {/* <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
             Weight: {weight.toFixed(2)}
-          </span>
+          </span> */}
         </div>
         <div className="ml-2 font-semibold">
           <EditableField

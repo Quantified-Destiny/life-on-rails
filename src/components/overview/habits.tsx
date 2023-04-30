@@ -70,11 +70,11 @@ export function HabitHeaderLine({
             <span className="mb-2 inline-block rounded-full bg-blue-500 px-2 py-1 text-xs font-bold text-white">
               Habit
             </span>
-            {weight && (
+            {/* {weight && (
               <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
                 Weight: {weight.toFixed(2)}
               </span>
-            )}
+            )} */}
           </div>
           <div className="mr-1 items-baseline text-lg font-bold">
             <EditableField
