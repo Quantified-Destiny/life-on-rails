@@ -327,7 +327,7 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
   return (
     <div className="container m-auto w-[80%]">
       <TimePicker date={date} setDate={setDate}></TimePicker>
-      <h1 className="m-auto mt-2 text-center text-xl font-bold">Journal</h1>
+      <h1 className="m-auto mt-2 text-center text-xl ">Journal</h1>
       <h2 className="font-semibold">Today{"'"}s Habits</h2>
       {habits.map((habit) => {
         console.log(

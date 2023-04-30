@@ -59,7 +59,7 @@ function SubjectiveForm({ goals, onClose, createSubjective }: SubjectiveFormProp
             <h2 className="mb-2 text-2xl font-semibold text-center">Create Subjective</h2>
             <form className="flex flex-col space-y-4" onSubmit={(e) => { e.preventDefault(); createSubjective(subjectiveName, selectedGoal); onClose(); }}>
               <div className="my-3 mx-2">
-                <label className="mb-2 block text-sm font-bold text-gray-700" htmlFor="title"> Prompt </label>
+                <label className="mb-2 block text-sm  text-gray-700" htmlFor="title"> Prompt </label>
                 <input className="text-sm focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow-sm focus:outline-none"
                   id="subjectiveName"
                   type="text"
@@ -69,7 +69,7 @@ function SubjectiveForm({ goals, onClose, createSubjective }: SubjectiveFormProp
               </div>
 
               <div className="my-3 mx-2">
-                <label className="mb-2 block text-sm font-bold text-gray-700" htmlFor="description"> Link to a Goal (Optional)</label>
+                <label className="mb-2 block text-sm  text-gray-700" htmlFor="description"> Link to a Goal (Optional)</label>
                 <GoalSelector goals={goals} selectedGoal={selectedGoal} onSelect={setSelectedGoal}></GoalSelector>
               </div>
 

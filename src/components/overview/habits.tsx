@@ -67,16 +67,16 @@ export function HabitHeaderLine({
       <div className="mb-2 flex flex-row items-center justify-between">
         <div className="flex flex-col">
           <div className="">
-            <span className="mb-2 inline-block rounded-full bg-blue-500 px-2 py-1 text-xs font-bold text-white">
+            <span className="mb-2 inline-block rounded-full bg-blue-500 px-2 py-1 text-xs  text-white">
               Habit
             </span>
             {/* {weight && (
-              <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
+              <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs ">
                 Weight: {weight.toFixed(2)}
               </span>
             )} */}
           </div>
-          <div className="mr-1 items-baseline text-lg font-bold">
+          <div className="mr-1 items-baseline text-lg ">
             <EditableField
               initialText={description}
               commit={(text) =>
@@ -85,9 +85,9 @@ export function HabitHeaderLine({
             ></EditableField>
             <span className="text-sm lowercase text-gray-500">
               <span className="space-x-1 text-sm">
-                <span className="text-md font-bold">Completed</span>
+                <span className="text-md ">Completed</span>
 
-                <span className="text-md font-bold">{completions}</span>
+                <span className="text-md ">{completions}</span>
                 <span className="">/</span>
                 <EditableNumberField
                   initial={frequency}
@@ -95,7 +95,7 @@ export function HabitHeaderLine({
                     editFrequency.mutate({ habitId: id, frequency: number })
                   }
                 ></EditableNumberField>
-                <span className="text-md font-bold">times this</span>
+                <span className="text-md ">times this</span>
                 <DropDown
                   frequencyHorizon={frequencyHorizon}
                   commit={(freq) =>
@@ -112,7 +112,7 @@ export function HabitHeaderLine({
         <div className="flex items-center space-x-2">
           <div
             className={classNames(
-              "rounded-lg bg-gray-100 p-2 text-xl font-bold",
+              "rounded-lg bg-gray-100 p-2 text-xl ",
               textcolor(score)
             )}
           >
@@ -181,7 +181,7 @@ export function LinkHabitBox({
         <div className="flex flex-row gap-2">
           {selectedItem ? (
             <button
-              className="rounded-md bg-blue-500 px-2 font-bold text-white hover:bg-blue-700"
+              className="rounded-md bg-blue-500 px-2  text-white hover:bg-blue-700"
               onClick={() => {
                 //alert(`Linked habit ${id} to goal ${selectedItem.name}`);
                 linkHabit.mutate({ habitId: id, goalId: selectedItem.id });
@@ -191,12 +191,12 @@ export function LinkHabitBox({
               Link
             </button>
           ) : (
-            <button className="cursor-not-allowed rounded bg-blue-500 px-4 py-2 font-bold text-white opacity-50">
+            <button className="cursor-not-allowed rounded bg-blue-500 px-4 py-2  text-white opacity-50">
               Link
             </button>
           )}
           <button
-            className="rounded-md bg-red-600 px-2 font-bold text-white hover:bg-red-700"
+            className="rounded-md bg-red-600 px-2  text-white hover:bg-red-700"
             onClick={closeBox}
           >
             Cancel
@@ -215,7 +215,7 @@ export function LinkHabitBox({
               className={classNames(
                 {
                   "bg-blue-300": highlightedIndex === index,
-                  "font-bold": selectedItem === item,
+                  "": selectedItem === item,
                 },
                 "flex flex-col px-3 py-2 shadow-sm"
               )}
@@ -238,7 +238,7 @@ export function LinkHabit({ id }: { id: string }) {
   if (!active) {
     return (
       <button
-        className="font-bold text-blue-500 hover:underline"
+        className=" text-blue-500 hover:underline"
         onClick={() => setActive(true)}
       >
         Link to Goal
@@ -290,7 +290,7 @@ export function HabitFooter({
         <div className="flex items-center space-x-4">
           {linkedGoal ? (
             <button
-              className="font-bold text-blue-500 hover:underline"
+              className=" text-blue-500 hover:underline"
               onClick={() =>
                 unlinkHabitFromGoal.mutate({ habitId: id, goalId: linkedGoal })
               }
@@ -301,13 +301,13 @@ export function HabitFooter({
             <LinkHabit id={id}></LinkHabit>
           )}
           <button
-            className="font-bold text-gray-500 hover:text-red-300"
+            className=" text-gray-500 hover:text-red-300"
             onClick={() => deleteHabit.mutate({ habitId: id })}
           >
             Delete
           </button>
           <button
-            className="font-bold text-gray-500 hover:text-red-300"
+            className=" text-gray-500 hover:text-red-300"
             onClick={() => openHabitPanel(id)}
           >
             Configure
@@ -363,7 +363,7 @@ export function HabitCard({
         completions={completions}
       ></HabitHeaderLine>
       <div className="ml-2 mt-2">
-        <span className=" text-xs font-bold uppercase">Metrics</span>
+        <span className=" text-xs  uppercase">Metrics</span>
       </div>
       <div className="my-2">
         <div className="flex flex-col flex-wrap">
@@ -378,7 +378,7 @@ export function HabitCard({
           ></CreateLinkedMetricInline>
         ) : (
           <button
-            className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm font-bold text-gray-600 hover:bg-gray-200"
+            className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm  text-gray-600 hover:bg-gray-200"
             onClick={() => setCreateHabitActive(true)}
           >
             + Create a new Linked Metric

@@ -34,7 +34,7 @@ export function HabitPanel() {
         <SheetHeader>
           <SheetTitle>{data.description}</SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you{"'"}re done.
+            Header
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4">

@@ -22,7 +22,7 @@ function StatsCardRow() {
   return (
     <div className="mb-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-10">
       <div className=" min-w-10 max-w-50 divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl font-bold">Goals</div>
+        <div className="p-4 text-center text-2xl ">Goals</div>
         <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
           <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
             10
@@ -34,7 +34,7 @@ function StatsCardRow() {
         </div>
       </div>
       <div className="divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl font-bold">Habits</div>
+        <div className="p-4 text-center text-2xl ">Habits</div>
         <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
           <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
             10
@@ -46,7 +46,7 @@ function StatsCardRow() {
         </div>
       </div>
       <div className="divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl font-bold">Metrics</div>
+        <div className="p-4 text-center text-2xl ">Metrics</div>
         <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
           <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
             10
@@ -72,7 +72,7 @@ function HabitTableRow({
     <tr>
       <td className="border-blue-gray-50 border-b px-5 py-3">
         <div className="flex items-center gap-4">
-          <p className="text-blue-gray-900 block font-sans text-sm font-bold leading-normal antialiased">
+          <p className="text-blue-gray-900 block font-sans text-sm  leading-normal antialiased">
             {description}
           </p>
         </div>

@@ -32,10 +32,10 @@ export function LinkedMetric({
     <div className="m-2 flex min-h-[100px] flex-row justify-between rounded-lg bg-gray-100 p-4">
       <div className="flex flex-col">
         <div className="mb-2">
-          <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs font-bold text-white">
+          <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs  text-white">
             Linked Metric
           </span>
-          {/* <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs font-bold">
+          {/* <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs ">
             Weight: {weight.toFixed(2)}
           </span> */}
         </div>
@@ -52,7 +52,7 @@ export function LinkedMetric({
       <div className="flex h-full w-fit flex-row space-x-3">
         <div className=" h-fit bg-white px-2">
           <span
-            className={classNames("h-fit text-lg font-bold", textcolor(score))}
+            className={classNames("h-fit text-lg ", textcolor(score))}
           >
             {score}
           </span>

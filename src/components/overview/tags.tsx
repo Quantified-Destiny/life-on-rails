@@ -1,3 +1,4 @@
+import { PlusIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 
 export function CreateTag({ commit }: { commit: (name: string) => void }) {
@@ -30,7 +31,12 @@ export function CreateTag({ commit }: { commit: (name: string) => void }) {
           }}
         ></input>
       ) : (
-        "+ New Tag"
+        <span className="w-content group flex h-4 flex-row items-center gap-1">
+          <PlusIcon className="h-4 w-4"></PlusIcon>
+          <span className="hidden whitespace-nowrap group-hover:inline-block">
+            New Tag
+          </span>
+        </span>
       )}
     </div>
   );

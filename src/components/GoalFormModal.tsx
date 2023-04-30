@@ -27,7 +27,7 @@ function GoalForm({ onClose, createGoal }: GoalFormProps) {
             >
               <div className="mx-2 my-3">
                 <label
-                  className="mb-2 block text-sm font-bold text-gray-700"
+                  className="mb-2 block text-sm  text-gray-700"
                   htmlFor="title"
                 >
                   {" "}

@@ -1,6 +1,7 @@
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const TopNav = () => {
   const { data: sessionData } = useSession();
@@ -25,7 +26,7 @@ const TopNav = () => {
       navbar-toggler
       border-0
       bg-transparent
-      py-2 px-2.5
+      px-2.5 py-2
       text-gray-500
       hover:no-underline
       hover:shadow-none
@@ -55,15 +56,15 @@ const TopNav = () => {
             ></path>
           </svg> */}
         </button>
-        <div className="text-sm font-bold text-blue-600">
+        <div className="text-sm  text-blue-600">
           {/* text-[#21A8F6] */}
           Life on Rails
         </div>
         <div className="flex-grow items-center" id="navbarSupportedContent">
           <a
             className="
-        mt-2
         mr-1
+        mt-2
         flex
         items-center
         text-gray-900
@@ -76,15 +77,15 @@ const TopNav = () => {
         </div>
 
         <div className="relative flex items-center">
-          <a
+          <Link
             className="
         dropdown-item
         block
         w-full
         whitespace-nowrap
         bg-transparent
-        py-2
         px-4
+        py-2
         text-sm
         font-normal
         text-gray-700
@@ -93,12 +94,12 @@ const TopNav = () => {
             href="/profile"
           >
             My Profile
-          </a>
+          </Link>
         </div>
         <div className="relative flex items-center">
           <button
             className="rounded-full bg-gray-500 px-2 py-1 text-xs font-semibold text-white no-underline transition hover:bg-black/20"
-            onClick={sessionData ? handleSignOut : () => void signIn()}
+            onClick={sessionData ? handleSignOut : undefined}
           >
             {sessionData ? "Sign out" : "Sign in"}
           </button>

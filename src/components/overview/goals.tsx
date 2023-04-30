@@ -48,17 +48,17 @@ export function GoalCard({
     <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
       <div className="mb-1 flex flex-row justify-between">
         <div className="mb-2 flex flex-col">
-          <span className="mb-2 inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs font-bold text-white">
+          <span className="mb-2 inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs  text-white">
             Goal
           </span>
-          <div className="mb-2 flex items-center justify-between text-xl font-bold">
+          <div className="mb-2 flex items-center justify-between text-xl ">
             <EditableField
               initialText={name}
               commit={(name) => mutation.mutate({ goalId: id, name })}
             ></EditableField>
           </div>
         </div>
-        <div className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl font-bold text-yellow-500">
+        <div className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl  text-yellow-500">
           {score.toFixed(2)}
         </div>
       </div>

@@ -96,7 +96,7 @@ export const EditableField = ({
       {...triggerProps}
     >
       {isActive ? (
-        <input {...editProps} autoFocus className="font-bold" />
+        <input {...editProps} autoFocus className="" />
       ) : (
         <>
           <span>{initialText}</span>
@@ -192,14 +192,14 @@ export const EditableNumberField = ({
           type="number"
           {...editProps}
           autoFocus
-          className="w-7 font-bold"
+          className="w-7 "
         />
       ) : (
         <div
           className="group inline-flex flex-row flex-nowrap gap-1 whitespace-nowrap"
           {...triggerProps}
         >
-          <span>{initial}</span>
+          <span className="font-extrabold">{initial}</span>
 
           <svg
             xmlns="http://www.w3.org/2000/svg"

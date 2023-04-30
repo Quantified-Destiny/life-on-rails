@@ -68,7 +68,7 @@ function HabitsPage() {
   };
   return (
     <div className="container mx-auto max-w-screen-md px-4 py-8">
-      <h1 className="mb-4 text-center text-2xl font-bold">
+      <h1 className="mb-4 text-center text-2xl ">
         Go jogging for 1 hour
       </h1>
       <p className="mb-4 text-center text-gray-500">
@@ -78,7 +78,7 @@ function HabitsPage() {
       <div className="flex flex-col items-center justify-center">
         {linkedGoal && (
           <a className="text-center my-4" href={linkedGoal.link}>
-            <button className="bg-yellow-500 text-white font-bold py-2 px-4 rounded mt-2">
+            <button className="bg-yellow-500 text-white  py-2 px-4 rounded mt-2">
               Linked Goal: {linkedGoal.name}
             </button>
           </a>
@@ -110,19 +110,19 @@ function HabitsPage() {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-lg bg-white p-4 shadow-md">
-          <h2 className="text-md mb-4 font-bold">Done in the month</h2>
+          <h2 className="text-md mb-4 ">Done in the month</h2>
           <p className="text-md text-center">5</p>
         </div>
         <div className="rounded-lg bg-white p-4 shadow-md">
-          <h2 className="text-md mb-4 font-bold">Total done</h2>
+          <h2 className="text-md mb-4 ">Total done</h2>
           <p className="text-md text-center">15</p>
         </div>
         <div className="rounded-lg bg-white p-4 shadow-md">
-          <h2 className="text-md mb-4 font-bold">Current streak</h2>
+          <h2 className="text-md mb-4 ">Current streak</h2>
           <p className="text-md text-center">2</p>
         </div>
         <div className="rounded-lg bg-white p-4 shadow-md">
-          <h2 className="text-md mb-4 font-bold">Best streak</h2>
+          <h2 className="text-md mb-4 ">Best streak</h2>
           <p className="text-md text-center">6</p>
         </div>
       </div>

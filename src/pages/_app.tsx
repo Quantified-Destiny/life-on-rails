@@ -4,8 +4,9 @@ import { SessionProvider } from "next-auth/react";
 import { api } from "../utils/api";
 
 import "../styles/globals.css";
-import "@fontsource/raleway";
-//import "@fontsource/raleway/600.css";
+import "@fontsource/raleway/400.css";
+import "@fontsource/raleway/600.css";
+import "@fontsource/raleway/800.css";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,

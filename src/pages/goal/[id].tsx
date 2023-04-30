@@ -30,7 +30,7 @@ function GoalCard({
         <section className="body-font text-gray-600">
           <div className="container mx-auto px-5 py-24">
             <div className="flex w-full flex-row justify-between text-center">
-              <h1 className="title-font mb-2 text-2xl font-bold text-black">
+              <h1 className="title-font mb-2 text-2xl  text-black">
                 {name}
               </h1>
               <div className="">
@@ -49,7 +49,7 @@ function GoalCard({
                 </div>
               </div>
             </div>
-            <span className="text-xs font-bold uppercase text-gray-600">
+            <span className="text-xs  uppercase text-gray-600">
               HABITS
             </span>
             <div className="m-auto rounded-lg bg-white shadow shadow-slate-300">
