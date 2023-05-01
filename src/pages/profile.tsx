@@ -1,6 +1,7 @@
 
 import Layout from "../components/layout";
 import { api } from "../utils/api";
+import { format } from 'date-fns';
 
 
 const ProfilePage = () => {
@@ -10,6 +11,8 @@ const ProfilePage = () => {
   if (query.isError) return <p>Error</p>;
 
   const profile = query.data;
+  const joinDate = format(profile.createdAt, 'yyyy/MM/dd');
+  joinDate.toString();
 
   return (<>
     <div className="flex min-h-screen justify-center ">
@@ -30,7 +33,7 @@ const ProfilePage = () => {
             <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
               <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Username</dt>
+                  <dt className="text-sm font-medium text-gray-500">User name</dt>
                   <dd className="mt-1 text-sm text-gray-900">{profile.name}</dd>
                 </div>
                 <div className="sm:col-span-1">
@@ -38,8 +41,12 @@ const ProfilePage = () => {
                   <dd className="mt-1 text-sm text-gray-900">{profile.email}</dd>
                 </div>
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">Provider:</dt>
+                  <dt className="text-sm font-medium text-gray-500">Provider</dt>
                   <dd className="mt-1 text-sm text-gray-900">{profile.providers.join(", ")}</dd>
+                </div>
+                <div className="sm:col-span-1">
+                  <dt className="text-sm font-medium text-gray-500">Join date</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{joinDate}</dd>
                 </div>
               </dl>
             </div>

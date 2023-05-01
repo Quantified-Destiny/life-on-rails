@@ -16,7 +16,8 @@ export const profileRouter = createTRPCRouter({
             select: {
               provider: true
             }
-          }
+          },
+          createdAt: true
         },
       });
 
@@ -24,7 +25,8 @@ export const profileRouter = createTRPCRouter({
         name: data.name,
         email: data.email,
         image: data.image,
-        providers: data.accounts.map(it => it.provider)
+        providers: data.accounts.map(it => it.provider),
+        createdAt: data.createdAt
       }
 
     }),
