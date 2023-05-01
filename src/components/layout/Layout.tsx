@@ -1,16 +1,14 @@
 import classNames from "classnames";
-import React, { PropsWithChildren, useState } from "react";
-import Navbar from "./Navbar";
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 
-
 const Layout = ({ main }: { main: () => JSX.Element }) => {
-    const [collapsed, setSidebarCollapsed] = useState(false);
+  const [collapsed, setSidebarCollapsed] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   return (
     <div
       className={classNames({
-        "grid bg-zinc-100 min-h-screen": true,
+        "grid min-h-screen bg-zinc-100": true,
         "grid-cols-sidebar": !collapsed,
         "grid-cols-sidebar-collapsed": collapsed,
         "transition-[grid-template-columns] duration-300 ease-in-out": true,
@@ -21,12 +19,8 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
         setCollapsed={setSidebarCollapsed}
         shown={showSidebar}
       />
-      <div className="">
-        <Navbar onMenuButtonClick={() => setShowSidebar((prev) => !prev)} />
-        {main()}
-      </div>
+      <div className="mt-40">{main()}</div>
     </div>
   );
-    }
-  export default Layout;
-  
+};
+export default Layout;

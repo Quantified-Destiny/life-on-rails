@@ -6,7 +6,7 @@ type Props = {
    * Allows the parent component to modify the state when the
    * menu button is clicked.
    */
-  onMenuButtonClick(): void;
+  onMenuButtonClick: () => void;
 };
 const Navbar = (props: Props) => {
   return (
@@ -14,7 +14,7 @@ const Navbar = (props: Props) => {
       className={classNames({
         "bg-white text-zinc-500": true, // colors
         "flex items-center": true, // layout
-        "w-screen md:w-full sticky z-10 px-4 shadow-sm h-[73px] top-0 ": true, //positioning & styling
+        "sticky top-0 z-10 h-[73px] w-screen px-4 shadow-sm md:w-full ": true, //positioning & styling
       })}
     >
       <div className=" text-lg">Admin Panel</div>

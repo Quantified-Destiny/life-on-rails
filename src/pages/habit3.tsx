@@ -51,13 +51,17 @@ const sortOptions = [
 const filterOptions = [
   { value: "All", label: "All", selected: true },
   { value: "Health", label: "Health", selected: false },
-  { value: "Personal Development", label: "Personal Development", selected: false },
+  {
+    value: "Personal Development",
+    label: "Personal Development",
+    selected: false,
+  },
   { value: "Fitness", label: "Fitness", selected: false },
   { value: "Mental Health", label: "Mental Health", selected: false },
 ];
 
 export default function HabitsTable() {
-  const [sortField, setSortField] = useState("name");
+  const [sortField, setSortField] = useState<keyof HabitItem>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedFilters, setSelectedFilters] = useState(filterOptions);
 
@@ -71,7 +75,7 @@ export default function HabitsTable() {
     }
   });
 
-  const handleSort = (field: string) => {
+  const handleSort = (field: keyof HabitItem) => {
     if (field === sortField) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -92,18 +96,19 @@ export default function HabitsTable() {
     setSelectedFilters(newSelectedFilters);
   };
 
-  const filteredItems =
-    selectedFilters.find((option) => option.value === "All").selected
-      ? sortedItems
-      : sortedItems.filter((item) =>
-          item.tags.some((tag) =>
+  const filteredItems = selectedFilters.find((option) => option.value === "All")
+    ?.selected
+    ? sortedItems
+    : sortedItems.filter((item) =>
+        item.tags.some(
+          (tag) =>
             selectedFilters.find((option) => option.value === tag)?.selected
-          )
-        );
+        )
+      );
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row justify-between mb-4">
+      <div className="mb-4 flex flex-col justify-between sm:flex-row">
         <div className="mb-4 sm:mb-0">
           <h2 className="text-xl font-medium">Habits</h2>
         </div>
@@ -111,7 +116,7 @@ export default function HabitsTable() {
           <ReactSelect
             options={sortOptions}
             value={sortOptions.find((option) => option.value === sortField)}
-            onChange={(option) => handleSort(option.value)}
+            onChange={(option) => handleSort(option?.value as keyof HabitItem)}
           />
         </div>
         <div className="w-full sm:w-auto">
@@ -121,8 +126,10 @@ export default function HabitsTable() {
             value={selectedFilters.filter((filter) => filter.selected)}
             onChange={(options) =>
               options && options.length > 0
-                ? setSelectedFilters(options)
-                : setSelectedFilters([{ value: "All", label: "All", selected: true }])
+                ? setSelectedFilters(options.map((it) => it))
+                : setSelectedFilters([
+                    { value: "All", label: "All", selected: true },
+                  ])
             }
           />
         </div>

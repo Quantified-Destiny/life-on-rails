@@ -1,8 +1,6 @@
-import { ExpandedHabit } from "../../server/queries";
 import { api } from "../../utils/api";
 import { State, useOverviewStore } from "../overviewState";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import {
   Sheet,

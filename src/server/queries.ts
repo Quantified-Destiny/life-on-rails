@@ -14,15 +14,7 @@ import { subDays } from "date-fns";
 import type { prisma as prismaClient } from "./db";
 
 function avg(arr: number[]) {
-  return arr.reduce((a, b) => a + b) / arr.length;
-}
-
-function targetCount(h: Habit) {
-  if (h.frequencyHorizon == "DAY") {
-    return h.frequency * 14;
-  } else if (h.frequencyHorizon == "WEEK") {
-    return h.frequency * 2;
-  } else return h.frequency / 2;
+  return arr.length == 0 ? 0 : arr.reduce((a, b) => a + b) / arr.length;
 }
 
 export interface ExpandedHabit extends Habit {
@@ -80,19 +72,19 @@ export async function getHabits(
   );
   const habitScores = new Map<string, number>(
     habitCompletions.map((it) => {
-      let habit = habitsMap.get(it.habitId)!;
-      let normalizedFrequency =
+      const habit = habitsMap.get(it.habitId)!;
+      const normalizedFrequency =
         habit.frequencyHorizon == FrequencyHorizon.WEEK
           ? habit.frequency
           : habit.frequency * 7;
-      let maxCompletionCount = normalizedFrequency * user.scoringWeeks;
-      let completionScore = it._count._all / maxCompletionCount;
+      const maxCompletionCount = normalizedFrequency * user.scoringWeeks;
+      const completionScore = it._count._all / maxCompletionCount;
 
-      let metricsScore = avg(
+      const metricsScore = avg(
         habit.metrics.map((m) => metricsMap.get(m.metricId)!.score)
       );
 
-      let score =
+      const score =
         habit.completionWeight * completionScore +
         (1 - habit.completionWeight) * metricsScore;
 
@@ -125,6 +117,7 @@ export async function getMetrics(
   prisma: typeof prismaClient,
   userId: string
 ): Promise<[ExpandedMetric[], Map<string, ExpandedMetric>]> {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const metrics: (Metric & {
     completionMetric: LinkedMetric[];
     MetricTag: (MetricTag & { tag: Tag })[];
