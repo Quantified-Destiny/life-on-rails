@@ -123,6 +123,7 @@ model HabitCompletion {
   isCompleted   Boolean        @default(true)
   Habit         Habit          @relation(fields: [habitId], references: [id], onDelete: Cascade)
   linkedAnswers MetricAnswer[]
+  memo          String?
 
   @@index([date])
   @@index([habitId])
@@ -132,6 +133,7 @@ model HabitMeasuresGoal {
   id      String @id @default(cuid())
   goalId  String
   habitId String
+  weight  Int
 
   goal  Goal  @relation(fields: [goalId], references: [id])
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
@@ -144,6 +146,7 @@ model MetricMeasuresGoal {
   id       String @id @default(cuid())
   goalId   String
   metricId String
+  weight   Int
 
   goal   Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
   metric Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
@@ -181,6 +184,7 @@ model MetricAnswer {
   updatedAt DateTime @updatedAt
   metricId  String
   metric    Metric   @relation(fields: [metricId], references: [id])
+  memo      String?
 
   // if this answer is linked to a metric, this will specify which habit-completion this answer relates to
   HabitCompletion   HabitCompletion? @relation(fields: [habitCompletionId], references: [id])
@@ -230,6 +234,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  scoringWeeks  Int       @default(2)
   accounts      Account[]
   sessions      Session[]
   Goal          Goal[]
