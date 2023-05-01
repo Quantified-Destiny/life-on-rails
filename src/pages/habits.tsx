@@ -59,8 +59,8 @@ const value = [
 ];
 
 function HabitsPage() {
-  const events = ['04-03-2023', '04-15-2023', '4-25-2023'];
-  const [tgl, setTgl] = useState("");
+  const events = ["04-03-2023", "04-15-2023", "4-25-2023"];
+  const [tgl, setTgl] = useState<Date>();
   const linkedGoal = {
     id: "123",
     name: "Exercise every day",
@@ -68,22 +68,20 @@ function HabitsPage() {
   };
   return (
     <div className="container mx-auto max-w-screen-md px-4 py-8">
-      <h1 className="mb-4 text-center text-2xl ">
-        Go jogging for 1 hour
-      </h1>
+      <h1 className="mb-4 text-center text-2xl ">Go jogging for 1 hour</h1>
       <p className="mb-4 text-center text-gray-500">
         Created on December 1st, 2022
       </p>
 
       <div className="flex flex-col items-center justify-center">
         {linkedGoal && (
-          <a className="text-center my-4" href={linkedGoal.link}>
-            <button className="bg-yellow-500 text-white  py-2 px-4 rounded mt-2">
+          <a className="my-4 text-center" href={linkedGoal.link}>
+            <button className="mt-2 rounded  bg-yellow-500 px-4 py-2 text-white">
               Linked Goal: {linkedGoal.name}
             </button>
           </a>
         )}
-        <Calendar 
+        <Calendar
           className="w-full md:w-auto"
           onChange={(value, event) => {
             if (value instanceof Date) setTgl(value);
