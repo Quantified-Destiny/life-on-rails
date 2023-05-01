@@ -29,7 +29,7 @@ export function LinkedMetric({
   });
 
   return (
-    <div className="m-2 flex min-h-[100px] flex-row justify-between rounded-lg bg-gray-100 p-4">
+    <div className="flex min-h-[100px] flex-row justify-between rounded-lg bg-gray-100 p-4">
       <div className="flex flex-col">
         <div className="mb-2">
           <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs  text-white">
@@ -39,21 +39,20 @@ export function LinkedMetric({
             Weight: {weight.toFixed(2)}
           </span> */}
         </div>
-        <div className="ml-2 font-semibold">
+        <div className="ml-2">
           <EditableField
             initialText={prompt}
             commit={(text) => {
               mutation.mutate({ metricId: id, prompt: text });
             }}
+            className="ml-2 font-semibold"
           ></EditableField>
         </div>
       </div>
 
       <div className="flex h-full w-fit flex-row space-x-3">
         <div className=" h-fit bg-white px-2">
-          <span
-            className={classNames("h-fit text-lg ", textcolor(score))}
-          >
+          <span className={classNames("h-fit text-lg ", textcolor(score))}>
             {score}
           </span>
         </div>

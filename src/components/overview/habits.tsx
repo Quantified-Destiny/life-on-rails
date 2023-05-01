@@ -12,6 +12,7 @@ import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";
 import { TagList } from "./tags";
 import { useOverviewStore } from "../overviewState";
+import { cva } from "class-variance-authority";
 
 function getGoalsFilter(
   inputValue: string | undefined
@@ -82,6 +83,7 @@ export function HabitHeaderLine({
               commit={(text) =>
                 mutation.mutate({ habitId: id, description: text })
               }
+              className="font-semibold"
             ></EditableField>
             <span className="text-sm lowercase text-gray-500">
               <span className="space-x-1 text-sm">
@@ -94,6 +96,7 @@ export function HabitHeaderLine({
                   commit={(number) =>
                     editFrequency.mutate({ habitId: id, frequency: number })
                   }
+                  className="font-semibold"
                 ></EditableNumberField>
                 <span className="text-md ">times this</span>
                 <DropDown
@@ -104,6 +107,7 @@ export function HabitHeaderLine({
                       frequencyHorizon: freq,
                     })
                   }
+                  className="font-semibold"
                 ></DropDown>
               </span>
             </span>
@@ -347,9 +351,20 @@ export function HabitCard({
     },
   });
 
-  const classes = linkedGoal
-    ? "rounded-sm p-6 shadow-md"
-    : "rounded-lg bg-white p-6 shadow-md";
+  const v = cva("rounded-lg p-6 shadow-md space-y-2", {
+    variants: {
+      variant: {
+        freestanding: "bg-white",
+        linked: "bg-white",
+      },
+    },
+  });
+
+  const classes = v({ variant: linkedGoal ? "linked" : "freestanding" });
+
+  // const classes = linkedGoal
+  //   ? "rounded-sm p-6 shadow-md"
+  //   : "rounded-lg bg-white p-6 shadow-md";
 
   return (
     <div className={classes}>
@@ -362,10 +377,10 @@ export function HabitCard({
         score={score}
         completions={completions}
       ></HabitHeaderLine>
-      <div className="ml-2 mt-2">
-        <span className=" text-xs  uppercase">Metrics</span>
+      <div className="ml-2 mt-4">
+        <span className="text-xs uppercase">Metrics</span>
       </div>
-      <div className="my-2">
+      <div className="">
         <div className="flex flex-col flex-wrap">
           {metrics.map((m) => (
             <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>

@@ -30,7 +30,7 @@ export function HabitPanel() {
 
   return (
     <Sheet open={modal?.state === State.HabitPanel} onOpenChange={reset}>
-      <SheetContent position="right" size="sm">
+      <SheetContent position="right" size="lg">
         <SheetHeader>
           <SheetTitle>{data.description}</SheetTitle>
           <SheetDescription>

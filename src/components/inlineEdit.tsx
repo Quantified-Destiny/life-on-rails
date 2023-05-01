@@ -81,9 +81,11 @@ export const useInlineNumberEdit = ({
 export const EditableField = ({
   initialText,
   commit,
+  className,
 }: {
   initialText: string;
   commit: (text: string) => void;
+  className?: string;
 }) => {
   const { isActive, triggerProps, editProps } = useInlineEdit({
     initialText,
@@ -96,7 +98,7 @@ export const EditableField = ({
       {...triggerProps}
     >
       {isActive ? (
-        <input {...editProps} autoFocus className="" />
+        <input {...editProps} autoFocus className={className} />
       ) : (
         <>
           <span>{initialText}</span>
@@ -123,62 +125,42 @@ export const EditableField = ({
 type DropDownProps = {
   frequencyHorizon: FrequencyHorizon;
   commit: (freq: FrequencyHorizon) => void;
+  className?: string;
 };
 
-export const DropDown = ({ frequencyHorizon, commit }: DropDownProps) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  if (showDropdown) {
-    return (
-      <select
-        defaultValue={frequencyHorizon}
-        onChange={(event) => {
-          commit(event.target.value as FrequencyHorizon);
-          setShowDropdown(false);
-        }}
-        onKeyDown={(event: KeyboardEvent<HTMLSelectElement>) => {
-          if (event.key == "Enter") {
-            commit(event.currentTarget.value as FrequencyHorizon);
-            setShowDropdown(false);
-          } else if (event.key == "Escape") {
-            setShowDropdown(false);
-          }
-        }}
-      >
-        <option value="DAY">Day</option>
-        <option value="WEEK">Week</option>
-      </select>
-    );
-  } else
-    return (
-      <span className="group">
-        <span onClick={() => setShowDropdown(true)}>{frequencyHorizon}</span>
-        <span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="hidden h-6 w-6 group-hover:inline-block"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-            />
-          </svg>
-        </span>
-      </span>
-    );
+export const DropDown = ({
+  frequencyHorizon,
+  commit,
+  className,
+}: DropDownProps) => {
+  return (
+    <select
+      defaultValue={frequencyHorizon}
+      onChange={(event) => {
+        commit(event.target.value as FrequencyHorizon);
+      }}
+      onKeyDown={(event: KeyboardEvent<HTMLSelectElement>) => {
+        if (event.key == "Enter") {
+          commit(event.currentTarget.value as FrequencyHorizon);
+        } else if (event.key == "Escape") {
+        }
+      }}
+      className={className}
+    >
+      <option value="DAY">Day</option>
+      <option value="WEEK">Week</option>
+    </select>
+  );
 };
 
 export const EditableNumberField = ({
   initial,
   commit,
+  className,
 }: {
   initial: number;
   commit: (text: number) => void;
+  className: string;
 }) => {
   const { isActive, triggerProps, editProps } = useInlineNumberEdit({
     initial,
@@ -188,18 +170,13 @@ export const EditableNumberField = ({
   return (
     <>
       {isActive ? (
-        <input
-          type="number"
-          {...editProps}
-          autoFocus
-          className="w-7 "
-        />
+        <input type="number" {...editProps} autoFocus className="w-7 " />
       ) : (
         <div
           className="group inline-flex flex-row flex-nowrap gap-1 whitespace-nowrap"
           {...triggerProps}
         >
-          <span className="font-extrabold">{initial}</span>
+          <span className={className}>{initial}</span>
 
           <svg
             xmlns="http://www.w3.org/2000/svg"

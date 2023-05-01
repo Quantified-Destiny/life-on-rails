@@ -62,7 +62,7 @@ export function GoalCard({
           {score.toFixed(2)}
         </div>
       </div>
-      <div className=" gap-x-10 space-y-2">
+      <div className="gap-x-10 space-y-2 mb-4">
         {habits.map((habit) => (
           <HabitCard
             {...habit}
