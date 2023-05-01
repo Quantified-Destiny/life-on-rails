@@ -1,4 +1,5 @@
-import type {
+import {
+  FrequencyHorizon,
   Goal,
   Habit,
   HabitMeasuresGoal,
@@ -11,6 +12,10 @@ import type {
 import { subDays } from "date-fns";
 
 import type { prisma as prismaClient } from "./db";
+
+function avg(arr: number[]) {
+  return arr.reduce((a, b) => a + b) / arr.length;
+}
 
 function targetCount(h: Habit) {
   if (h.frequencyHorizon == "DAY") {
@@ -33,11 +38,13 @@ export async function getHabits(
   metricsMap: Map<string, ExpandedMetric>,
   userId: string
 ): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
-  const habits: (Habit & {
+  type HabitType = Habit & {
     metrics: LinkedMetric[];
     HabitTag: (HabitTag & { tag: Tag })[];
     goals: HabitMeasuresGoal[];
-  })[] = await prisma.habit.findMany({
+  };
+
+  const habits: HabitType[] = await prisma.habit.findMany({
     where: {
       ownerId: userId,
     },
@@ -47,7 +54,13 @@ export async function getHabits(
       goals: true,
     },
   });
-  const habitsMap = new Map<string, Habit>(habits.map((h) => [h.id, h]));
+  const habitsMap = new Map<string, HabitType>(habits.map((h) => [h.id, h]));
+
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
 
   const habitCompletions = await prisma.habitCompletion.groupBy({
     by: ["habitId"],
@@ -56,7 +69,7 @@ export async function getHabits(
     },
     where: {
       Habit: { ownerId: userId },
-      date: { gt: subDays(new Date(), 14) },
+      date: { gt: subDays(new Date(), user.scoringWeeks * 7) },
     },
   });
   const habitCompletionsCount = new Map<string, number>(
@@ -67,11 +80,24 @@ export async function getHabits(
   );
   const habitScores = new Map<string, number>(
     habitCompletions.map((it) => {
+      let habit = habitsMap.get(it.habitId)!;
+      let normalizedFrequency =
+        habit.frequencyHorizon == FrequencyHorizon.WEEK
+          ? habit.frequency
+          : habit.frequency * 7;
+      let maxCompletionCount = normalizedFrequency * user.scoringWeeks;
+      let completionScore = it._count._all / maxCompletionCount;
+
+      let metricsScore = avg(
+        habit.metrics.map((m) => metricsMap.get(m.metricId)!.score)
+      );
+
+      let score =
+        habit.completionWeight * completionScore +
+        (1 - habit.completionWeight) * metricsScore;
+
       console.log(it.habitId);
-      return [
-        it.habitId,
-        it._count._all / targetCount(habitsMap.get(it.habitId)!),
-      ];
+      return [it.habitId, score];
     })
   );
   const expandedHabits = habits.map((h) => ({
@@ -114,18 +140,27 @@ export async function getMetrics(
     },
   });
 
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
   const metricAnswers = await prisma.metricAnswer.groupBy({
     by: ["metricId"],
-    _avg: {
+    _sum: {
       value: true,
     },
     where: {
-      createdAt: { gt: subDays(new Date(), 14) },
+      createdAt: { gt: subDays(new Date(), 7 * user.scoringWeeks) },
     },
   });
 
   const metricScores = new Map<string, number>(
-    metricAnswers.map((a) => [a.metricId, a._avg.value ?? 0])
+    metricAnswers.map((a) => [
+      a.metricId,
+      (a._sum.value ?? 0) / 5 / (7 * user.scoringWeeks),
+    ])
   );
 
   const expandedMetrics = metrics.map((m) => ({
