@@ -18,31 +18,37 @@ export function HabitPanel() {
   const modal = useOverviewStore((store) => store.modal);
   const reset = useOverviewStore((store) => store.reset);
   const habitId = modal?.state == State.HabitPanel ? modal?.habitId : null;
-  const habitData = api.habits.getHabit.useQuery(
+
+  const habitQuery = api.habits.getHabit.useQuery(
     { habitId: habitId! },
     { enabled: habitId != null }
   );
 
-  const data = habitData.data;
-  if (!habitId || habitData.isError || habitData.isLoading || !data) {
+  const data = habitQuery.data;
+  if (!habitId || habitQuery.isError || habitQuery.isLoading || !data) {
     return <p>ERROR</p>;
   }
 
   return (
     <Sheet open={modal?.state === State.HabitPanel} onOpenChange={reset}>
       <SheetContent position="right" size="lg">
-        <SheetHeader>
-          <SheetTitle>{data.description}</SheetTitle>
-          <SheetDescription>
-            Header
-          </SheetDescription>
-        </SheetHeader>
-        <div className="grid gap-4 py-4">
-          <HabitCard {...data} weight={0.1}></HabitCard>
+        <div className="relative h-full">
+          <SheetHeader>
+            <SheetTitle>{data.description}</SheetTitle>
+            <SheetDescription>Configure habit information</SheetDescription>
+          </SheetHeader>
+          <div className="">
+            <HabitCard {...data} weight={0.1}></HabitCard>
+          </div>
+          <SheetFooter className="absolute bottom-0 right-0 w-full">
+            <Button variant="default">
+              <Label>Archive</Label>
+            </Button>
+            <Button variant="destructive">
+              <Label>Delete</Label>
+            </Button>
+          </SheetFooter>
         </div>
-        <SheetFooter>
-          Footer
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
