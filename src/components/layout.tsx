@@ -1,109 +1,100 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import Link from "next/link";
-import TopNav from "../components/topnav";
-
-import {
-  faBook,
-  faChartSimple,
-  faHome,
-  faPlusCircle,
-} from "@fortawesome/free-solid-svg-icons";
 import { useIsFetching } from "@tanstack/react-query";
-import classNames from "classnames";
-
-function SideBar() {
-  return (
-    <div className="fixed flex h-full flex-col bg-gray-800/80 px-4 py-8 shadow-[inset_-25px_-15px_80px_#46464620] backdrop-blur-md">
-      <h1 className="mb-8 text-2xl  text-white">Navigation</h1>
-      <ul className="flex flex-col space-y-2">
-        <li>
-          <Link
-            href="/dashboard"
-            className="flex items-center text-white opacity-75 hover:opacity-100"
-          >
-            <FontAwesomeIcon icon={faChartSimple} className="mr-2 h-6 w-6" />
-            <span>Dashboard</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/overview2"
-            className="flex items-center text-white opacity-75 hover:opacity-100"
-          >
-            <FontAwesomeIcon icon={faHome} className="mr-2 h-6 w-6" />
-            <span>Overview</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/journal"
-            className="flex items-center text-white opacity-75 hover:opacity-100"
-          >
-            <FontAwesomeIcon icon={faBook} className="mr-2 h-6 w-6" />
-            <span>Journal</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/create"
-            className="flex items-center text-white opacity-75 hover:opacity-100"
-          >
-            <FontAwesomeIcon icon={faPlusCircle} className="mr-2 h-6 w-6" />
-            <span>Create</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/habits"
-            className="flex items-center text-white opacity-75 hover:opacity-100"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="mr-2 h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"
-              />
-            </svg>
-            <span>Habits</span>
-          </Link>
-        </li>
-      </ul>
-    </div>
-  );
-}
+import { MdOutlineDashboard, MdCalendarViewMonth, MdAddCircleOutline, MdOutlineToday, MdBarChart, MdOutlineLogout, MdPerson, MdArrowBackIosNew } from "react-icons/md";
+import { useEffect, useState } from "react";
+import React from "react";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const Layout = ({ main }: { main: () => JSX.Element }) => {
   const isFetching = useIsFetching();
   console.log(isFetching);
 
+  const { data: sessionData } = useSession();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await router.push("/");
+    await signOut();
+  };
+
+  const [open, setOpen] = useState(true);
+
+  const Menus = [
+    { name: "Dashboard", link: '/dashboard', icon: MdBarChart, gap: true },
+    { name: "Journal", link: '/journal', icon: MdOutlineToday },
+    { name: "Create New", link: '/create', icon: MdAddCircleOutline },
+    { name: "All Items", link: '/overview2', icon: MdOutlineDashboard },
+    { name: "Habits", link: '/habits', icon: MdCalendarViewMonth },
+  ]
+
+  // Auto close menu when on mobile
+  const handleResize = () => {
+    if (window.innerWidth < 720) {
+      setOpen(false)
+    } else {
+      setOpen(true)
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize)
+  });
+
   return (
-    <div className="relative inset-0">
-      <div className="z-50 grid min-h-screen grid-cols-[10em_1fr] grid-rows-[3em_1fr]">
+
+    <div className="flex">
+
+      <div className={`${open ? "w-[14rem]" : "w-20"} duration-200 p-5 pt-8 h-screen bg-gradient-to-b from-[#00164d] to-[#3c118b] fixed top-0 left-0 bottom-0`}>
         <div
-          id="topbar"
-          className="fixed z-50 col-span-2 col-start-1 row-start-1 w-full bg-white"
-        >
-          <TopNav></TopNav>
-          <div
-            className={classNames("absolute left-0 bottom-0 z-10 h-1 w-full", {
-              hidden: isFetching === 0,
-              "animate-pulse bg-green-400": isFetching > 0,
-            })}
-          ></div>
+          className={`absolute h-8 w-8 bg-white rounded-full cursor-pointer -right-4 top-9 border-2 border-black ${!open && "rotate-180"}`}
+          onClick={() => setOpen(!open)} >
+          <MdArrowBackIosNew className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></MdArrowBackIosNew>
         </div>
-        <div className="col-start-1 row-span-2 row-start-2 bg-gray-100">
-          <SideBar></SideBar>
+
+
+        <div className="flex gap-x-4 items-center">
+          <a href="/journal">
+            <img src="lor-logo.png" alt=""
+              width="40"
+              height="40"
+              className={`cursor-pointer duration-100`} />
+          </a>
+          <h1 className={`text-white origin-left ${!open && 'hidden'}`}>
+            Life on Rails
+          </h1>
         </div>
-        <div className="relative col-start-2 row-start-2 bg-slate-50">
-          {main()}
-        </div>
+        {Menus.map((menu, index) => (
+          <Link
+            href={menu.link}
+            key={index} className={`text-white text-sm flex items-center gap-x-4 cursor-pointer p-2 hover:bg-slate-200 hover:bg-opacity-10 rounded-md ${menu?.gap ? "mt-9" : "mt-2"}`}>
+            <div>
+              {React.createElement(menu?.icon, { size: 20 })}
+            </div>
+            <span className={`${!open && `hidden`} origin-left duration-200`}>{menu.name}</span>
+          </Link>
+        ))}
+        <Link
+          href='/profile'
+          key='profile' className={`text-white text-sm flex items-end absolute bottom-14 gap-x-4 cursor-pointer p-2 hover:bg-opacity-10	hover:bg-white rounded-md`}>
+          <div>
+            {React.createElement(MdPerson, { size: 20 })}
+          </div>
+          <span className={`${!open && `hidden`} origin-left duration-200`}>Profile</span>
+        </Link>
+        <Link
+          href='/'
+          onClick={sessionData ? handleSignOut : undefined}
+          key='logout' className={`text-white text-sm flex flex-row-10 items-end absolute bottom-4 gap-x-4 cursor-pointer p-2 hover:bg-opacity-10	hover:bg-white rounded-md`}>
+          <div>
+            {React.createElement(MdOutlineLogout, { size: 20 })}
+          </div>
+          <span className={`${!open && `hidden`} origin-left duration-200`}>Log Out</span>
+        </Link>
+      </div>
+      <div className={`${open ? "pl-[14rem]" : "pl-20"} p-2 font-semi flex-1 h-screen overflow-auto`}>
+        {main()}
       </div>
     </div>
   );

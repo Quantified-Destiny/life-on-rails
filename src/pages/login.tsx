@@ -34,7 +34,7 @@ export default function SignIn({
         <div className="flex justify-center mx-auto my-4 text-2xl font-extrabold font-sans">
           Life on Rails
         </div>
-        <div className="flex justify-center mx-auto my-2">
+        <div className="flex justify-center text-sm mx-auto my-2">
           Sign Up or Log In
         </div>
         <hr className="w-48 h-1 mx-auto my-4 bg-gray-200 border-0 rounded dark:bg-gray-700" />

@@ -15,7 +15,7 @@ const ProfilePage = () => {
   joinDate.toString();
 
   return (<>
-    <div className="flex min-h-screen justify-center ">
+    <div className="flex justify-center">
       <div className="w-full max-w-7xl py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8">
           <div className="overflow-hidden rounded-lg bg-white shadow md:col-span-2">

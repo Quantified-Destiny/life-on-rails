@@ -26,14 +26,14 @@ const Home: NextPage = () => {
     <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
     Ride the rails to success
     </h1>
-    <p className="mb-8 text-lg font-normal text-whitelg:text-xl sm:px-16 lg:px-48 dark:text-gray-400">
+    <p className="mb-8 text-lg font-normal lg:text-xl sm:px-16 lg:px-48 dark:text-gray-400">
     Empower your journey to success with Life on Rails - the app that tracks your goals, habits, and progress.
     </p>
     <div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
       <AuthShowcase />
       <a
         href="#"
-        className="inline-flex bg-gray-200 justify-center items-center py-3 px-5 text-base font-medium text-center text-gray-900 rounded-lg border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+        className="inline-flex bg-gray-200 justify-center items-center py-3 px-5 text-base font-medium text-center text-gray-900 rounded-lg border border-gray-300 hover:bg-gray-300 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
       >
         Learn more
       </a>
