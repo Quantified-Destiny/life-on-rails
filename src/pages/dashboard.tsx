@@ -206,13 +206,13 @@ function HabitsTable() {
 
 export function Home() {
   return (
-    <div className="h-full w-full bg-gray-100">
+    <div className="">
       <div className="m-auto mx-20 h-full pt-10">
         <StatsCardRow></StatsCardRow>
 
         <HabitsTable></HabitsTable>
 
-        <div className="mb-6 mt-5 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 xl:grid-cols-3">
+        {/* <div className="mb-6 mt-5 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 xl:grid-cols-3">
           {statisticsChartsData.map((props) => (
             <StatisticsChart
               key={props.title}
@@ -225,7 +225,7 @@ export function Home() {
               }
             />
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );
