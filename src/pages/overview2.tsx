@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { CreateMenu } from "../components/createMenu";
 import { EllipsisIcon } from "../components/icons";
-import Layout from "../components/layout";
+import Layout from "../components/layout/layout";
 import {
   CreateGoalModal,
   CreateHabitModal,

@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { type NextPage } from "next";
-import Layout from "../components/layout";
+import Layout from "../components/layout/layout";
 import { api } from "../utils/api";
 
 const textcolor = (score: number | undefined) => {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import Layout from "../components/layout";
+import Layout from "../components/layout/layout";
 
 import dynamic from "next/dynamic";
 

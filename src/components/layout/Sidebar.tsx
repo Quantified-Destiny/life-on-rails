@@ -1,12 +1,11 @@
-import React, { useRef } from "react";
-import classNames from "classnames";
-import Link from "next/link";
-import Image from "next/image";
-import { defaultNavItems, NavItem } from "./defaultNavItems";
 import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
 } from "@heroicons/react/24/outline";
+import classNames from "classnames";
+import Image from "next/image";
+import Link from "next/link";
+import { defaultNavItems, NavItem } from "./defaultNavItems";
 
 // add NavItem prop to component prop
 type Props = {

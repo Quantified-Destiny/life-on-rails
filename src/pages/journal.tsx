@@ -2,7 +2,7 @@ import { Button, Stack } from "@chakra-ui/react";
 
 import classNames from "classnames";
 import { useState } from "react";
-import Layout from "../components/layout";
+import Layout from "../components/layout/layout";
 import { api } from "../utils/api";
 import TimePicker from "../components/time-picker";
 import type { Metric } from "@prisma/client";
