@@ -32,7 +32,6 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
   const Menus = [
     { name: "Dashboard", link: "/dashboard", icon: MdBarChart, gap: true },
     { name: "Journal", link: "/journal", icon: MdOutlineToday },
-    { name: "Create New", link: "/create", icon: MdAddCircleOutline },
     { name: "All Items", link: "/overview2", icon: MdOutlineDashboard },
     { name: "Habits", link: "/habits", icon: MdCalendarViewMonth },
   ];
@@ -121,7 +120,7 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
       <div
         className={`${
           open ? "pl-[14rem]" : "pl-20"
-        } font-semi h-screen flex-1 overflow-auto p-2`}
+        } mt-5 font-semi h-screen flex-1 overflow-auto p-2`}
       >
         {main()}
       </div>
