@@ -428,7 +428,7 @@ export function CreateLinkedMetricInline({
 
   const createLinkedMetric = api.metrics.createMetric.useMutation({
     onSuccess() {
-      void context.goals.getAllGoals.invalidate();
+      void context.invalidate();
     },
   });
 

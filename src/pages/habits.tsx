@@ -21,7 +21,7 @@ const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
 //   { ssr: false }
 // );
 
-import { differenceInCalendarDays } from "date-fns";
+import { differenceInCalendarDays, startOfYear } from "date-fns";
 import type { TileArgs } from "react-calendar/dist/cjs/shared/types";
 
 function isSameDay(a: Date, b: Date) {
@@ -100,7 +100,7 @@ function HabitsPage() {
       <div className="my-8 flex flex-col items-center justify-center">
         <HeatMap
           value={value}
-          startDate={new Date("2023/01/01")}
+          startDate={new Date(startOfYear(new Date()))}
           width={600}
           legendCellSize={0}
         />

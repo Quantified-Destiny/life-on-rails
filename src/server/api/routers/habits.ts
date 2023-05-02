@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { FrequencyHorizon, LinkedMetric, Metric } from "@prisma/client";
 import { getHabits, getMetrics } from "../../queries";
+import { subDays } from "date-fns";
 
 export const habitsRouter = createTRPCRouter({
   linkHabit: protectedProcedure
@@ -50,6 +51,18 @@ export const habitsRouter = createTRPCRouter({
       });
 
       return goals;
+    }),
+
+  getCompletions: protectedProcedure
+    .input(z.object({ habitId: z.string(), timeHorizon: z.number().int() }))
+    .query(async ({ input, ctx }) => {
+      const completions = await ctx.prisma.habitCompletion.findMany({
+        where: {
+          habitId: input.habitId,
+          date: { gt: subDays(new Date(), input.timeHorizon) },
+        },
+      });
+      return completions;
     }),
 
   getMetrics: protectedProcedure
@@ -100,6 +113,27 @@ export const habitsRouter = createTRPCRouter({
         },
         data: {
           description: input.description,
+        },
+      });
+    }),
+
+  editCompletionWeight: protectedProcedure
+    .input(
+      z.object({
+        habitId: z.string(),
+        completionWeight: z.number().gte(0).lte(1),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      console.log(
+        `Editing habit ${input.habitId} in db with completion weight ${input.completionWeight}`
+      );
+      return await ctx.prisma.habit.update({
+        where: {
+          id: input.habitId,
+        },
+        data: {
+          completionWeight: input.completionWeight,
         },
       });
     }),

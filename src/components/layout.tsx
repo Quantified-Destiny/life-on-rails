@@ -1,19 +1,17 @@
-import Link from "next/link";
 import { useIsFetching } from "@tanstack/react-query";
-import {
-  MdOutlineDashboard,
-  MdCalendarViewMonth,
-  MdAddCircleOutline,
-  MdOutlineToday,
-  MdBarChart,
-  MdOutlineLogout,
-  MdPerson,
-  MdArrowBackIosNew,
-} from "react-icons/md";
-import { useEffect, useState } from "react";
-import React from "react";
 import { signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import {
+  MdArrowBackIosNew,
+  MdBarChart,
+  MdCalendarViewMonth,
+  MdOutlineDashboard,
+  MdOutlineLogout,
+  MdOutlineToday,
+  MdPerson
+} from "react-icons/md";
 
 const Layout = ({ main }: { main: () => JSX.Element }) => {
   const isFetching = useIsFetching();
@@ -120,7 +118,7 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
       <div
         className={`${
           open ? "pl-[14rem]" : "pl-20"
-        } mt-5 font-semi h-screen flex-1 overflow-auto p-2`}
+        } font-semi h-screen flex-1 overflow-auto p-2`}
       >
         {main()}
       </div>

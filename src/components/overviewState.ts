@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { ExpandedHabit } from "../server/queries";
 
 export enum State {
   None,

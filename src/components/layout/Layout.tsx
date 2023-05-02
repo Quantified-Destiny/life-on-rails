@@ -19,7 +19,7 @@ const Layout = ({ main }: { main: () => JSX.Element }) => {
         setCollapsed={setSidebarCollapsed}
         shown={showSidebar}
       />
-      <div className="mt-40">{main()}</div>
+      <div className="">{main()}</div>
     </div>
   );
 };
