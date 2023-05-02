@@ -183,7 +183,8 @@ function HistorySection({ habitId }: { habitId: string }) {
 }
 
 import { Metric } from "@prisma/client";
-import DonutChart from "react-donut-chart";
+
+const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
 import { Slider } from "../ui/slider";
 
 function ScoringSection({
