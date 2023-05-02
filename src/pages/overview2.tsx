@@ -57,7 +57,7 @@ function Header() {
 
 function OverviewPage() {
   const store = useOverviewStore();
-  const goalsQuery = api.goals.getGoals.useQuery();
+  const goalsQuery = api.goals.getAllGoals.useQuery();
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
 

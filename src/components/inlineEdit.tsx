@@ -94,7 +94,7 @@ export const EditableField = ({
 
   return (
     <div
-      className="group flex flex-row flex-nowrap gap-1 whitespace-nowrap"
+      className="group flex flex-row flex-nowrap gap-1 whitespace-nowrap hover:bg-gray-100 px-2 py-2 rounded-lg"
       {...triggerProps}
     >
       {isActive ? (
@@ -134,22 +134,24 @@ export const DropDown = ({
   className,
 }: DropDownProps) => {
   return (
-    <select
-      defaultValue={frequencyHorizon}
-      onChange={(event) => {
-        commit(event.target.value as FrequencyHorizon);
-      }}
-      onKeyDown={(event: KeyboardEvent<HTMLSelectElement>) => {
-        if (event.key == "Enter") {
-          commit(event.currentTarget.value as FrequencyHorizon);
-        } else if (event.key == "Escape") {
-        }
-      }}
-      className={className}
-    >
-      <option value="DAY">Day</option>
-      <option value="WEEK">Week</option>
-    </select>
+    <div className="inline-block hover:bg-gray-100">
+      <select
+        defaultValue={frequencyHorizon}
+        onChange={(event) => {
+          commit(event.target.value as FrequencyHorizon);
+        }}
+        onKeyDown={(event: KeyboardEvent<HTMLSelectElement>) => {
+          if (event.key == "Enter") {
+            commit(event.currentTarget.value as FrequencyHorizon);
+          } else if (event.key == "Escape") {
+          }
+        }}
+        className={className}
+      >
+        <option value="DAY">Day</option>
+        <option value="WEEK">Week</option>
+      </select>
+    </div>
   );
 };
 
@@ -173,7 +175,7 @@ export const EditableNumberField = ({
         <input type="number" {...editProps} autoFocus className="w-7 " />
       ) : (
         <div
-          className="group inline-flex flex-row flex-nowrap gap-1 whitespace-nowrap"
+          className="group inline-flex flex-row flex-nowrap gap-1 whitespace-nowrap hover:bg-gray-100"
           {...triggerProps}
         >
           <span className={className}>{initial}</span>

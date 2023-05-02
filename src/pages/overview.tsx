@@ -200,7 +200,7 @@ function Overview({ goals, habits, subjectives }: OverviewProps) {
 const today = new Date();
 
 function OverviewPage() {
-  const goalsQuery = api.goals.getGoals.useQuery();
+  const goalsQuery = api.goals.getAllGoals.useQuery();
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
 

@@ -41,7 +41,7 @@ export function CreateGoalModal() {
   const context = api.useContext();
   const mutation = api.goals.createGoal.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 
@@ -112,7 +112,7 @@ export function CreateHabitModal() {
   const context = api.useContext();
   const mutation = api.habits.createHabit.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 
@@ -183,7 +183,7 @@ export function CreateMetricModal() {
   const context = api.useContext();
   const mutation = api.metrics.createMetric.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 

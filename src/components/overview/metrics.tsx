@@ -19,12 +19,12 @@ export function LinkedMetric({
   const context = api.useContext();
   const mutation = api.metrics.editMetric.useMutation({
     onSuccess: () => {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
   const deleteMetric = api.metrics.deleteMetric.useMutation({
     onSuccess: () => {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 

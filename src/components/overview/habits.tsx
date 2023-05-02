@@ -49,17 +49,17 @@ export function HabitHeaderLine({
   const context = api.useContext();
   const mutation = api.habits.editHabit.useMutation({
     onSuccess: () => {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
   const editFrequency = api.habits.editFrequency.useMutation({
     onSuccess: () => {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
   const editFrequencyHorizon = api.habits.editFrequencyHorizon.useMutation({
     onSuccess: () => {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 
@@ -137,10 +137,10 @@ export function LinkHabitBox({
 }) {
   const context = api.useContext();
 
-  const goalsData = api.goals.getGoals.useQuery();
+  const goalsData = api.goals.getAllGoals.useQuery();
   const linkHabit = api.habits.linkHabit.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 
@@ -185,7 +185,7 @@ export function LinkHabitBox({
         <div className="flex flex-row gap-2">
           {selectedItem ? (
             <button
-              className="rounded-md bg-blue-500 px-2  text-white hover:bg-blue-700"
+              className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
               onClick={() => {
                 //alert(`Linked habit ${id} to goal ${selectedItem.name}`);
                 linkHabit.mutate({ habitId: id, goalId: selectedItem.id });
@@ -200,7 +200,7 @@ export function LinkHabitBox({
             </button>
           )}
           <button
-            className="rounded-md bg-red-600 px-2  text-white hover:bg-red-700"
+            className="rounded-md bg-red-300 px-2  text-white hover:bg-red-500"
             onClick={closeBox}
           >
             Cancel
@@ -271,13 +271,13 @@ export function HabitFooter({
   const context = api.useContext();
   const unlinkHabitFromGoal = api.habits.unlinkHabit.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 
   const deleteHabit = api.habits.deleteHabit.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 
@@ -342,12 +342,12 @@ export function HabitCard({
   const context = api.useContext();
   const linkHabit = api.tags.linkHabit.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
   const unlinkHabit = api.tags.unlinkHabit.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 
@@ -433,7 +433,7 @@ function CreateLinkedMetricInline({
 
   const createLinkedMetric = api.metrics.createMetric.useMutation({
     onSuccess() {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 

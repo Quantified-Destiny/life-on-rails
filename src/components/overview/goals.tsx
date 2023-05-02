@@ -30,17 +30,17 @@ export function GoalCard({
   const context = api.useContext();
   const mutation = api.goals.editGoal.useMutation({
     onSettled: () => {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
   const linkGoal = api.tags.linkGoal.useMutation({
     onSettled: () => {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
   const unlinkGoal = api.tags.linkGoal.useMutation({
     onSettled: () => {
-      void context.goals.getGoals.invalidate();
+      void context.goals.getAllGoals.invalidate();
     },
   });
 
