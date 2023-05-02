@@ -1,4 +1,4 @@
-import { startOfYear, subYears } from "date-fns";
+import { subYears } from "date-fns";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { api } from "../../utils/api";
@@ -11,13 +11,7 @@ import {
 } from "../ui/accordion";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "../ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { CreateLinkedMetricInline, HabitHeaderLine, LinkHabit } from "./habits";
 
 function GoalsSection({ habitId }: { habitId: string }) {
@@ -182,10 +176,10 @@ function HistorySection({ habitId }: { habitId: string }) {
   );
 }
 
-import { Metric } from "@prisma/client";
+import type { Metric } from "@prisma/client";
+import { Slider } from "../ui/slider";
 
 const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
-import { Slider } from "../ui/slider";
 
 function ScoringSection({
   habitId,
@@ -267,7 +261,6 @@ export function HabitPanel() {
             <Accordion
               className="flex-grow overflow-scroll scrollbar-none"
               type="multiple"
-              defaultValue={["history"]}
             >
               <AccordionItem value="scoring">
                 <AccordionTrigger>Scoring and metrics</AccordionTrigger>

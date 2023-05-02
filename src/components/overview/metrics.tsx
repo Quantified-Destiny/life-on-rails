@@ -53,7 +53,7 @@ export function LinkedMetric({
       <div className="flex h-full w-fit flex-row space-x-3">
         <div className=" h-fit bg-white px-2">
           <span className={classNames("h-fit text-lg ", textcolor(score))}>
-            {score}
+            {(score * 100).toFixed(2)}%
           </span>
         </div>
         <DropdownMenu
