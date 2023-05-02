@@ -138,6 +138,7 @@ model HabitMeasuresGoal {
   goal  Goal  @relation(fields: [goalId], references: [id])
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
+  @@unique([goalId, habitId])
   @@index([goalId])
   @@index([habitId])
 }
@@ -151,6 +152,7 @@ model MetricMeasuresGoal {
   goal   Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
   metric Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
 
+  @@unique([goalId, metricId])
   @@index([goalId])
   @@index([metricId])
 }

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { FrequencyHorizon } from "@prisma/client";
+import { FrequencyHorizon, LinkedMetric, Metric } from "@prisma/client";
 import { getHabits, getMetrics } from "../../queries";
 
 export const habitsRouter = createTRPCRouter({
@@ -31,6 +31,49 @@ export const habitsRouter = createTRPCRouter({
         return existingLink;
       }
     }),
+
+  getGoals: protectedProcedure
+    .input(z.object({ habitId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const goals = await ctx.prisma.goal.findMany({
+        where: {
+          ownerId: ctx.session.user.id,
+          habits: {
+            some: {
+              habitId: input.habitId,
+            },
+          },
+        },
+        include: {
+          habits: true,
+        },
+      });
+
+      return goals;
+    }),
+
+  getMetrics: protectedProcedure
+    .input(z.object({ habitId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const metrics: (Metric & { completionMetric: LinkedMetric[] })[] =
+        await ctx.prisma.metric.findMany({
+          where: {
+            ownerId: ctx.session.user.id,
+            completionMetric: {
+              some: {
+                habitId: input.habitId,
+              },
+            },
+          },
+          include: {
+            completionMetric: true,
+          },
+        });
+
+      return metrics;
+    }),
+
   createHabit: protectedProcedure
     .input(z.object({ description: z.string() }))
     .mutation(async ({ input, ctx }) => {
@@ -64,10 +107,12 @@ export const habitsRouter = createTRPCRouter({
   unlinkHabit: protectedProcedure
     .input(z.object({ habitId: z.string(), goalId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.habitMeasuresGoal.deleteMany({
+      return await ctx.prisma.habitMeasuresGoal.delete({
         where: {
-          habitId: input.habitId,
-          goalId: input.goalId,
+          goalId_habitId: {
+            habitId: input.habitId,
+            goalId: input.goalId,
+          },
         },
       });
     }),

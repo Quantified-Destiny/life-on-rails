@@ -28,18 +28,6 @@ export const goalsRouter = createTRPCRouter({
         habits: habits,
       };
     }),
-  getGoals: protectedProcedure
-    .input(z.object({ ids: z.array(z.string()) }))
-    .query(async ({ input, ctx }) => {
-      const goals = await ctx.prisma.goal.findMany({
-        where: {
-          id: { in: input.ids },
-          ownerId: ctx.session.user.id,
-        },
-      });
-
-      return goals;
-    }),
 
   getAllGoals: protectedProcedure.query(async ({ ctx }) => {
     const [metrics, metricsMap] = await getMetrics(
@@ -47,15 +35,11 @@ export const goalsRouter = createTRPCRouter({
       ctx.session.user.id
     );
 
-    console.log("Fetched metrics");
-
     const [habits, habitsMap] = await getHabits(
       ctx.prisma,
       metricsMap,
       ctx.session.user.id
     );
-
-    console.log("Fetched habits");
 
     const goalsData = await getGoals(
       ctx.prisma,

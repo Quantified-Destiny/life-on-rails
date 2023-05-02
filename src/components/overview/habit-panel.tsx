@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useState } from "react";
 import { api } from "../../utils/api";
 import { State, useOverviewStore } from "../overviewState";
 import {
@@ -17,95 +17,17 @@ import {
   SheetHeader,
   SheetTitle,
 } from "../ui/sheet";
-import { HabitCard } from "./habits";
-import { useTable } from "react-table";
-import { LinkHabitBox } from "./habits";
+import { CreateLinkedMetricInline, HabitCard, LinkHabit } from "./habits";
 
-const columns = [
-  {
-    Header: "Column 1",
-    accessor: "col1", // accessor is the "key" in the data
-  },
-  {
-    Header: "Column 2",
-    accessor: "col2",
-  },
-];
+function GoalsSection({ habitId }: { habitId: string }) {
+  const context = api.useContext();
+  const unlinkGoalMutation = api.habits.unlinkHabit.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
+  const goalQuery = api.habits.getGoals.useQuery({ habitId: habitId });
 
-// function GoalsTable() {
-//   const data = useMemo(
-//     () => [
-//       {
-//         col1: "Hello",
-//         col2: "World",
-//       },
-//       {
-//         col1: "react-table",
-//         col2: "rocks",
-//       },
-//       {
-//         col1: "whatever",
-//         col2: "you want",
-//       },
-//     ],
-//     []
-//   );
-
-//   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-//     useTable({ columns, data });
-
-//   return (
-//     <table {...getTableProps()} style={{ border: "solid 1px blue" }}>
-//       <thead>
-//         {headerGroups.map((headerGroup) => (
-//           <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
-//             {headerGroup.headers.map((column) => (
-//               <th
-//                 {...column.getHeaderProps()}
-//                 style={{
-//                   borderBottom: "solid 3px red",
-//                   background: "aliceblue",
-//                   color: "black",
-//                   fontWeight: "bold",
-//                 }}
-//                 key={column.id}
-//               >
-//                 {column.render("Header")}
-//               </th>
-//             ))}
-//           </tr>
-//         ))}
-//       </thead>
-//       <tbody {...getTableBodyProps()}>
-//         {rows.map((row) => {
-//           prepareRow(row);
-//           return (
-//             <tr {...row.getRowProps()} key={row.id}>
-//               {row.cells.map((cell, i) => {
-//                 return (
-//                   <td
-//                     {...cell.getCellProps()}
-//                     key={i}
-//                     style={{
-//                       padding: "10px",
-//                       border: "solid 1px gray",
-//                       background: "papayawhip",
-//                     }}
-//                   >
-//                     {cell.render("Cell")}
-//                   </td>
-//                 );
-//               })}
-//             </tr>
-//           );
-//         })}
-//       </tbody>
-//     </table>
-//   );
-// }
-
-function GoalsTable({ habitId, goals }: { habitId: string; goals: string[] }) {
-  const goalQuery = api.goals.getGoals.useQuery({ ids: goals });
   if (goalQuery.isError) {
     return <p>ERROR</p>;
   }
@@ -114,28 +36,105 @@ function GoalsTable({ habitId, goals }: { habitId: string; goals: string[] }) {
   }
 
   return (
-    <div className="w-full space-y-2 divide-y-2 divide-gray-100">
-      {goalQuery.data?.map((goal) => {
-        return (
-          <div
-            key={goal.id}
-            className="flex w-full flex-row justify-between p-2"
-          >
-            <div>
-              <p className="text-lg">{goal.name}</p>
-              <p className="text-sm text-gray-300">
-                Created: {goal.createdAt.toUTCString()}
-              </p>
-            </div>
-            <div className="space-x-2">
-              <Button>Unlink</Button>
-              <Button>Manage</Button>
-            </div>
-          </div>
-        );
-      })}
-      <LinkHabitBox id={habitId} closeBox={() => {}}></LinkHabitBox>
-    </div>
+    <>
+      <div className="mb-2 grid w-full grid-cols-3 items-baseline justify-between gap-2">
+        {goalQuery.data.length == 0 && <div>No goals linked</div>}
+        {goalQuery.data.map((goal) => {
+          const scoreWeight =
+            goal.habits.find((h) => h.id == habitId)?.weight ?? 1;
+          return (
+            <>
+              <div>
+                <p className="text-lg">{goal.name}</p>
+                <p className="text-sm text-gray-300">
+                  Created: {goal.createdAt.toUTCString()}
+                </p>
+              </div>
+              <div>
+                Weight: <span className="ml-2">{scoreWeight}</span>
+              </div>
+              <div className="space-x-2 text-right">
+                <Button
+                  onClick={() =>
+                    unlinkGoalMutation.mutate({
+                      goalId: goal.id,
+                      habitId: habitId,
+                    })
+                  }
+                >
+                  Unlink
+                </Button>
+                <Button>Manage</Button>
+              </div>
+            </>
+          );
+        })}
+      </div>
+      <LinkHabit id={habitId}></LinkHabit>
+    </>
+  );
+}
+
+function MetricsSection({ habitId }: { habitId: string }) {
+  const [creatingMetric, setCreatingMetric] = useState(false);
+  const context = api.useContext();
+  const deleteMetric = api.metrics.deleteMetric.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
+  const metricsQuery = api.habits.getMetrics.useQuery({ habitId: habitId });
+
+  if (metricsQuery.isError) {
+    return <p>ERROR</p>;
+  }
+  if (metricsQuery.isLoading) {
+    return <p>LOADING</p>;
+  }
+
+  return (
+    <>
+      <div className="mb-2 grid w-full grid-cols-3 items-baseline justify-between gap-2">
+        {metricsQuery.data.length == 0 && <div>No linked metrics</div>}
+        {metricsQuery.data.map((metric) => {
+          return (
+            <>
+              <div>
+                <p className="text-lg">{metric.prompt}</p>
+                <p className="text-sm text-gray-300">
+                  Created: {metric.createdAt.toUTCString()}
+                </p>
+              </div>
+              <div className="space-x-2 text-right">
+                <Button
+                  onClick={() =>
+                    deleteMetric.mutate({
+                      metricId: metric.id,
+                    })
+                  }
+                  variant="destructive"
+                >
+                  Delete
+                </Button>
+              </div>
+            </>
+          );
+        })}
+      </div>
+      {creatingMetric ? (
+        <CreateLinkedMetricInline
+          habitId={habitId}
+          closeEdit={() => setCreatingMetric(false)}
+        ></CreateLinkedMetricInline>
+      ) : (
+        <button
+          className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm text-gray-600 hover:bg-gray-200"
+          onClick={() => setCreatingMetric(true)}
+        >
+          + Create a new Linked Metric
+        </button>
+      )}
+    </>
   );
 }
 
@@ -167,17 +166,19 @@ export function HabitPanel() {
 
             <Accordion type="multiple" defaultValue={["stats"]}>
               <AccordionItem value="stats">
-                <AccordionTrigger>Stats and calendar</AccordionTrigger>
+                <AccordionTrigger>Details</AccordionTrigger>
                 <AccordionContent>A bunch of stats</AccordionContent>
               </AccordionItem>
               <AccordionItem value="metrics">
                 <AccordionTrigger>Metrics</AccordionTrigger>
-                <AccordionContent>Metrics table</AccordionContent>
+                <AccordionContent>
+                  <MetricsSection habitId={habitId}></MetricsSection>{" "}
+                </AccordionContent>
               </AccordionItem>
               <AccordionItem value="goals">
                 <AccordionTrigger>Goals</AccordionTrigger>
                 <AccordionContent>
-                  <GoalsTable goals={data.goals} habitId={habitId} />
+                  <GoalsSection habitId={habitId} />
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

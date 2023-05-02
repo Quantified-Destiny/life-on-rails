@@ -13,6 +13,7 @@ import { LinkedMetric } from "./metrics";
 import { TagList } from "./tags";
 import { useOverviewStore } from "../overviewState";
 import { cva } from "class-variance-authority";
+import { Button } from "../ui/button";
 
 function getGoalsFilter(
   inputValue: string | undefined
@@ -128,19 +129,13 @@ export function HabitHeaderLine({
   );
 }
 
-export function LinkHabitBox({
-  id,
-  closeBox,
-}: {
-  id: string;
-  closeBox: () => void;
-}) {
+function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
   const context = api.useContext();
 
   const goalsData = api.goals.getAllGoals.useQuery();
   const linkHabit = api.habits.linkHabit.useMutation({
     onSuccess() {
-      void context.goals.getAllGoals.invalidate();
+      void context.invalidate();
     },
   });
 
@@ -242,7 +237,7 @@ export function LinkHabit({ id }: { id: string }) {
   if (!active) {
     return (
       <button
-        className=" text-blue-500 hover:underline"
+        className="text-blue-500 hover:underline"
         onClick={() => setActive(true)}
       >
         Link to Goal
@@ -416,7 +411,7 @@ type CreateLinkedMetric = {
   type: "FIVE_POINT" | "number";
 };
 
-function CreateLinkedMetricInline({
+export function CreateLinkedMetricInline({
   habitId,
   closeEdit,
 }: {
@@ -444,7 +439,7 @@ function CreateLinkedMetricInline({
   };
 
   return (
-    <div className="mt-2 rounded-lg p-4">
+    <div className="mt-2 rounded-lg p-4 w-full">
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <input
@@ -456,35 +451,9 @@ function CreateLinkedMetricInline({
             {...register("prompt")}
           />
         </div>
-        <div>
-          <label
-            htmlFor="type"
-            className="mb-2 block text-sm font-medium text-gray-900"
-          >
-            Metric type
-          </label>
-          <select
-            id="type"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            {...register("type")}
-          >
-            <option value="FIVE_POINT">5-point</option>
-            <option value="number">number</option>
-          </select>
-        </div>
-        <div className="flex flex-row gap-5">
-          <button
-            className="w-full rounded-lg bg-gray-400 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
-            onClick={closeEdit}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
-          >
-            Create
-          </button>
+        <div className="space-x-2 text-right">
+          <Button onClick={closeEdit}>Cancel</Button>
+          <Button onClick={closeEdit}>Create</Button>
         </div>
       </form>
     </div>

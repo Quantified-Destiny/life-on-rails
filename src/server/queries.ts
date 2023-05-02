@@ -66,7 +66,6 @@ export async function getHabits(
   });
   const habitCompletionsCount = new Map<string, number>(
     habitCompletions.map((it) => {
-      console.log(it.habitId);
       return [it.habitId, it._count._all];
     })
   );
@@ -88,7 +87,6 @@ export async function getHabits(
         habit.completionWeight * completionScore +
         (1 - habit.completionWeight) * metricsScore;
 
-      console.log(it.habitId);
       return [it.habitId, score];
     })
   );
@@ -165,11 +163,8 @@ export async function getMetrics(
 
   const metricsMap = new Map<string, ExpandedMetric>();
   expandedMetrics.forEach((m) => {
-    console.log(`Tried to set metric ${m.id} to ${JSON.stringify(m)}`);
     metricsMap.set(m.id, m);
   });
-
-  //console.log(metricsMap);
 
   return [expandedMetrics, metricsMap];
 }
@@ -211,8 +206,6 @@ export async function getGoals(
       GoalTag: { include: { tag: true } },
     },
   });
-
-  console.log("Fetched goals");
 
   const goalsData = goals.map((g) => {
     const m: number[] = g.metrics.map(
