@@ -17,6 +17,10 @@ function avg(arr: number[]) {
   return arr.length == 0 ? 0 : arr.reduce((a, b) => a + b) / arr.length;
 }
 
+function sum(arr: number[]) {
+  return arr.reduce((a, b) => a + b, 0);
+}
+
 export interface ExpandedHabit extends Habit {
   metrics: ExpandedMetric[];
   tags: string[];
@@ -211,12 +215,17 @@ export async function getGoals(
     const m: number[] = g.metrics.map(
       (it) => metricsMap.get(it.metricId)?.score ?? 0
     );
+    const mWeight: number[] = g.metrics.map((it) => it.weight);
     const h: number[] = g.habits.map(
       (it) => habitsMap.get(it.habitId)?.score ?? 0
     );
+    const hWeight: number[] = g.habits.map((it) => it.weight);
+    let weightedMetricScores = m.map((score, i) => score * (mWeight[i] ?? 1));
+    let weightedHabitScores = h.map((score, i) => score * (hWeight[i] ?? 1));
 
-    let score = m.reduce((a, b) => a + b, 0) + h.reduce((a, b) => a + b, 0);
-    score = score / (m.length + h.length);
+    let score =
+      (sum(weightedMetricScores) + sum(weightedHabitScores)) /
+      (sum(mWeight) + sum(hWeight));
 
     const linkedHabits = g.habits.map((h) => habitsMap.get(h.habitId)!);
 
