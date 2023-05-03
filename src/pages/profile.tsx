@@ -1,8 +1,7 @@
 
+import { format } from 'date-fns';
 import Layout from "../components/layout";
 import { api } from "../utils/api";
-import { format } from 'date-fns';
-import { MdPerson } from "react-icons/md";
 
 const ProfilePage = () => {
   const query = api.profile.getProfile.useQuery();
@@ -90,4 +89,6 @@ const ProfilePage = () => {
   );
 };
 
-export default () => <Layout main={ProfilePage}></Layout>;
+export default function Page() {
+  return <Layout main={ProfilePage}></Layout>;
+}

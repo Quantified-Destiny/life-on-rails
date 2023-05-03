@@ -3,11 +3,10 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 import {
-  getHabitsWithMetricsMap,
-  getMetrics,
   getGoals,
-  ExpandedMetric,
   getHabits,
+  getHabitsWithMetricsMap,
+  getMetrics
 } from "../../queries";
 
 export const goalsRouter = createTRPCRouter({

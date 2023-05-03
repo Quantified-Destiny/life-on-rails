@@ -3,25 +3,26 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
+
 import {
-  MdArrowBackIosNew,
-  MdBarChart,
-  MdCalendarViewMonth,
-  MdOutlineDashboard,
-  MdOutlineLogout,
-  MdOutlineToday,
-  MdPerson,
-  MdHelpCenter
-} from "react-icons/md";
+  BarChart,
+  Book,
+  CalendarRange,
+  ChevronLeft,
+  HelpCircle,
+  LayoutDashboard,
+  LogOut,
+  User,
+} from "lucide-react";
 
 import classNames from "classnames";
-import type { IconType } from "react-icons";
+import type { LucideIcon } from "lucide-react";
 import { useSidebarStore } from "./state";
 
 interface MenuItem {
   name: string;
   link: string;
-  icon: IconType;
+  icon: LucideIcon;
   gap?: boolean;
 }
 
@@ -46,7 +47,7 @@ function Sidebar(props: {
         }`}
         onClick={() => props.setOpen(!props.open)}
       >
-        <MdArrowBackIosNew className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"></MdArrowBackIosNew>
+        <ChevronLeft className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"></ChevronLeft>
       </div>
 
       <div className="flex items-center gap-x-4">
@@ -56,7 +57,7 @@ function Sidebar(props: {
             alt=""
             width="40"
             height="40"
-            className={`cursor-pointer duration-100`}
+            className="cursor-pointer opacity-90 duration-100"
           />
         </Link>
         <h1 className={`origin-left text-white ${!props.open ? "hidden" : ""}`}>
@@ -93,7 +94,7 @@ function Sidebar(props: {
         className={`absolute bottom-14 flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm text-white	hover:bg-white hover:bg-opacity-10`}
       >
         <div>
-          {React.createElement(MdPerson, {
+          {React.createElement(User, {
             size: 20,
           })}
         </div>
@@ -110,7 +111,7 @@ function Sidebar(props: {
         className={`flex-row-10 absolute bottom-4 flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm text-white	hover:bg-white hover:bg-opacity-10`}
       >
         <div>
-          {React.createElement(MdOutlineLogout, {
+          {React.createElement(LogOut, {
             size: 20,
           })}
         </div>
@@ -125,11 +126,11 @@ function Sidebar(props: {
 }
 
 const menus = [
-  { name: "Dashboard", link: "/dashboard", icon: MdBarChart, gap: true },
-  { name: "Journal", link: "/journal", icon: MdOutlineToday },
-  { name: "All Items", link: "/overview", icon: MdOutlineDashboard },
-  { name: "Habits", link: "/habits", icon: MdCalendarViewMonth },
-  { name: "Resources", link: "/habit2", icon: MdHelpCenter}
+  { name: "Dashboard", link: "/dashboard", icon: BarChart, gap: true },
+  { name: "Journal", link: "/journal", icon: Book },
+  { name: "All Items", link: "/overview", icon: LayoutDashboard },
+  { name: "Habits", link: "/habits", icon: CalendarRange },
+  { name: "Help", link: "/habit2", icon: HelpCircle },
 ];
 
 function Layout({ main }: { main: () => JSX.Element }) {

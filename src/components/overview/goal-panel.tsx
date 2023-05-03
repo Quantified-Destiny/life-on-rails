@@ -1,8 +1,10 @@
+import type { Habit, Metric } from "@prisma/client";
 import { subYears } from "date-fns";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { api } from "../../utils/api";
+import { CreateLinkedMetricInline, EditableField } from "../inlineEdit";
 import {
   Accordion,
   AccordionContent,
@@ -18,6 +20,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
+import { Slider } from "../ui/slider";
+import { GoalTagList } from "./tags";
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
@@ -112,7 +116,7 @@ function HabitsSection({ habits }: { habits: Habit[] }) {
       <div className="mb-4 grid w-full grid-cols-2 items-baseline justify-between gap-2">
         {habits.length == 0 && (
           <div className="col-span-full w-full bg-gray-100 px-4 py-2">
-            No linked metrics
+            No linked habits
           </div>
         )}
         {habits.map((habit) => {
@@ -187,11 +191,6 @@ function HistorySection({ habitId }: { habitId: string }) {
     </div>
   );
 }
-
-import type { Habit, Metric } from "@prisma/client";
-import { CreateLinkedMetricInline, EditableField } from "../inlineEdit";
-import { Slider } from "../ui/slider";
-import { GoalTagList } from "./tags";
 
 const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
 

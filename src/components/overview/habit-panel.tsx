@@ -81,7 +81,6 @@ function GoalsSection({ habitId }: { habitId: string }) {
 }
 
 function MetricsSection({ habitId }: { habitId: string }) {
-  const [creatingMetric, setCreatingMetric] = useState(false);
   const context = api.useContext();
   const deleteMetric = api.metrics.deleteMetric.useMutation({
     onSuccess() {
