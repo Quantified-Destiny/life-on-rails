@@ -1,7 +1,7 @@
 // import dynamic from "next/dynamic";
 // import NoSsr from "../components/NoSsr";
 
-import Layout from "../components/layout/layout";
+import Layout from "../components/layout";
 
 import { ClockIcon } from "@heroicons/react/24/outline";
 

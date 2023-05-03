@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import Layout from "../../components/layout/layout";
+import Layout from "../../components/layout";
 import { api } from "../../utils/api";
 import { Sparklines, SparklinesLine, SparklinesSpots } from "react-sparklines";
 

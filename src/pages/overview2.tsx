@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { CreateMenu } from "../components/createMenu";
 import { EllipsisIcon } from "../components/icons";
-import Layout from "../components/layout/layout";
+import Layout from "../components/layout";
 import {
   CreateGoalModal,
   CreateHabitModal,
@@ -62,9 +62,8 @@ function OverviewPage() {
   if (goalsQuery.isError) return <p>Query error</p>;
 
   const data = goalsQuery.data;
-  console.log(data.goals);
   return (
-    <div className="container h-full">
+    <div className="scrollbar-none">
       {store.modal?.state === State.CreateGoal && (
         <CreateGoalModal></CreateGoalModal>
       )}
@@ -75,7 +74,7 @@ function OverviewPage() {
       {store.modal?.state === State.CreateMetric && (
         <CreateMetricModal></CreateMetricModal>
       )}
-      <div className="mx-auto mb-10 px-10 py-2">
+      <div className="mx-auto mb-10 px-10 py-2 scrollbar-none">
         <Header></Header>
         {data.goals.map((goal) => (
           <GoalCard

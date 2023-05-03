@@ -1,5 +1,5 @@
 
-import Layout from "../components/layout/layout";
+import Layout from "../components/layout";
 import { api } from "../utils/api";
 import { format } from 'date-fns';
 
