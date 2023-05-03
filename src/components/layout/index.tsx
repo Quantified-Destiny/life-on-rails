@@ -11,6 +11,7 @@ import {
   MdOutlineLogout,
   MdOutlineToday,
   MdPerson,
+  MdHelpCenter
 } from "react-icons/md";
 
 import classNames from "classnames";
@@ -128,6 +129,7 @@ const menus = [
   { name: "Journal", link: "/journal", icon: MdOutlineToday },
   { name: "All Items", link: "/overview2", icon: MdOutlineDashboard },
   { name: "Habits", link: "/habits", icon: MdCalendarViewMonth },
+  { name: "Resources", link: "/habit2", icon: MdHelpCenter}
 ];
 
 function Layout({ main }: { main: () => JSX.Element }) {

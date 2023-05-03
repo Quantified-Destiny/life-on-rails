@@ -1,6 +1,10 @@
 import { Table, TableBody, TableHeader, TableRow } from "@windmill/react-ui";
 import { useState } from "react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import Layout from "../components/layout";
 
+import dynamic from "next/dynamic";
 type HabitItem = {
   name: string;
   schedule: string;
@@ -59,7 +63,7 @@ const filterOptions = [
   { value: "Mental Health", label: "Mental Health", selected: false },
 ];
 
-export default function HabitsTable() {
+function HabitsTable() {
   const [sortField, setSortField] = useState<keyof HabitItem>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [filterFields, setFilterFields] = useState<string[]>(["All"]);
@@ -175,4 +179,7 @@ export default function HabitsTable() {
       </Table>
     </div>
   );
+}
+export default function Page() {
+  return <Layout main={HabitsTable}></Layout>;
 }

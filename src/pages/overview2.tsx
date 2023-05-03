@@ -17,6 +17,7 @@ import { api } from "../utils/api";
 
 function Header() {
   return (
+    <>
     <div className="mb-2 flex w-full items-center justify-between">
       <div>
         <h1 className="ml-2 text-xl font-semibold uppercase text-gray-800">
@@ -52,6 +53,9 @@ function Header() {
         </button>
       </div>
     </div>
+    <p className="px-2 mb-2 text-xs text-slate-500 italic">All scores are based off the last 2 weeks based on your <a href="/profile" className="underline">user settings</a>.</p>
+    
+    </>
   );
 }
 
