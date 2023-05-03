@@ -1,15 +1,16 @@
-import {
-  FrequencyHorizon,
+import type {
   Goal,
   Habit,
   HabitMeasuresGoal,
   HabitTag,
   LinkedMetric,
   Metric,
+  MetricAnswer,
   MetricTag,
   Tag,
 } from "@prisma/client";
-import { subDays } from "date-fns";
+import { FrequencyHorizon } from "@prisma/client";
+import { subDays, subWeeks } from "date-fns";
 
 import type { prisma as prismaClient } from "./db";
 
@@ -29,20 +30,31 @@ export interface ExpandedHabit extends Habit {
   score: number;
 }
 
-export async function getHabits(
-  prisma: typeof prismaClient,
-  metricsMap: Map<string, ExpandedMetric>,
-  userId: string
-): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
+export async function getHabitsWithMetricsMap({
+  prisma,
+  metricsMap,
+  userId,
+  goalIds,
+}: {
+  prisma: typeof prismaClient;
+  metricsMap: Map<string, ExpandedMetric>;
+  userId: string;
+  goalIds?: string[];
+}): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
   type HabitType = Habit & {
     metrics: LinkedMetric[];
     HabitTag: (HabitTag & { tag: Tag })[];
     goals: HabitMeasuresGoal[];
   };
 
+  const whereConditions = {
+    goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
+  };
+
   const habits: HabitType[] = await prisma.habit.findMany({
     where: {
       ownerId: userId,
+      ...whereConditions,
     },
     include: {
       metrics: true,
@@ -108,6 +120,118 @@ export async function getHabits(
 
   return [expandedHabits, expandedHabitsMap];
 }
+export async function getHabits({
+  prisma,
+  userId,
+  goalIds,
+}: {
+  prisma: typeof prismaClient;
+  userId: string;
+  goalIds?: string[];
+}): Promise<ExpandedHabit[]> {
+  type HabitType = (Habit & {
+    HabitTag: (HabitTag & {
+      tag: Tag;
+    })[];
+    metrics: (LinkedMetric & {
+      metric: Metric & {
+        metricAnswers: MetricAnswer[];
+        MetricTag: { tag: Tag }[];
+      };
+    })[];
+    goals: HabitMeasuresGoal[];
+  })[];
+
+  const whereConditions = {
+    goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
+  };
+
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
+  const habits: HabitType = await prisma.habit.findMany({
+    where: {
+      ownerId: userId,
+      ...whereConditions,
+    },
+    include: {
+      metrics: {
+        include: {
+          metric: {
+            include: {
+              MetricTag: { include: { tag: true } },
+              metricAnswers: {
+                where: {
+                  createdAt: { gt: subWeeks(new Date(), user.scoringWeeks) },
+                },
+              },
+            },
+          },
+        },
+      },
+      HabitTag: { include: { tag: true } },
+      goals: true,
+    },
+  });
+
+  const habitCompletions = await prisma.habitCompletion.groupBy({
+    by: ["habitId"],
+    _count: {
+      _all: true,
+    },
+    where: {
+      Habit: { ownerId: userId },
+      date: { gt: subDays(new Date(), user.scoringWeeks * 7) },
+    },
+  });
+
+  const habitCompletionsCount = new Map<string, number>(
+    habitCompletions.map((it) => {
+      return [it.habitId, it._count._all];
+    })
+  );
+
+  const expandedHabits = habits.map((habit) => {
+    const expandedMetrics = habit.metrics.map((m) => {
+      const score = avg(m.metric.metricAnswers.map((it) => it.value));
+      const tags = m.metric.MetricTag.map((it) => it.tag);
+
+      return { ...m.metric, score, tags, linkedHabits: [] };
+    });
+
+    const normalizedFrequency =
+      habit.frequencyHorizon == FrequencyHorizon.WEEK
+        ? habit.frequency
+        : habit.frequency * 7;
+    const maxCompletionCount = normalizedFrequency * user.scoringWeeks;
+    const completionScore =
+      habitCompletionsCount.get(habit.id)! / maxCompletionCount;
+
+    const metricsScore = avg(
+      habit.metrics.map((m) =>
+        avg(m.metric.metricAnswers.map((it) => it.value))
+      )
+    );
+
+    const score =
+      habit.completionWeight * completionScore +
+      (1 - habit.completionWeight) * metricsScore;
+
+    return {
+      ...habit,
+      score,
+      metrics: expandedMetrics,
+      goals: habit.goals.map((it) => it.goalId),
+      tags: habit.HabitTag.map((it) => it.tag.name),
+      completions: habitCompletionsCount.get(habit.id) ?? 0,
+    };
+  });
+
+  return expandedHabits;
+}
 
 export interface ExpandedMetric extends Metric {
   linkedHabits: string[];
@@ -115,10 +239,24 @@ export interface ExpandedMetric extends Metric {
   score: number;
 }
 
-export async function getMetrics(
-  prisma: typeof prismaClient,
-  userId: string
-): Promise<[ExpandedMetric[], Map<string, ExpandedMetric>]> {
+export async function getMetrics({
+  prisma,
+  userId,
+  goalIds,
+  habitIds,
+}: {
+  prisma: typeof prismaClient;
+  userId: string;
+  goalIds?: string[];
+  habitIds?: string[];
+}): Promise<[ExpandedMetric[], Map<string, ExpandedMetric>]> {
+  const whereConditions = {
+    goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
+    completionMetric: habitIds
+      ? { some: { habitId: { in: habitIds } } }
+      : undefined,
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const metrics: (Metric & {
     completionMetric: LinkedMetric[];
@@ -126,6 +264,7 @@ export async function getMetrics(
   })[] = await prisma.metric.findMany({
     where: {
       ownerId: userId,
+      ...whereConditions,
     },
     include: {
       completionMetric: true,
@@ -141,12 +280,15 @@ export async function getMetrics(
     },
   });
 
+  const metricIds = metrics.map((m) => m.id);
+
   const metricAnswers = await prisma.metricAnswer.groupBy({
     by: ["metricId"],
     _sum: {
       value: true,
     },
     where: {
+      metricId: { in: metricIds },
       createdAt: { gt: subDays(new Date(), 7 * user.scoringWeeks) },
     },
   });
@@ -220,10 +362,10 @@ export async function getGoals(
       (it) => habitsMap.get(it.habitId)?.score ?? 0
     );
     const hWeight: number[] = g.habits.map((it) => it.weight);
-    let weightedMetricScores = m.map((score, i) => score * (mWeight[i] ?? 1));
-    let weightedHabitScores = h.map((score, i) => score * (hWeight[i] ?? 1));
+    const weightedMetricScores = m.map((score, i) => score * (mWeight[i] ?? 1));
+    const weightedHabitScores = h.map((score, i) => score * (hWeight[i] ?? 1));
 
-    let score =
+    const score =
       (sum(weightedMetricScores) + sum(weightedHabitScores)) /
       (sum(mWeight) + sum(hWeight));
 

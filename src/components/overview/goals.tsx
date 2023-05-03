@@ -11,6 +11,7 @@ import type {
 import { api } from "../../utils/api";
 import { TagList } from "./tags";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { GoalPanel } from "./goal-panel";
 
 export function GoalCard({
   id,
@@ -29,7 +30,7 @@ export function GoalCard({
   metrics: (Metric & { score: number })[];
 }) {
   const context = api.useContext();
-  const mutation = api.goals.editGoal.useMutation({
+  const editGoal = api.goals.editGoal.useMutation({
     onSettled: () => {
       void context.goals.getAllGoals.invalidate();
     },
@@ -46,24 +47,24 @@ export function GoalCard({
   });
 
   return (
-    <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
+    <div className="rounded-lg bg-white p-4 shadow-md">
       <div className="mb-1 flex flex-row justify-between">
-        <div className="mb-2 flex flex-col">
-          <div className="mb-2 flex items-center justify-between text-xl">
-            <span className="mb-2 inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs  text-white">
-              Goal
-            </span>
-            <EditableField
-              initialText={name}
-              commit={(name) => mutation.mutate({ goalId: id, name })}
-            ></EditableField>
-          </div>
+        <div className="flex items-center justify-between text-xl">
+          <span className="inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs text-white">
+            Goal
+          </span>
+          <EditableField
+            initialText={name}
+            commit={(name) => editGoal.mutate({ goalId: id, name })}
+          ></EditableField>
         </div>
         <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
           <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
             {score.toFixed(2)}
           </span>
-          <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+          <GoalPanel goalId={id}>
+            <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+          </GoalPanel>
         </div>
       </div>
       <div className="mb-4 gap-x-10 space-y-2">

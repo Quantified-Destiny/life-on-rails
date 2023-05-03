@@ -1,16 +1,14 @@
-import { Button, Stack } from "@chakra-ui/react";
-
+import type { Metric } from "@prisma/client";
 import classNames from "classnames";
 import { useState } from "react";
 import Layout from "../components/layout";
-import { api } from "../utils/api";
 import TimePicker from "../components/time-picker";
-import type { Metric } from "@prisma/client";
+import { api } from "../utils/api";
 
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // fixes zoomed in icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import { Button } from "../components/ui/button";
 
 interface HabitProps {
   id: string;
@@ -158,48 +156,38 @@ const Subjective = ({ id, prompt, score, setScore }: SubjectiveProps) => {
   return (
     <div className="mb-1 py-1">
       <p>{prompt}</p>
-      <Stack direction="row" spacing={4} align="center">
+      <div className="flex flex-row flex-nowrap gap-2 p-2">
         <Button
           onClick={() => setScore(1)}
-          colorScheme="teal"
-          size="xs"
-          variant={score == 1 ? "solid" : "outline"}
+          variant={score == 1 ? "default" : "outline"}
         >
           1
         </Button>
         <Button
           onClick={() => setScore(2)}
-          colorScheme="teal"
-          size="xs"
-          variant={score == 2 ? "solid" : "outline"}
+          variant={score == 2 ? "default" : "outline"}
         >
           2
         </Button>
         <Button
           onClick={() => setScore(3)}
-          colorScheme="teal"
-          size="xs"
-          variant={score == 3 ? "solid" : "outline"}
+          variant={score == 3 ? "default" : "outline"}
         >
           3
         </Button>
         <Button
           onClick={() => setScore(4)}
-          colorScheme="teal"
-          size="xs"
-          variant={score == 4 ? "solid" : "outline"}
+          variant={score == 4 ? "default" : "outline"}
         >
           4
         </Button>
         <Button
           onClick={() => setScore(5)}
-          colorScheme="teal"
-          size="xs"
-          variant={score == 5 ? "solid" : "outline"}
+          variant={score == 5 ? "default" : "outline"}
         >
           5
         </Button>
-      </Stack>
+      </div>
     </div>
   );
 };
@@ -219,7 +207,7 @@ const InlineEdit = ({
     return (
       <div className="bg-slate-100">
         <span onClick={() => setActive(true)}>
-          <FontAwesomeIcon className="mx-1" icon={faPlus}></FontAwesomeIcon>
+          <PlusIcon className="h-4 w-4"></PlusIcon>
           {placeholder}
         </span>
       </div>

@@ -1,9 +1,10 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { FrequencyHorizon, LinkedMetric, Metric } from "@prisma/client";
-import { getHabits, getMetrics } from "../../queries";
+import type { LinkedMetric, Metric } from "@prisma/client";
+import { FrequencyHorizon } from "@prisma/client";
 import { subDays } from "date-fns";
+import { getHabitsWithMetricsMap, getMetrics } from "../../queries";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const habitsRouter = createTRPCRouter({
   linkHabit: protectedProcedure
@@ -180,13 +181,16 @@ export const habitsRouter = createTRPCRouter({
     }),
 
   getHabits: protectedProcedure.query(async ({ ctx }) => {
-    const [_, metricsMap] = await getMetrics(ctx.prisma, ctx.session.user.id);
+    const [_, metricsMap] = await getMetrics({
+      prisma: ctx.prisma,
+      userId: ctx.session.user.id,
+    });
 
-    const [habits, _habitsMap] = await getHabits(
-      ctx.prisma,
+    const [habits, _habitsMap] = await getHabitsWithMetricsMap({
+      prisma: ctx.prisma,
       metricsMap,
-      ctx.session.user.id
-    );
+      userId: ctx.session.user.id,
+    });
     return habits;
   }),
 
@@ -194,13 +198,16 @@ export const habitsRouter = createTRPCRouter({
     .input(z.object({ habitId: z.string() }))
     .query(async ({ input, ctx }) => {
       //TODO fix this
-      const [_, metricsMap] = await getMetrics(ctx.prisma, ctx.session.user.id);
+      const [_, metricsMap] = await getMetrics({
+        prisma: ctx.prisma,
+        userId: ctx.session.user.id,
+      });
 
-      const [habits, _habitsMap] = await getHabits(
-        ctx.prisma,
+      const [habits, _habitsMap] = await getHabitsWithMetricsMap({
+        prisma: ctx.prisma,
         metricsMap,
-        ctx.session.user.id
-      );
+        userId: ctx.session.user.id,
+      });
       return habits.find((habit) => habit.id === input.habitId);
     }),
 

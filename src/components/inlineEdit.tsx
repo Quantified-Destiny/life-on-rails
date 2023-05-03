@@ -1,6 +1,8 @@
 import type { FrequencyHorizon } from "@prisma/client";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "./ui/button";
 
 export const useInlineEdit = ({
   initialText,
@@ -94,7 +96,7 @@ export const EditableField = ({
 
   return (
     <div
-      className="group flex flex-row flex-nowrap gap-1 whitespace-nowrap hover:bg-gray-100 px-2 py-2 rounded-lg"
+      className="group flex flex-row flex-nowrap gap-1 whitespace-nowrap rounded-lg px-2 py-2 hover:bg-gray-100"
       {...triggerProps}
     >
       {isActive ? (
@@ -199,3 +201,49 @@ export const EditableNumberField = ({
     </>
   );
 };
+
+export type CreateLinkedMetric = {
+  prompt: string;
+  type: "FIVE_POINT" | "number";
+};
+
+export function CreateLinkedMetricInline({
+  createMetric,
+  closeEdit,
+}: {
+  createMetric: (prompt: string) => void;
+  closeEdit: () => void;
+}) {
+  const { register, handleSubmit } = useForm<CreateLinkedMetric>();
+
+  const onSubmit = (formData: CreateLinkedMetric) => {
+    return createMetric(formData.prompt);
+  };
+
+  return (
+    <div className="mt-2 w-full rounded-lg p-4">
+      <form className="space-y-6" onSubmit={void handleSubmit(onSubmit)}>
+        <div className="flex flex-row flex-nowrap gap-2">
+          <div className="flex-grow">
+            <input
+              type="text"
+              id="prompt"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Prompt"
+              required
+              {...register("prompt")}
+            />
+          </div>
+          <div className="space-x-2 text-right">
+            <Button onClick={closeEdit} variant="outline">
+              Cancel
+            </Button>
+            <Button onClick={closeEdit} type="submit">
+              Create
+            </Button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}

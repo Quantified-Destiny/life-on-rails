@@ -71,14 +71,13 @@ function OverviewPage() {
       {store.modal?.state === State.CreateGoal && (
         <CreateGoalModal></CreateGoalModal>
       )}
-      {store.modal?.state === State.HabitPanel && <HabitPanel></HabitPanel>}
       {store.modal?.state === State.CreateHabit && (
         <CreateHabitModal></CreateHabitModal>
       )}
       {store.modal?.state === State.CreateMetric && (
         <CreateMetricModal></CreateMetricModal>
       )}
-      <div className="mx-auto mb-10 px-10 py-2 scrollbar-none">
+      <div className="mx-auto mb-10 space-y-2 px-10 py-2 scrollbar-none">
         <Header></Header>
         {data.goals.map((goal) => (
           <GoalCard

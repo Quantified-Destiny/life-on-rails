@@ -10,6 +10,7 @@ export const metricsRouter = createTRPCRouter({
       z.object({
         prompt: z.string(),
         habitId: z.string().optional(),
+        goalId: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -24,6 +25,14 @@ export const metricsRouter = createTRPCRouter({
           },
         });
       }
+      if (input.goalId) {
+        await ctx.prisma.metricMeasuresGoal.create({
+          data: {
+            metricId: metric.id,
+            goalId: input.goalId,
+          },
+        });
+      }
     }),
 
   editMetric: protectedProcedure
@@ -34,7 +43,7 @@ export const metricsRouter = createTRPCRouter({
         data: { prompt: input.prompt },
       });
     }),
-    
+
   deleteMetric: protectedProcedure
     .input(z.object({ metricId: z.string() }))
     .mutation(async ({ input, ctx }) => {

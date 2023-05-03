@@ -185,7 +185,7 @@ model MetricAnswer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   metricId  String
-  metric    Metric   @relation(fields: [metricId], references: [id])
+  metric    Metric   @relation(fields: [metricId], references: [id], onDelete: Cascade)
   memo      String?
 
   // if this answer is linked to a metric, this will specify which habit-completion this answer relates to

@@ -1,10 +1,54 @@
-import type { Goal } from "@prisma/client";
+import type { Goal, Metric } from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
-import { getHabits, getMetrics, getGoals } from "../../queries";
+import {
+  getHabitsWithMetricsMap,
+  getMetrics,
+  getGoals,
+  ExpandedMetric,
+  getHabits,
+} from "../../queries";
 
 export const goalsRouter = createTRPCRouter({
+  deleteGoal: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      console.log(`Deleting goal ${input.id} from db`);
+      return await ctx.prisma.goal.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    }),
+
+  getTags: protectedProcedure
+    .input(z.object({ goalId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      return await ctx.prisma.tag.findMany({
+        where: {
+          GoalTag: {
+            some: {
+              goalId: input.goalId,
+            },
+          },
+        },
+      });
+    }),
+
+  getMetrics: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const metrics: Metric[] = await ctx.prisma.metric.findMany({
+        where: {
+          ownerId: ctx.session.user.id,
+          goals: { some: { goalId: input.id } },
+        },
+      });
+      return metrics;
+    }),
+
   getGoal: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -15,31 +59,36 @@ export const goalsRouter = createTRPCRouter({
         },
       });
 
-      const habits = await ctx.prisma.habitMeasuresGoal.findMany({
-        where: {
-          goalId: goal.id,
-        },
-        include: {
-          habit: true,
-        },
+      const habits = await getHabits({
+        prisma: ctx.prisma,
+        userId: ctx.session.user.id,
+        goalIds: [input.id],
       });
+
+      const metrics = await getMetrics({
+        prisma: ctx.prisma,
+        userId: ctx.session.user.id,
+        goalIds: [goal.id],
+      });
+
       return {
-        goal: goal,
-        habits: habits,
+        ...goal,
+        habits,
+        metrics,
       };
     }),
 
   getAllGoals: protectedProcedure.query(async ({ ctx }) => {
-    const [metrics, metricsMap] = await getMetrics(
-      ctx.prisma,
-      ctx.session.user.id
-    );
+    const [metrics, metricsMap] = await getMetrics({
+      prisma: ctx.prisma,
+      userId: ctx.session.user.id,
+    });
 
-    const [habits, habitsMap] = await getHabits(
-      ctx.prisma,
+    const [habits, habitsMap] = await getHabitsWithMetricsMap({
+      prisma: ctx.prisma,
       metricsMap,
-      ctx.session.user.id
-    );
+      userId: ctx.session.user.id,
+    });
 
     const goalsData = await getGoals(
       ctx.prisma,

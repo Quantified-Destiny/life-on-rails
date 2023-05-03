@@ -1,6 +1,7 @@
 import { MinusCircleIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
+import { api } from "../../utils/api";
 
 export function CreateTag({ commit }: { commit: (name: string) => void }) {
   const [active, setActive] = useState<boolean>(false);
@@ -66,6 +67,49 @@ export function TagList(props: {
       ))}
       {/* TODO add combobox features */}
       <CreateTag commit={(name: string) => props.link(name)}></CreateTag>
+    </div>
+  );
+}
+
+export function GoalTagList({ goalId }: { goalId: string }) {
+  const context = api.useContext();
+
+  const linkGoal = api.tags.linkGoal.useMutation({
+    onSettled: () => {
+      void context.goals.getAllGoals.invalidate();
+    },
+  });
+  const unlinkGoal = api.tags.linkGoal.useMutation({
+    onSettled: () => {
+      void context.goals.getAllGoals.invalidate();
+    },
+  });
+
+  const tagsQuery = api.goals.getTags.useQuery({ goalId: goalId });
+
+  const tags = tagsQuery.data ?? [];
+
+  return (
+    <div className="flex items-center space-x-2 pt-2">
+      {tags.map((tag) => (
+        <div
+          key={tag.name}
+          className="hover:bg-slate:300 flex flex-row flex-nowrap items-center rounded-r-full bg-slate-200"
+        >
+          <span className="h-4 text-xs">{tag.name}</span>
+          <button
+            className="h-6 w-6 hover:stroke-red-300"
+            onClick={() =>
+              unlinkGoal.mutate({ goalId: goalId, tagName: tag.name })
+            }
+          >
+            <MinusCircleIcon></MinusCircleIcon>
+          </button>
+        </div>
+      ))}
+      <CreateTag
+        commit={(name) => linkGoal.mutate({ goalId: goalId, tagName: name })}
+      ></CreateTag>
     </div>
   );
 }

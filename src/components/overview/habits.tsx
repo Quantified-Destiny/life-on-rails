@@ -1,20 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import type { FrequencyHorizon, Goal } from "@prisma/client";
+import { cva } from "class-variance-authority";
 import classNames from "classnames";
 import { useCombobox } from "downshift";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import type { ExpandedHabit } from "../../server/queries";
 import { api } from "../../utils/api";
-import { DropDown, EditableField, EditableNumberField } from "../inlineEdit";
+import {
+  CreateLinkedMetricInline,
+  DropDown,
+  EditableField,
+  EditableNumberField,
+} from "../inlineEdit";
+import { useOverviewStore } from "../overviewState";
+import { HabitPanel } from "./habit-panel";
 import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";
 import { TagList } from "./tags";
-import { useOverviewStore } from "../overviewState";
-import { cva } from "class-variance-authority";
-import { Button } from "../ui/button";
-import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
 function getGoalsFilter(
   inputValue: string | undefined
@@ -64,7 +68,7 @@ export function HabitHeaderLine({
       void context.goals.getAllGoals.invalidate();
     },
   });
-  const openHabitPanel = useOverviewStore((store) => store.openHabitPanel);
+  //const openHabitPanel = useOverviewStore((store) => store.openHabitPanel);
 
   return (
     <>
@@ -125,10 +129,9 @@ export function HabitHeaderLine({
           >
             {score.toFixed(2)}
           </span>
-          <Cog6ToothIcon
-            className="h-6 w-6 cursor-pointer opacity-40"
-            onClick={() => openHabitPanel(id)}
-          ></Cog6ToothIcon>
+          <HabitPanel habitId={id}>
+            <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+          </HabitPanel>
         </div>
       </div>
     </>
@@ -387,19 +390,7 @@ export function HabitCard({
             <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>
           ))}
         </div>
-        {createHabitActive ? (
-          <CreateLinkedMetricInline
-            habitId={id}
-            closeEdit={() => setCreateHabitActive(false)}
-          ></CreateLinkedMetricInline>
-        ) : (
-          <button
-            className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm  text-gray-600 hover:bg-gray-200"
-            onClick={() => setCreateHabitActive(true)}
-          >
-            + Create a new Linked Metric
-          </button>
-        )}
+        <CreateMetricLinkedToHabit habitId={id}></CreateMetricLinkedToHabit>
       </div>
       {/* <HabitFooter
         id={id}
@@ -412,24 +403,7 @@ export function HabitCard({
   );
 }
 
-type CreateLinkedMetric = {
-  prompt: string;
-  type: "FIVE_POINT" | "number";
-};
-
-export function CreateLinkedMetricInline({
-  habitId,
-  closeEdit,
-}: {
-  habitId: string;
-  closeEdit: () => void;
-}) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CreateLinkedMetric>();
-
+export function CreateMetricLinkedToHabit({ habitId }: { habitId: string }) {
   const context = api.useContext();
 
   const createLinkedMetric = api.metrics.createMetric.useMutation({
@@ -438,30 +412,21 @@ export function CreateLinkedMetricInline({
     },
   });
 
-  const onSubmit = (formData: CreateLinkedMetric) => {
-    const data = { habitId, prompt: formData.prompt };
-    console.log(data);
-    return createLinkedMetric.mutate(data);
-  };
+  const [active, setActive] = useState(false);
 
-  return (
-    <div className="mt-2 w-full rounded-lg p-4">
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <input
-            type="text"
-            id="prompt"
-            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Prompt"
-            required
-            {...register("prompt")}
-          />
-        </div>
-        <div className="space-x-2 text-right">
-          <Button onClick={closeEdit}>Cancel</Button>
-          <Button onClick={closeEdit}>Create</Button>
-        </div>
-      </form>
-    </div>
+  return active ? (
+    <CreateLinkedMetricInline
+      createMetric={(prompt) => createLinkedMetric.mutate({ prompt, habitId })}
+      closeEdit={() => setActive(false)}
+    ></CreateLinkedMetricInline>
+  ) : (
+    <button
+      className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm  text-gray-600 hover:bg-gray-200"
+      onClick={() => setActive(true)}
+    >
+      + Create a new Linked Metric
+    </button>
   );
 }
+
+

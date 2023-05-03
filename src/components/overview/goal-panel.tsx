@@ -18,77 +18,41 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
-import {
-  HabitHeaderLine,
-  LinkHabit,
-  CreateMetricLinkedToHabit,
-} from "./habits";
 
-function GoalsSection({ habitId }: { habitId: string }) {
+export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
-  const unlinkGoalMutation = api.habits.unlinkHabit.useMutation({
+
+  const createLinkedMetric = api.metrics.createMetric.useMutation({
     onSuccess() {
       void context.invalidate();
     },
   });
-  const goalQuery = api.habits.getGoals.useQuery({ habitId: habitId });
 
-  if (goalQuery.isError) {
-    return <p>ERROR</p>;
-  }
-  if (goalQuery.isLoading) {
-    return <p>LOADING</p>;
-  }
+  const [active, setActive] = useState(false);
 
-  return (
-    <>
-      <div className="mb-2 grid w-full grid-cols-3 items-baseline justify-between gap-2">
-        {goalQuery.data.length == 0 && <div>No goals linked</div>}
-        {goalQuery.data.map((goal) => {
-          const scoreWeight =
-            goal.habits.find((h) => h.id == habitId)?.weight ?? 1;
-          return (
-            <>
-              <div>
-                <p className="text-lg">{goal.name}</p>
-                <p className="text-sm text-gray-300">
-                  Created: {goal.createdAt.toUTCString()}
-                </p>
-              </div>
-              <div>
-                Weight: <span className="ml-2">{scoreWeight}</span>
-              </div>
-              <div className="space-x-2 text-right">
-                <Button
-                  onClick={() =>
-                    unlinkGoalMutation.mutate({
-                      goalId: goal.id,
-                      habitId: habitId,
-                    })
-                  }
-                >
-                  Unlink
-                </Button>
-                <Button>Manage</Button>
-              </div>
-            </>
-          );
-        })}
-      </div>
-      <LinkHabit id={habitId}></LinkHabit>
-    </>
+  return active ? (
+    <CreateLinkedMetricInline
+      createMetric={(prompt) => createLinkedMetric.mutate({ prompt, goalId })}
+      closeEdit={() => setActive(false)}
+    ></CreateLinkedMetricInline>
+  ) : (
+    <button
+      className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm  text-gray-600 hover:bg-gray-200"
+      onClick={() => setActive(true)}
+    >
+      + Create a new Linked Metric
+    </button>
   );
 }
 
-function MetricsSection({ habitId }: { habitId: string }) {
-  const [creatingMetric, setCreatingMetric] = useState(false);
+function MetricsSection({ goalId }: { goalId: string }) {
   const context = api.useContext();
   const deleteMetric = api.metrics.deleteMetric.useMutation({
     onSuccess() {
       void context.invalidate();
     },
   });
-  const metricsQuery = api.habits.getMetrics.useQuery({ habitId: habitId });
+  const metricsQuery = api.goals.getMetrics.useQuery({ id: goalId });
 
   if (metricsQuery.isError) {
     return <p>ERROR</p>;
@@ -99,8 +63,12 @@ function MetricsSection({ habitId }: { habitId: string }) {
 
   return (
     <>
-      <div className="mb-2 grid w-full grid-cols-2 items-baseline justify-between gap-2">
-        {metricsQuery.data.length == 0 && <div>No linked metrics</div>}
+      <div className="mb-4 grid w-full grid-cols-2 items-baseline justify-between gap-2">
+        {metricsQuery.data.length == 0 && (
+          <div className="col-span-full w-full bg-gray-100 px-4 py-2">
+            No linked metrics
+          </div>
+        )}
         {metricsQuery.data.map((metric) => {
           return (
             <>
@@ -126,7 +94,53 @@ function MetricsSection({ habitId }: { habitId: string }) {
           );
         })}
       </div>
-      <CreateMetricLinkedToHabit habitId={habitId}></CreateMetricLinkedToHabit>
+      <CreateMetricLinkedToGoal goalId={goalId}></CreateMetricLinkedToGoal>
+    </>
+  );
+}
+
+function HabitsSection({ habits }: { habits: Habit[] }) {
+  const context = api.useContext();
+  const deleteMetric = api.metrics.deleteMetric.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
+
+  return (
+    <>
+      <div className="mb-4 grid w-full grid-cols-2 items-baseline justify-between gap-2">
+        {habits.length == 0 && (
+          <div className="col-span-full w-full bg-gray-100 px-4 py-2">
+            No linked metrics
+          </div>
+        )}
+        {habits.map((habit) => {
+          return (
+            <>
+              <div>
+                <p className="text-lg">{habit.description}</p>
+                <p className="text-sm text-gray-300">
+                  Created: {habit.createdAt.toUTCString()}
+                </p>
+              </div>
+              <div className="flex-shrink space-x-2 text-right">
+                <Button
+                  onClick={() =>
+                    deleteMetric.mutate({
+                      metricId: habit.id,
+                    })
+                  }
+                  variant="destructive"
+                >
+                  Delete
+                </Button>
+              </div>
+            </>
+          );
+        })}
+      </div>
+      {/* <CreateHabitLinkedToGoal goalId={goalId}></CreateHabitLinkedToGoal> */}
     </>
   );
 }
@@ -174,9 +188,10 @@ function HistorySection({ habitId }: { habitId: string }) {
   );
 }
 
-import type { Metric } from "@prisma/client";
+import type { Habit, Metric } from "@prisma/client";
+import { CreateLinkedMetricInline, EditableField } from "../inlineEdit";
 import { Slider } from "../ui/slider";
-import { TagList } from "./tags";
+import { GoalTagList } from "./tags";
 
 const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
 
@@ -225,37 +240,33 @@ function ScoringSection({
   );
 }
 
-export function HabitPanel({
-  habitId,
+export function GoalPanel({
+  goalId,
   children,
 }: {
-  habitId: string;
+  goalId: string;
   children: ReactNode;
 }) {
   const context = api.useContext();
-  const deleteHabit = api.habits.deleteHabit.useMutation({
+  const deleteGoal = api.goals.deleteGoal.useMutation({
     onSuccess() {
       void context.invalidate();
     },
   });
-  const linkHabit = api.tags.linkHabit.useMutation({
-    onSuccess() {
-      void context.invalidate();
+  const editGoal = api.goals.editGoal.useMutation({
+    onSettled: () => {
+      void context.goals.getAllGoals.invalidate();
     },
   });
-  const unlinkHabit = api.tags.unlinkHabit.useMutation({
-    onSuccess() {
-      void context.invalidate();
-    },
-  });
+  const goalQuery = api.goals.getGoal.useQuery({ id: goalId });
 
-  const habitQuery = api.habits.getHabit.useQuery({ habitId: habitId });
-
-  const data = habitQuery.data;
-  if (!habitId || habitQuery.isError || habitQuery.isLoading || !data) {
-    return <p>ERROR</p>;
+  const data = goalQuery.data;
+  if (goalQuery.isError) {
+    return <p>Error</p>;
   }
-
+  if (goalQuery.isLoading || !data) {
+    return <p>LOADING</p>;
+  }
   return (
     <Sheet>
       <SheetTrigger>{children}</SheetTrigger>
@@ -264,14 +275,26 @@ export function HabitPanel({
           <div className="flex h-full flex-col gap-2">
             <SheetHeader>
               <SheetTitle>
-                <HabitHeaderLine {...data} weight={0.1}></HabitHeaderLine>
-                <TagList
-                  tags={data.tags}
-                  link={(tag) => linkHabit.mutate({ habitId, tagName: tag })}
-                  unlink={(tag) =>
-                    unlinkHabit.mutate({ habitId, tagName: tag })
-                  }
-                ></TagList>
+                <div className="mb-1 flex flex-row justify-between">
+                  <div className="flex items-center justify-between text-xl">
+                    <span className="inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs text-white">
+                      Goal
+                    </span>
+                    <EditableField
+                      initialText={data.name}
+                      commit={(name) =>
+                        editGoal.mutate({ goalId: data.id, name })
+                      }
+                    ></EditableField>
+                  </div>
+                  <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
+                    <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
+                      {0}
+                    </span>
+                  </div>
+                </div>
+
+                <GoalTagList goalId={goalId}></GoalTagList>
               </SheetTitle>
             </SheetHeader>
             <Accordion
@@ -281,27 +304,29 @@ export function HabitPanel({
               <AccordionItem value="scoring">
                 <AccordionTrigger>Scoring and metrics</AccordionTrigger>
                 <AccordionContent>
-                  <ScoringSection
+                  {/* <ScoringSection
                     habitId={habitId}
                     completionWeight={data.completionWeight}
                     metrics={data.metrics}
-                  ></ScoringSection>
-                  <h2 className="text-md py-4 uppercase text-slate-600">
-                    Metrics
-                  </h2>
-                  <MetricsSection habitId={habitId}></MetricsSection>
+                  ></ScoringSection> */}
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem value="history">
+              {/* <AccordionItem value="history">
                 <AccordionTrigger>History</AccordionTrigger>
                 <AccordionContent>
                   <HistorySection habitId={habitId}></HistorySection>
                 </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="goals">
-                <AccordionTrigger>Goals</AccordionTrigger>
+              </AccordionItem> */}
+              <AccordionItem value="metrics">
+                <AccordionTrigger>Metrics</AccordionTrigger>
                 <AccordionContent>
-                  <GoalsSection habitId={habitId} />
+                  <MetricsSection goalId={goalId}></MetricsSection>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="habits">
+                <AccordionTrigger>Habits</AccordionTrigger>
+                <AccordionContent>
+                  <HabitsSection habits={data.habits}></HabitsSection>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -311,7 +336,7 @@ export function HabitPanel({
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => deleteHabit.mutate({ habitId })}
+                onClick={() => deleteGoal.mutate({ id: goalId })}
               >
                 <Label>Delete</Label>
               </Button>
