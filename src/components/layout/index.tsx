@@ -127,7 +127,7 @@ function Sidebar(props: {
 const menus = [
   { name: "Dashboard", link: "/dashboard", icon: MdBarChart, gap: true },
   { name: "Journal", link: "/journal", icon: MdOutlineToday },
-  { name: "All Items", link: "/overview2", icon: MdOutlineDashboard },
+  { name: "All Items", link: "/overview", icon: MdOutlineDashboard },
   { name: "Habits", link: "/habits", icon: MdCalendarViewMonth },
   { name: "Resources", link: "/habit2", icon: MdHelpCenter}
 ];

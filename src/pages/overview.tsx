@@ -1,223 +1,123 @@
-import classNames from "classnames";
-import { type NextPage } from "next";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+import Link from "next/link";
+import { CreateMenu } from "../components/createMenu";
+import { EllipsisIcon } from "../components/icons";
 import Layout from "../components/layout";
+import {
+  CreateGoalModal,
+  CreateHabitModal,
+  CreateMetricModal,
+} from "../components/modals";
+import { GoalCard } from "../components/overview/goals";
+import { HabitPanel } from "../components/overview/habit-panel";
+import { HabitCard } from "../components/overview/habits";
+import { LinkedMetric } from "../components/overview/metrics";
+import { State, useOverviewStore } from "../components/overviewState";
 import { api } from "../utils/api";
 
-const textcolor = (score: number | undefined) => {
-  if (!score) return "text-green-400";
-  return score < 0.25
-    ? "text-red-300"
-    : score < 0.7
-    ? "text-yellow-400"
-    : "text-green-200";
-};
-
-const displayPercent = (percent: number | undefined) => (
-  <span
-    className={classNames(
-      "text-md rounded-md bg-slate-50 p-1 font-semibold",
-      textcolor(percent)
-    )}
-  >{`${percent ? percent.toFixed(2) : "unscorable"}`}</span>
-);
-
-interface PillProps {
-  text: string;
-}
-
-function Pill({ text }: PillProps) {
+function Header() {
   return (
-    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-      {text}
-    </span>
-  );
-}
-
-interface NestedItemsProps {
-  habits: Habit[];
-  subjectives: Metric[];
-}
-
-function NestedItems({ habits, subjectives }: NestedItemsProps) {
-  return (
-    <ul className="divide-y divide-gray-200">
-      {habits.map((habit) => (
-        <li className="py-2">
-          <div className="flex items-center justify-between">
-            <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-              Habit
-            </span>
-            <span className="text-md font-medium text-gray-500">
-              {displayPercent(habit.score)}
-            </span>
-          </div>
-          <div className="mt-2">
-            <div className="text-lg font-semibold text-gray-900">
-              {habit.description}
-            </div>
-          </div>
-        </li>
-      ))}
-
-      {subjectives.map((subjective) => (
-        <li className="py-4">
-          <div className="flex items-center justify-between">
-            <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
-              Subjective
-            </span>
-            <span className="text-md font-medium text-gray-500">
-              {displayPercent(subjective.score)}
-            </span>
-          </div>
-          <div className="mt-4">
-            <div className="text-lg font-semibold text-gray-900">
-              {subjective.prompt}
-            </div>
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-interface Habit {
-  description: string;
-  score: number | undefined;
-}
-interface Metric {
-  prompt: string;
-  score: number | undefined;
-}
-
-interface Goal {
-  name: string;
-  score: number | undefined;
-}
-interface GoalCardProps {
-  goal: Goal;
-  habits: Habit[];
-  subjectives: Metric[];
-}
-
-function GoalCard({ goal, habits, subjectives }: GoalCardProps) {
-  return (
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-2 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <Pill text={"Goal"}></Pill>
-          {displayPercent(goal.score)}
+    <>
+      <div className="mb-2 flex w-full items-center justify-between">
+        <div>
+          <h1 className="ml-2 text-xl font-semibold uppercase text-gray-800">
+            Overview
+          </h1>
         </div>
-        <div className="text-lg font-semibold text-gray-900">{goal.name}</div>
-      </div>
-      {subjectives.length == 0 && habits.length == 0 ? undefined : (
-        <div className="divide-y bg-gray-50 px-4 py-2 sm:px-6">
-          <NestedItems habits={habits} subjectives={subjectives}></NestedItems>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function HabitCard(habit: Habit) {
-  return (
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-            Habit
-          </span>
-          <span className="text-md rounded-md bg-slate-100 p-1 font-medium text-gray-500">
-            {displayPercent(habit.score)}
-          </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">
-            {habit.description}
-          </div>
+        <div className="flex">
+          <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
+            Filter
+          </button>
+          <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
+            Sort
+          </button>
+          <button className="rounded px-2 py-2 hover:bg-gray-200">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.7}
+              stroke="currentColor"
+              className="h-6 w-6 stroke-gray-400"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </button>
+          <CreateMenu></CreateMenu>
+          <button className="rounded stroke-gray-500 px-2 py-2 hover:bg-gray-200">
+            <EllipsisIcon></EllipsisIcon>
+          </button>
         </div>
       </div>
-    </div>
+      <p className="mb-2 px-2 text-xs italic text-slate-500">
+        All scores are based off the last 2 weeks based on your{" "}
+        <Link href="/profile" className="underline">
+          user settings
+        </Link>
+        .
+      </p>
+    </>
   );
 }
-
-function SubjectiveCard(subjective: Metric) {
-  return (
-    <div className="overflow-hidden rounded-lg bg-white shadow shadow-slate-300">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
-            Subjective
-          </span>
-          <span className="text-md rounded-md bg-slate-100  p-1 font-medium text-gray-500">
-            {displayPercent(subjective.score)}
-          </span>
-        </div>
-        <div className="mt-4">
-          <div className="text-lg font-semibold text-gray-900">
-            {subjective.prompt}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface OverviewProps {
-  goals: { goal: Goal; habits: Habit[]; metrics: Metric[] }[];
-  habits: Habit[];
-  subjectives: Metric[];
-}
-
-function Overview({ goals, habits, subjectives }: OverviewProps) {
-  return (
-    <div className="text-md mx-auto max-w-4xl py-6 px-4 sm:px-6 md:px-7 lg:px-8">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-1">
-        {goals.map((goal) => (
-          <GoalCard
-            goal={goal.goal}
-            habits={goal.habits}
-            subjectives={goal.metrics}
-          ></GoalCard>
-        ))}
-        <h1 className="my-2 font-semibold text-gray-900">Uncategorized</h1>
-        {habits.map((habit) => (
-          <HabitCard
-            description={habit.description}
-            score={habit.score}
-          ></HabitCard>
-        ))}
-        {subjectives.map((subjective) => (
-          <SubjectiveCard
-            prompt={subjective.prompt}
-            score={subjective.score}
-          ></SubjectiveCard>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-const today = new Date();
 
 function OverviewPage() {
+  const store = useOverviewStore();
   const goalsQuery = api.goals.getAllGoals.useQuery();
   if (goalsQuery.isLoading) return <p>Loading...</p>;
   if (goalsQuery.isError) return <p>Query error</p>;
 
   const data = goalsQuery.data;
-  console.log(data);
-
   return (
-    <Overview
-      goals={data.goals}
-      habits={data.habits}
-      subjectives={data.metrics}
-    ></Overview>
+    <div className="scrollbar-none">
+      {store.modal?.state === State.CreateGoal && (
+        <CreateGoalModal></CreateGoalModal>
+      )}
+      {store.modal?.state === State.CreateHabit && (
+        <CreateHabitModal></CreateHabitModal>
+      )}
+      {store.modal?.state === State.CreateMetric && (
+        <CreateMetricModal></CreateMetricModal>
+      )}
+      <div className="mx-auto mb-10 space-y-2 px-10 py-2 scrollbar-none">
+        <Header></Header>
+        {data.goals.map((goal) => (
+          <GoalCard
+            {...goal.goal}
+            habits={goal.habits}
+            metrics={goal.metrics}
+            key={goal.goal.id}
+          ></GoalCard>
+        ))}
+        {/* Habit Card with Progress Bar */}
+        <h1 className="mb-4 ml-2 text-lg font-semibold uppercase text-slate-600">
+          Unlinked Items
+        </h1>
+        <div className="space-y-2">
+          {data.habits.map((habit) => (
+            <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
+          ))}
+          {data.metrics.map((metric) => {
+            return (
+              <LinkedMetric
+                {...metric}
+                weight={0.5}
+                key={metric.id}
+              ></LinkedMetric>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
-const Page: NextPage = () => {
+function Page() {
   return <Layout main={OverviewPage}></Layout>;
-};
+}
 
 export default Page;
