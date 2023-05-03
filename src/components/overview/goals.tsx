@@ -10,6 +10,7 @@ import type {
 } from "../../server/queries";
 import { api } from "../../utils/api";
 import { TagList } from "./tags";
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
 export function GoalCard({
   id,
@@ -48,21 +49,24 @@ export function GoalCard({
     <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
       <div className="mb-1 flex flex-row justify-between">
         <div className="mb-2 flex flex-col">
-          <span className="mb-2 inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs  text-white">
-            Goal
-          </span>
-          <div className="mb-2 flex items-center justify-between text-xl ">
+          <div className="mb-2 flex items-center justify-between text-xl">
+            <span className="mb-2 inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs  text-white">
+              Goal
+            </span>
             <EditableField
               initialText={name}
               commit={(name) => mutation.mutate({ goalId: id, name })}
             ></EditableField>
           </div>
         </div>
-        <div className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl  text-yellow-500">
-          {score.toFixed(2)}
+        <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
+          <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
+            {score.toFixed(2)}
+          </span>
+          <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
         </div>
       </div>
-      <div className="gap-x-10 space-y-2 mb-4">
+      <div className="mb-4 gap-x-10 space-y-2">
         {habits.map((habit) => (
           <HabitCard
             {...habit}

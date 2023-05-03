@@ -178,6 +178,7 @@ function HistorySection({ habitId }: { habitId: string }) {
 
 import type { Metric } from "@prisma/client";
 import { Slider } from "../ui/slider";
+import { TagList } from "./tags";
 
 const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
 
@@ -233,7 +234,16 @@ export function HabitPanel() {
       void context.invalidate();
     },
   });
-
+  const linkHabit = api.tags.linkHabit.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
+  const unlinkHabit = api.tags.unlinkHabit.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
   const modal = useOverviewStore((store) => store.modal);
   const reset = useOverviewStore((store) => store.reset);
   const habitId = modal?.state == State.HabitPanel ? modal?.habitId : null;
@@ -256,6 +266,13 @@ export function HabitPanel() {
             <SheetHeader>
               <SheetTitle>
                 <HabitHeaderLine {...data} weight={0.1}></HabitHeaderLine>
+                <TagList
+                  tags={data.tags}
+                  link={(tag) => linkHabit.mutate({ habitId, tagName: tag })}
+                  unlink={(tag) =>
+                    unlinkHabit.mutate({ habitId, tagName: tag })
+                  }
+                ></TagList>
               </SheetTitle>
             </SheetHeader>
             <Accordion

@@ -14,6 +14,7 @@ import { TagList } from "./tags";
 import { useOverviewStore } from "../overviewState";
 import { cva } from "class-variance-authority";
 import { Button } from "../ui/button";
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
 function getGoalsFilter(
   inputValue: string | undefined
@@ -63,6 +64,7 @@ export function HabitHeaderLine({
       void context.goals.getAllGoals.invalidate();
     },
   });
+  const openHabitPanel = useOverviewStore((store) => store.openHabitPanel);
 
   return (
     <>
@@ -114,15 +116,19 @@ export function HabitHeaderLine({
             </span>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <div
+        <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
+          <span
             className={classNames(
-              "rounded-lg bg-gray-100 p-2 text-xl ",
+              "rounded-lg bg-gray-100 p-2 text-xl",
               textcolor(score)
             )}
           >
             {score.toFixed(2)}
-          </div>
+          </span>
+          <Cog6ToothIcon
+            className="h-6 w-6 cursor-pointer opacity-40"
+            onClick={() => openHabitPanel(id)}
+          ></Cog6ToothIcon>
         </div>
       </div>
     </>
@@ -395,13 +401,13 @@ export function HabitCard({
           </button>
         )}
       </div>
-      <HabitFooter
+      {/* <HabitFooter
         id={id}
         tags={tags}
         linkedGoal={linkedGoal}
         linkHabit={linkHabit.mutate}
         unlinkHabit={unlinkHabit.mutate}
-      ></HabitFooter>
+      ></HabitFooter> */}
     </div>
   );
 }
@@ -439,7 +445,7 @@ export function CreateLinkedMetricInline({
   };
 
   return (
-    <div className="mt-2 rounded-lg p-4 w-full">
+    <div className="mt-2 w-full rounded-lg p-4">
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <input

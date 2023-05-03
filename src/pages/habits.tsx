@@ -59,7 +59,6 @@ const value = [
 ];
 
 function HabitsPage() {
-  const events = ["04-03-2023", "04-15-2023", "4-25-2023"];
   const [tgl, setTgl] = useState<Date>();
   const linkedGoal = {
     id: "123",

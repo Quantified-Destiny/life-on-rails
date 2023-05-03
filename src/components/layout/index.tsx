@@ -164,8 +164,8 @@ function Layout({ main }: { main: () => JSX.Element }) {
         Menus={menus}
       ></Sidebar>
       <div
-        className={classNames("h-2 w-full bg-white", {
-          "animate-pulse bg-green-300": isFetching > 0,
+        className={classNames("h-1 w-full", {
+          "animate-pulse bg-green-600": isFetching,
         })}
       ></div>
       <div

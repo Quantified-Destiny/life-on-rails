@@ -1,14 +1,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { useForm } from "react-hook-form";
-import { State, useOverviewStore } from "./overviewState";
 import classNames from "classnames";
-import { api } from "../utils/api";
 import type { ReactNode } from "react";
-
-interface FormData {
-  prompt: string;
-  type: "FIVE_POINT|NUMBER";
-}
+import { useForm } from "react-hook-form";
+import { api } from "../utils/api";
+import { useOverviewStore } from "./overviewState";
 
 function Modal({
   close,
