@@ -72,54 +72,44 @@ export function HabitHeaderLine({
 
   return (
     <>
-      <div className="mb-2 flex flex-row items-center justify-between">
-        <div className="flex flex-col">
-          <div className="">
-            <span className="mb-2 inline-block rounded-full bg-blue-500 px-2 py-1 text-xs  text-white">
-              Habit
-            </span>
-            {/* {weight && (
-              <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs ">
-                Weight: {weight.toFixed(2)}
-              </span>
-            )} */}
-          </div>
-          <div className="mr-1 items-baseline text-lg ">
-            <EditableField
-              initialText={description}
-              commit={(text) =>
-                mutation.mutate({ habitId: id, description: text })
+      <div className="flex flex-row items-center justify-around">
+        <div className="flex flex-row items-baseline gap-2">
+          <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
+            Habit
+          </span>
+          <EditableField
+            initialText={description}
+            commit={(text) =>
+              mutation.mutate({ habitId: id, description: text })
+            }
+            className="font-semibold"
+          ></EditableField>
+        </div>
+        <span className="text-sm lowercase text-gray-500">
+          <span className="space-x-1 text-sm">
+            <span className="text-md ">Completed</span>
+            <span className="text-md ">{completions}</span>
+            <span className="">/</span>
+            <EditableNumberField
+              initial={frequency}
+              commit={(number) =>
+                editFrequency.mutate({ habitId: id, frequency: number })
               }
               className="font-semibold"
-            ></EditableField>
-            <span className="text-sm lowercase text-gray-500">
-              <span className="space-x-1 text-sm">
-                <span className="text-md ">Completed</span>
-
-                <span className="text-md ">{completions}</span>
-                <span className="">/</span>
-                <EditableNumberField
-                  initial={frequency}
-                  commit={(number) =>
-                    editFrequency.mutate({ habitId: id, frequency: number })
-                  }
-                  className="font-semibold"
-                ></EditableNumberField>
-                <span className="text-md ">times this</span>
-                <DropDown
-                  frequencyHorizon={frequencyHorizon}
-                  commit={(freq) =>
-                    editFrequencyHorizon.mutate({
-                      habitId: id,
-                      frequencyHorizon: freq,
-                    })
-                  }
-                  className="font-semibold"
-                ></DropDown>
-              </span>
-            </span>
-          </div>
-        </div>
+            ></EditableNumberField>
+            <span className="text-md ">times this</span>
+            <DropDown
+              frequencyHorizon={frequencyHorizon}
+              commit={(freq) =>
+                editFrequencyHorizon.mutate({
+                  habitId: id,
+                  frequencyHorizon: freq,
+                })
+              }
+              className="font-semibold"
+            ></DropDown>
+          </span>
+        </span>
         <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
           <span
             className={classNames(
@@ -341,20 +331,6 @@ export function HabitCard({
   weight: number | undefined;
   linkedGoal?: string | undefined;
 }) {
-  const [createHabitActive, setCreateHabitActive] = useState<boolean>(false);
-
-  const context = api.useContext();
-  const linkHabit = api.tags.linkHabit.useMutation({
-    onSuccess() {
-      void context.goals.getAllGoals.invalidate();
-    },
-  });
-  const unlinkHabit = api.tags.unlinkHabit.useMutation({
-    onSuccess() {
-      void context.goals.getAllGoals.invalidate();
-    },
-  });
-
   const v = cva("rounded-lg p-6 shadow-md space-y-2", {
     variants: {
       variant: {
@@ -428,5 +404,3 @@ export function CreateMetricLinkedToHabit({ habitId }: { habitId: string }) {
     </button>
   );
 }
-
-

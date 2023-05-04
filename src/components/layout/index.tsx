@@ -146,17 +146,18 @@ function Layout({ main }: { main: () => JSX.Element }) {
   };
 
   // Auto close menu when on mobile
-  const handleResize = () => {
-    if (window.innerWidth < 720) {
-      setOpen(false);
-    } else {
-      setOpen(true);
-    }
-  };
 
   useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 720) {
+        setOpen(false);
+      } else {
+        setOpen(true);
+      }
+    };
+
     window.addEventListener("resize", handleResize);
-  });
+  }, []);
 
   return (
     <>

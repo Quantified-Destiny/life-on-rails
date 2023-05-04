@@ -316,16 +316,16 @@ export function GoalPanel({
                   <HistorySection habitId={habitId}></HistorySection>
                 </AccordionContent>
               </AccordionItem> */}
-              <AccordionItem value="metrics">
-                <AccordionTrigger>Metrics</AccordionTrigger>
-                <AccordionContent>
-                  <MetricsSection goalId={goalId}></MetricsSection>
-                </AccordionContent>
-              </AccordionItem>
               <AccordionItem value="habits">
                 <AccordionTrigger>Habits</AccordionTrigger>
                 <AccordionContent>
                   <HabitsSection habits={data.habits}></HabitsSection>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="metrics">
+                <AccordionTrigger>Metrics</AccordionTrigger>
+                <AccordionContent>
+                  <MetricsSection goalId={goalId}></MetricsSection>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
