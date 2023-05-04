@@ -1,5 +1,5 @@
 import { useIsFetching } from "@tanstack/react-query";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
@@ -30,10 +30,16 @@ function Sidebar(props: {
   open: boolean;
   setOpen: (open: boolean) => void;
   Menus: MenuItem[];
-  handleSignOut: () => Promise<void>;
+  
 }) {
   const router = useRouter();
   const path = router.asPath;
+  const { data: sessionData } = useSession();
+
+  const handleSignOut = async () => {
+    await router.push("/");
+    await signOut();
+  };
 
   return (
     <div
@@ -88,10 +94,15 @@ function Sidebar(props: {
           </span>
         </Link>
       ))}
+      <hr className="h-px my-8 mx-2 bg-gray-500 border-0 dark:bg-gray-700"></hr>
+
       <Link
         href="/profile"
         key="profile"
-        className={`absolute bottom-14 flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm text-white	hover:bg-white hover:bg-opacity-10`}
+        className={classNames(
+          "flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm text-white hover:bg-slate-200 hover:bg-opacity-10 mt-2",
+          path.includes('profile') ? "bg-slate-200 bg-opacity-10" : ""
+        )}
       >
         <div>
           {React.createElement(User, {
@@ -104,11 +115,12 @@ function Sidebar(props: {
           Profile
         </span>
       </Link>
+      
       <Link
         href="/"
-        onClick={void props.handleSignOut}
+        onClick={handleSignOut}
         key="logout"
-        className={`flex-row-10 absolute bottom-4 flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm text-white	hover:bg-white hover:bg-opacity-10`}
+        className={`flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm text-white	hover:bg-white hover:bg-opacity-10 mt-2`}
       >
         <div>
           {React.createElement(LogOut, {
