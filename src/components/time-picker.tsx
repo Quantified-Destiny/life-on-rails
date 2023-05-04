@@ -11,6 +11,7 @@ import { addDays, subDays } from "date-fns";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { forwardRef } from "react";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
@@ -37,7 +38,11 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
   };
 
   const showNextDayButton = date.toDateString() !== maxDate.toDateString();
-
+  const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
+    <button className="example-custom-input" onClick={onClick} ref={ref}>
+      {value}
+    </button>
+  ));
   return (
     <div
       id="time-selector"
@@ -52,6 +57,8 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
           onChange={(date) => date && setDate(date)}
           maxDate={maxDate}
           className="text-center"
+          dateFormat="EEEE, MMMM dd, yyyy"
+          customInput={<ExampleCustomInput />}
         />
 
         <button

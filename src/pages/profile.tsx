@@ -20,7 +20,7 @@ const ProfilePage = () => {
           <div className="overflow-hidden rounded-sm bg-white  md:col-span-2">
             <div className="flex items-center justify-between px-4 py-4 sm:px-6 ">
               <h3 className="text-lg font-medium leading-6 text-gray-700">Profile Information</h3>
-              <div className="h-12 w-12 rounded-full">
+              <div className="h-12 w-12 rounded-full bg-gray-200">
                 {
                   (profile.image == undefined)
                     ? <img src="https://media.istockphoto.com/id/1210939712/vector/user-icon-people-icon-isolated-on-white-background-vector-illustration.jpg?s=612x612&w=0&k=20&c=vKDH9j7PPMN-AiUX8vsKlmOonwx7wjqdKiLge7PX1ZQ="></img>

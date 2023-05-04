@@ -1,26 +1,6 @@
 import { useState } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
 import Layout from "../components/layout";
 import TimePicker from "../components/time-picker";
-import dynamic from "next/dynamic";
-
-// import HeatMap from '@uiw/react-heat-map';
-//Next.js error Global CSS cannot be imported from within node_modules
-
-import "@uiw/react-heat-map/dist.css";
-import "@uiw/react-heat-map/esm/style/index.css";
-
-// import '@uiw/react-tooltip/esm/style/index.css';
-// import '@uiw/react-tooltip/dist.css';
-
-const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
-
-// const Tooltip = dynamic(
-//   () => import("@uiw/react-tooltip"),
-//   { ssr: false }
-// );
-
 
 import { TbSquareRoundedLetterG, TbSquareRoundedLetterH, TbSquareRoundedLetterM} from 'react-icons/tb';
 import { RiCalendarCheckLine } from 'react-icons/ri';
@@ -318,6 +298,20 @@ interface JournalProps {
   }[];
 }
 
+// https://tailwindcomponents.com/component/free-tailwind-css-advance-table-component
+// function dropdownFunction(element) {
+//     var dropdowns = document.getElementsByClassName("dropdown-content");
+//     var i;
+//     let list = element.parentElement.parentElement.getElementsByClassName("dropdown-content")[0];
+//     list.classList.add("target");
+//     for (i = 0; i < dropdowns.length; i++) {
+//         if (!dropdowns[i].classList.contains("target")) {
+//             dropdowns[i].classList.add("hidden");
+//         }
+//     }
+//     list.classList.toggle("hidden");
+// }
+
 function Journal({ date, setDate, habits, metrics }: JournalProps) {
   const context = api.useContext();
   const setHabitCompletion = api.journal.setCompletion.useMutation({
@@ -343,8 +337,10 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
 
   return (
     <>
+    <div className="container flex justify-center max-w-5xl">
+
+    
   <div className="sm:px-6 w-full">
-    {/*- more free and premium Tailwind CSS components at https://tailwinduikit.com/ -*/}
     <div className="px-4 md:px-10 py-4 md:py-7">
       <div className="flex items-center justify-between">
         <p
@@ -366,17 +362,10 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
         </div>
       </div>
       <div className="flex items-center justify-between">
-        {/* <p
-          tabIndex={0}
-          className="focus:outline-none text-base sm:text-lg md:text-xl lg:text-xl leading-normal text-gray-800"
-        >
-          May 3, 2023 
-        </p> */}
         <TimePicker date={date} setDate={setDate}></TimePicker>
-        
       </div>
     </div>
-    <div className="bg-white py-4 md:py-7 px-4 md:px-6 xl:px-10">
+    <div className="bg-white py-3 md:py-4 px-4 md:px-6 xl:px-10">
       <div className="sm:flex items-center justify-between">
         <div className="flex items-center">
           <a
@@ -415,11 +404,21 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
       </div>
       <div className="mt-7 overflow-x-auto">
         <table className="w-full whitespace-nowrap">
+          <thead>
+            <tr className="text-xs justify-between">
+              <th></th>
+              <th>Type</th>
+              <th>Name</th>
+              <th></th>
+              <th>Last</th>
+              <th>Done</th>
+              <th></th>
+            </tr>
+          </thead>
           <tbody>
-            
             <tr
               tabIndex={0}
-              className="focus:outline-none h-16 border border-gray-100 rounded"
+              className="focus:outline-none h-12 border border-gray-100 rounded"
             >
               <td>
                 <div className="ml-5">
@@ -521,6 +520,13 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
                   </p>
                 </div>
               </td>
+              <td className="pl-2">
+                <div className="flex items-center">
+                  <p className="text-sm leading-none text-gray-600 ml-2">
+                    1/3
+                  </p>
+                </div>
+              </td>
               <td className="pl-5">
                 <button className="focus:ring-2 focus:ring-offset-2 focus:ring-red-300 text-sm leading-none text-gray-600 py-3 px-5 bg-gray-100 rounded hover:bg-gray-200 focus:outline-none">
                   View
@@ -585,7 +591,7 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
             </tr>
             <tr
               tabIndex={0}
-              className="focus:outline-none h-16 border border-gray-100 rounded"
+              className="focus:outline-none h-12 border border-gray-100 rounded"
             >
               <td>
                 <div className="ml-5">
@@ -667,6 +673,13 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
                   </p>
                 </div>
               </td>
+              <td className="pl-2">
+                <div className="flex items-center">
+                  <p className="text-sm leading-none text-gray-600 ml-2">
+                    0/1
+                  </p>
+                </div>
+              </td>
               <td className="pl-5">
                 <button className="focus:ring-2 focus:ring-offset-2 focus:ring-red-300 text-sm leading-none text-gray-600 py-3 px-5 bg-gray-100 rounded hover:bg-gray-200 focus:outline-none">
                   View
@@ -731,7 +744,7 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
             </tr>
             <tr
               tabIndex={0}
-              className="focus:outline-none h-16 border border-gray-100 rounded"
+              className="focus:outline-none h-12 border border-gray-100 rounded"
             >
               <td>
                 <div className="ml-5">
@@ -786,6 +799,13 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
                   <RiCalendarCheckLine></RiCalendarCheckLine>
                   <p className="text-sm leading-none text-gray-600 ml-2">
                     05/02
+                  </p>
+                </div>
+              </td>
+              <td className="pl-2">
+                <div className="flex items-center">
+                  <p className="text-sm leading-none text-gray-600 ml-2">
+                    0/1
                   </p>
                 </div>
               </td>
@@ -854,7 +874,7 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
 
             <tr
               tabIndex={0}
-              className="focus:outline-none h-16 border border-gray-100 rounded"
+              className="focus:outline-none h-12 border border-gray-100 rounded"
             >
               <td>
                 <div className="ml-5">
@@ -909,6 +929,13 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
                   <RiCalendarCheckLine></RiCalendarCheckLine>
                   <p className="text-sm leading-none text-gray-600 ml-2">
                     05/02
+                  </p>
+                </div>
+              </td>
+              <td className="pl-2">
+                <div className="flex items-center">
+                  <p className="text-sm leading-none text-gray-600 ml-2">
+                    0/1
                   </p>
                 </div>
               </td>
@@ -985,6 +1012,7 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
       __html: ".checkbox:checked + .check-icon {\n  display: flex;\n}\n"
     }}
   />
+  </div>
 </>
 );
 }
