@@ -11,7 +11,7 @@ import type {
 import { api } from "../../utils/api";
 import { TagList } from "./tags";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { GoalPanel } from "./goal-panel";
+import { GoalSheet } from "./goal-panel";
 import { LinkedMetric } from "./metrics";
 
 export function GoalCard({
@@ -36,39 +36,40 @@ export function GoalCard({
     },
   });
   return (
-    <div className="bg-gray-50 p-2">
-      <div className="flex flex-row items-center justify-between">
-        <div className="flex items-center justify-between text-xl">
-          <span className="inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs text-white">
-            Goal
-          </span>
-          <EditableField
-            initialText={name}
-            commit={(name) => editGoal.mutate({ goalId: id, name })}
-          ></EditableField>
-        </div>
-        <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
-          <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
-            {score.toFixed(2)}
-          </span>
-          <GoalPanel goalId={id}>
-            <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
-          </GoalPanel>
-        </div>
+    <div className="contents" onClick={console.log}>
+      <div className="col-span-2 flex flex-row items-center">
+        <span className="inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs text-white">
+          Goal
+        </span>
+        <EditableField
+          initialText={name}
+          commit={(name) => editGoal.mutate({ goalId: id, name })}
+        ></EditableField>
       </div>
-      <div className="">
-        {habits.map((habit) => (
-          <HabitCard
-            {...habit}
-            weight={0.4}
-            linkedGoal={id}
-            key={habit.id}
-          ></HabitCard>
-        ))}
-        {metrics.map((m) => (
-          <LinkedMetric {...m} weight={0.4} key={m.id}></LinkedMetric>
-        ))}
+      <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
+        <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
+          {score.toFixed(2)}
+        </span>
+        <GoalSheet goalId={id}>
+          <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+        </GoalSheet>
       </div>
+      {habits.map((habit) => (
+        <HabitCard
+          {...habit}
+          weight={0.4}
+          linkedGoal={id}
+          key={habit.id}
+        ></HabitCard>
+      ))}
+      {metrics.map((m) => (
+        <LinkedMetric
+          {...m}
+          weight={0.4}
+          key={m.id}
+          linked={false}
+        ></LinkedMetric>
+      ))}
     </div>
   );
 }

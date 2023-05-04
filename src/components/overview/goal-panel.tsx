@@ -239,14 +239,9 @@ function ScoringSection({
   );
 }
 
-export function GoalPanel({
-  goalId,
-  children,
-}: {
-  goalId: string;
-  children: ReactNode;
-}) {
+function GoalPanel({ goalId }: { goalId: string }) {
   const context = api.useContext();
+
   const deleteGoal = api.goals.deleteGoal.useMutation({
     onSuccess() {
       void context.invalidate();
@@ -267,81 +262,91 @@ export function GoalPanel({
     return <p>LOADING</p>;
   }
   return (
-    <Sheet>
-      <SheetTrigger>{children}</SheetTrigger>
-      <SheetContent position="right" size="lg" className="overflow-scroll">
-        <div className="relative h-full">
-          <div className="flex h-full flex-col gap-2">
-            <SheetHeader>
-              <SheetTitle>
-                <div className="mb-1 flex flex-row justify-between">
-                  <div className="flex items-center justify-between text-xl">
-                    <span className="inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs text-white">
-                      Goal
-                    </span>
-                    <EditableField
-                      initialText={data.name}
-                      commit={(name) =>
-                        editGoal.mutate({ goalId: data.id, name })
-                      }
-                    ></EditableField>
-                  </div>
-                  <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
-                    <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
-                      {0}
-                    </span>
-                  </div>
-                </div>
+    <div className="relative h-full">
+      <div className="flex h-full flex-col gap-2">
+        <SheetHeader>
+          <SheetTitle>
+            <div className="mb-1 flex flex-row justify-between">
+              <div className="flex items-center justify-between text-xl">
+                <span className="inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs text-white">
+                  Goal
+                </span>
+                <EditableField
+                  initialText={data.name}
+                  commit={(name) => editGoal.mutate({ goalId: data.id, name })}
+                ></EditableField>
+              </div>
+              <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
+                <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
+                  {0}
+                </span>
+              </div>
+            </div>
 
-                <GoalTagList goalId={goalId}></GoalTagList>
-              </SheetTitle>
-            </SheetHeader>
-            <Accordion
-              className="flex-grow overflow-scroll scrollbar-none"
-              type="multiple"
-            >
-              <AccordionItem value="scoring">
-                <AccordionTrigger>Scoring and metrics</AccordionTrigger>
-                <AccordionContent>
-                  {/* <ScoringSection
+            <GoalTagList goalId={goalId}></GoalTagList>
+          </SheetTitle>
+        </SheetHeader>
+        <Accordion
+          className="flex-grow overflow-scroll scrollbar-none"
+          type="multiple"
+        >
+          <AccordionItem value="scoring">
+            <AccordionTrigger>Scoring and metrics</AccordionTrigger>
+            <AccordionContent>
+              {/* <ScoringSection
                     habitId={habitId}
                     completionWeight={data.completionWeight}
                     metrics={data.metrics}
                   ></ScoringSection> */}
-                </AccordionContent>
-              </AccordionItem>
-              {/* <AccordionItem value="history">
+            </AccordionContent>
+          </AccordionItem>
+          {/* <AccordionItem value="history">
                 <AccordionTrigger>History</AccordionTrigger>
                 <AccordionContent>
                   <HistorySection habitId={habitId}></HistorySection>
                 </AccordionContent>
               </AccordionItem> */}
-              <AccordionItem value="habits">
-                <AccordionTrigger>Habits</AccordionTrigger>
-                <AccordionContent>
-                  <HabitsSection habits={data.habits}></HabitsSection>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="metrics">
-                <AccordionTrigger>Metrics</AccordionTrigger>
-                <AccordionContent>
-                  <MetricsSection goalId={goalId}></MetricsSection>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-            <div className="w-full space-x-2 bg-gray-100 px-4 py-2 text-right">
-              <Button variant="default">
-                <Label>Archive</Label>
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => deleteGoal.mutate({ id: goalId })}
-              >
-                <Label>Delete</Label>
-              </Button>
-            </div>
-          </div>
+          <AccordionItem value="habits">
+            <AccordionTrigger>Habits</AccordionTrigger>
+            <AccordionContent>
+              <HabitsSection habits={data.habits}></HabitsSection>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="metrics">
+            <AccordionTrigger>Metrics</AccordionTrigger>
+            <AccordionContent>
+              <MetricsSection goalId={goalId}></MetricsSection>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        <div className="w-full space-x-2 bg-gray-100 px-4 py-2 text-right">
+          <Button variant="default">
+            <Label>Archive</Label>
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => deleteGoal.mutate({ id: goalId })}
+          >
+            <Label>Delete</Label>
+          </Button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function GoalSheet({
+  goalId,
+  children,
+}: {
+  goalId: string;
+  children: ReactNode;
+}) {
+  return (
+    <Sheet>
+      <SheetTrigger>{children}</SheetTrigger>
+      <SheetContent position="right" size="lg" className="overflow-scroll">
+        <GoalPanel goalId={goalId}></GoalPanel>
       </SheetContent>
     </Sheet>
   );

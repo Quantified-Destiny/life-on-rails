@@ -10,7 +10,6 @@ import {
   CreateMetricModal,
 } from "../components/modals";
 import { GoalCard } from "../components/overview/goals";
-import { HabitPanel } from "../components/overview/habit-panel";
 import { HabitCard } from "../components/overview/habits";
 import { LinkedMetric } from "../components/overview/metrics";
 import { State, useOverviewStore } from "../components/overviewState";
@@ -84,35 +83,32 @@ function OverviewPage() {
         <CreateMetricModal></CreateMetricModal>
       )}
       <Header></Header>
-      <div className="mx-auto px-10 py-2 scrollbar-none">
-        <div className="space-y-2 divide-y-2 divide-gray-100">
-          {data.goals.map((goal) => (
-            <GoalCard
-              {...goal.goal}
-              habits={goal.habits}
-              metrics={goal.metrics}
-              key={goal.goal.id}
-            ></GoalCard>
-          ))}
-        </div>
+      <div className="mx-auto grid grid-cols-3 items-center gap-5 bg-slate-50 px-10 py-2 scrollbar-none">
+        {data.goals.map((goal) => (
+          <GoalCard
+            {...goal.goal}
+            habits={goal.habits}
+            metrics={goal.metrics}
+            key={goal.goal.id}
+          ></GoalCard>
+        ))}
         {/* Habit Card with Progress Bar */}
-        <h1 className="my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
+        <h1 className="col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
           Unlinked Items
         </h1>
-        <div className="space-y-2">
-          {data.habits.map((habit) => (
-            <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
-          ))}
-          {data.metrics.map((metric) => {
-            return (
-              <LinkedMetric
-                {...metric}
-                weight={0.5}
-                key={metric.id}
-              ></LinkedMetric>
-            );
-          })}
-        </div>
+        {data.habits.map((habit) => (
+          <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
+        ))}
+        {data.metrics.map((metric) => {
+          return (
+            <LinkedMetric
+              {...metric}
+              weight={0.5}
+              key={metric.id}
+              linked={false}
+            ></LinkedMetric>
+          );
+        })}
       </div>
     </div>
   );

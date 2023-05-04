@@ -1,20 +1,6 @@
 // import dynamic from "next/dynamic";
-// import NoSsr from "../components/NoSsr";
-
 import Layout from "../components/layout";
 
-import { ClockIcon } from "@heroicons/react/24/outline";
-
-import dynamic from "next/dynamic";
-
-const StatisticsChart = dynamic(
-  () => {
-    return import("../components/StatisticsChart");
-  },
-  { ssr: false }
-);
-
-import { statisticsChartsData } from "../data";
 import type { ExpandedHabit } from "../server/queries";
 import { api } from "../utils/api";
 

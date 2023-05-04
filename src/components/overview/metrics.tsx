@@ -4,17 +4,20 @@ import { DropdownMenu } from "../createMenu";
 import { EllipsisIcon } from "../icons";
 import { EditableField } from "../inlineEdit";
 import { textcolor } from "./lib";
+import { CornerDownRight } from "lucide-react";
 
 export function LinkedMetric({
   id,
   weight,
   prompt,
   score,
+  linked,
 }: {
   id: string;
   weight: number;
   prompt: string;
   score: number;
+  linked: boolean;
 }) {
   const context = api.useContext();
   const mutation = api.metrics.editMetric.useMutation({
@@ -29,10 +32,11 @@ export function LinkedMetric({
   });
 
   return (
-    <div className="flex min-h-[100px] flex-row justify-between rounded-lg bg-gray-100 p-4">
-      <div className="flex flex-col">
+    <>
+      <div className={classNames("col-span-2 flex flex-row items-center ml-10")}>
+        {linked && <CornerDownRight className="opacity-40"></CornerDownRight>}
         <div className="mb-2">
-          <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs  text-white">
+          <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs text-white">
             Linked Metric
           </span>
           {/* <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs ">
@@ -50,7 +54,7 @@ export function LinkedMetric({
         </div>
       </div>
 
-      <div className="flex h-full w-fit flex-row space-x-3">
+      <div className="flex h-full w-fit flex-row space-x-3 justify-self-end">
         <div className=" h-fit bg-white px-2">
           <span className={classNames("h-fit text-lg ", textcolor(score))}>
             {score.toFixed(2)}
@@ -68,6 +72,6 @@ export function LinkedMetric({
           }
         ></DropdownMenu>
       </div>
-    </div>
+    </>
   );
 }

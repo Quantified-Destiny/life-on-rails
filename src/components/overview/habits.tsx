@@ -15,10 +15,11 @@ import {
   EditableNumberField,
 } from "../inlineEdit";
 import { useOverviewStore } from "../overviewState";
-import { HabitPanel } from "./habit-panel";
+import { HabitSheet } from "./habit-panel";
 import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";
 import { TagList } from "./tags";
+import { CornerDownRight } from "lucide-react";
 
 function getGoalsFilter(
   inputValue: string | undefined
@@ -119,10 +120,101 @@ export function HabitHeaderLine({
           >
             {score.toFixed(2)}
           </span>
-          <HabitPanel habitId={id}>
+          <HabitSheet habitId={id}>
             <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
-          </HabitPanel>
+          </HabitSheet>
         </div>
+      </div>
+    </>
+  );
+}
+export function HabitHeaderLineGrid({
+  id,
+  weight,
+  description,
+  frequency,
+  frequencyHorizon,
+  score,
+  completions,
+  linked,
+}: {
+  id: string;
+  weight: number | undefined;
+  description: string;
+  frequency: number;
+  frequencyHorizon: FrequencyHorizon;
+  score: number;
+  completions: number;
+  linked: boolean;
+}) {
+  const context = api.useContext();
+  const mutation = api.habits.editHabit.useMutation({
+    onSuccess: () => {
+      void context.goals.getAllGoals.invalidate();
+    },
+  });
+  const editFrequency = api.habits.editFrequency.useMutation({
+    onSuccess: () => {
+      void context.goals.getAllGoals.invalidate();
+    },
+  });
+  const editFrequencyHorizon = api.habits.editFrequencyHorizon.useMutation({
+    onSuccess: () => {
+      void context.goals.getAllGoals.invalidate();
+    },
+  });
+  //const openHabitPanel = useOverviewStore((store) => store.openHabitPanel);
+
+  return (
+    <>
+      <div className={classNames("flex flex-row items-baseline gap-2")}>
+        {linked && <CornerDownRight className="opacity-40"></CornerDownRight>}
+        <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
+          Habit
+        </span>
+        <EditableField
+          initialText={description}
+          commit={(text) => mutation.mutate({ habitId: id, description: text })}
+          className="font-semibold"
+        ></EditableField>
+      </div>
+      <span className="text-sm lowercase text-gray-500">
+        <span className="space-x-1 text-sm">
+          <span className="text-md ">Completed</span>
+          <span className="text-md ">{completions}</span>
+          <span className="">/</span>
+          <EditableNumberField
+            initial={frequency}
+            commit={(number) =>
+              editFrequency.mutate({ habitId: id, frequency: number })
+            }
+            className="font-semibold"
+          ></EditableNumberField>
+          <span className="text-md ">times this</span>
+          <DropDown
+            frequencyHorizon={frequencyHorizon}
+            commit={(freq) =>
+              editFrequencyHorizon.mutate({
+                habitId: id,
+                frequencyHorizon: freq,
+              })
+            }
+            className="font-semibold"
+          ></DropDown>
+        </span>
+      </span>
+      <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
+        <span
+          className={classNames(
+            "rounded-lg bg-gray-100 p-2 text-xl",
+            textcolor(score)
+          )}
+        >
+          {score.toFixed(2)}
+        </span>
+        <HabitSheet habitId={id}>
+          <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+        </HabitSheet>
       </div>
     </>
   );
@@ -347,8 +439,8 @@ export function HabitCard({
   //   : "rounded-lg bg-white p-6 shadow-md";
 
   return (
-    <div className={classes}>
-      <HabitHeaderLine
+    <>
+      <HabitHeaderLineGrid
         id={id}
         weight={weight}
         description={description}
@@ -356,18 +448,12 @@ export function HabitCard({
         frequencyHorizon={frequencyHorizon}
         score={score}
         completions={completions}
-      ></HabitHeaderLine>
-      <div className="ml-2 mt-4">
-        <span className="text-xs uppercase">Metrics</span>
-      </div>
-      <div className="">
-        <div className="flex flex-col flex-wrap">
-          {metrics.map((m) => (
-            <LinkedMetric {...m} weight={0.5} key={m.id}></LinkedMetric>
-          ))}
-        </div>
-        <CreateMetricLinkedToHabit habitId={id}></CreateMetricLinkedToHabit>
-      </div>
+        linked={!!linkedGoal}
+      ></HabitHeaderLineGrid>
+      {metrics.map((m) => (
+        <LinkedMetric {...m} weight={0.5} key={m.id} linked></LinkedMetric>
+      ))}
+      {/* <CreateMetricLinkedToHabit habitId={id}></CreateMetricLinkedToHabit> */}
       {/* <HabitFooter
         id={id}
         tags={tags}
@@ -375,7 +461,7 @@ export function HabitCard({
         linkHabit={linkHabit.mutate}
         unlinkHabit={unlinkHabit.mutate}
       ></HabitFooter> */}
-    </div>
+    </>
   );
 }
 

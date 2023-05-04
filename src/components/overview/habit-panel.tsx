@@ -224,13 +224,7 @@ function ScoringSection({
   );
 }
 
-export function HabitPanel({
-  habitId,
-  children,
-}: {
-  habitId: string;
-  children: ReactNode;
-}) {
+function HabitPanel({ habitId }: { habitId: string }) {
   const context = api.useContext();
   const deleteHabit = api.habits.deleteHabit.useMutation({
     onSuccess() {
@@ -256,67 +250,75 @@ export function HabitPanel({
   }
 
   return (
+    <div className="relative h-full">
+      <div className="flex h-full flex-col gap-2">
+        <SheetHeader>
+          <SheetTitle>
+            <HabitHeaderLine {...data} weight={0.1}></HabitHeaderLine>
+            <TagList
+              tags={data.tags}
+              link={(tag) => linkHabit.mutate({ habitId, tagName: tag })}
+              unlink={(tag) => unlinkHabit.mutate({ habitId, tagName: tag })}
+            ></TagList>
+          </SheetTitle>
+        </SheetHeader>
+        <Accordion
+          className="flex-grow overflow-scroll scrollbar-none"
+          type="multiple"
+        >
+          <AccordionItem value="scoring">
+            <AccordionTrigger>Scoring and metrics</AccordionTrigger>
+            <AccordionContent>
+              <ScoringSection
+                habitId={habitId}
+                completionWeight={data.completionWeight}
+                metrics={data.metrics}
+              ></ScoringSection>
+              <h2 className="text-md py-4 uppercase text-slate-600">Metrics</h2>
+              <MetricsSection habitId={habitId}></MetricsSection>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="history">
+            <AccordionTrigger>History</AccordionTrigger>
+            <AccordionContent>
+              <HistorySection habitId={habitId}></HistorySection>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="goals">
+            <AccordionTrigger>Goals</AccordionTrigger>
+            <AccordionContent>
+              <GoalsSection habitId={habitId} />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        <div className="w-full space-x-2 bg-gray-100 px-4 py-2 text-right">
+          <Button variant="default">
+            <Label>Archive</Label>
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => deleteHabit.mutate({ habitId })}
+          >
+            <Label>Delete</Label>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function HabitSheet({
+  habitId,
+  children,
+}: {
+  habitId: string;
+  children: ReactNode;
+}) {
+  return (
     <Sheet>
       <SheetTrigger>{children}</SheetTrigger>
       <SheetContent position="right" size="lg" className="overflow-scroll">
-        <div className="relative h-full">
-          <div className="flex h-full flex-col gap-2">
-            <SheetHeader>
-              <SheetTitle>
-                <HabitHeaderLine {...data} weight={0.1}></HabitHeaderLine>
-                <TagList
-                  tags={data.tags}
-                  link={(tag) => linkHabit.mutate({ habitId, tagName: tag })}
-                  unlink={(tag) =>
-                    unlinkHabit.mutate({ habitId, tagName: tag })
-                  }
-                ></TagList>
-              </SheetTitle>
-            </SheetHeader>
-            <Accordion
-              className="flex-grow overflow-scroll scrollbar-none"
-              type="multiple"
-            >
-              <AccordionItem value="scoring">
-                <AccordionTrigger>Scoring and metrics</AccordionTrigger>
-                <AccordionContent>
-                  <ScoringSection
-                    habitId={habitId}
-                    completionWeight={data.completionWeight}
-                    metrics={data.metrics}
-                  ></ScoringSection>
-                  <h2 className="text-md py-4 uppercase text-slate-600">
-                    Metrics
-                  </h2>
-                  <MetricsSection habitId={habitId}></MetricsSection>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="history">
-                <AccordionTrigger>History</AccordionTrigger>
-                <AccordionContent>
-                  <HistorySection habitId={habitId}></HistorySection>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="goals">
-                <AccordionTrigger>Goals</AccordionTrigger>
-                <AccordionContent>
-                  <GoalsSection habitId={habitId} />
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-            <div className="w-full space-x-2 bg-gray-100 px-4 py-2 text-right">
-              <Button variant="default">
-                <Label>Archive</Label>
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => deleteHabit.mutate({ habitId })}
-              >
-                <Label>Delete</Label>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <HabitPanel habitId={habitId}></HabitPanel>
       </SheetContent>
     </Sheet>
   );
