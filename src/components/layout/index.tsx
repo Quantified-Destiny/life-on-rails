@@ -129,8 +129,8 @@ const menus = [
   { name: "Dashboard", link: "/dashboard", icon: BarChart, gap: true },
   { name: "Journal", link: "/journal", icon: Book },
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
-  { name: "Habits", link: "/", icon: CalendarRange },
-  { name: "Help", link: "/", icon: HelpCircle },
+  { name: "Habits", link: "/habits", icon: CalendarRange },
+  { name: "Help", link: "/help", icon: HelpCircle },
 ];
 
 function Layout({ main }: { main: () => JSX.Element }) {
