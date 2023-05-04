@@ -1,9 +1,7 @@
+import dynamic from "next/dynamic";
 import { useState } from "react";
-import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import Layout from "../components/layout";
-import TimePicker from "../components/time-picker";
-import dynamic from "next/dynamic";
 
 // import HeatMap from '@uiw/react-heat-map';
 //Next.js error Global CSS cannot be imported from within node_modules
@@ -22,15 +20,12 @@ const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
 // );
 
 
-import { TbSquareRoundedLetterG, TbSquareRoundedLetterH, TbSquareRoundedLetterM} from 'react-icons/tb';
-import { RiCalendarCheckLine } from 'react-icons/ri';
-import { differenceInCalendarDays, startOfYear } from "date-fns";
-import type { TileArgs } from "react-calendar/dist/cjs/shared/types";
+import type { Metric } from "@prisma/client";
+import classNames from "classnames";
+import { differenceInCalendarDays } from "date-fns";
 function isSameDay(a: Date, b: Date) {
   return differenceInCalendarDays(a, b) === 0;
 }
-import type { Metric } from "@prisma/client";
-import classNames from "classnames";
 
 import { api } from "../utils/api";
 
