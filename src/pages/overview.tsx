@@ -83,18 +83,20 @@ function OverviewPage() {
       {store.modal?.state === State.CreateMetric && (
         <CreateMetricModal></CreateMetricModal>
       )}
-      <div className="mx-auto mb-10 space-y-2 px-10 py-2 scrollbar-none">
-        <Header></Header>
-        {data.goals.map((goal) => (
-          <GoalCard
-            {...goal.goal}
-            habits={goal.habits}
-            metrics={goal.metrics}
-            key={goal.goal.id}
-          ></GoalCard>
-        ))}
+      <Header></Header>
+      <div className="mx-auto px-10 py-2 scrollbar-none">
+        <div className="space-y-2 divide-y-2 divide-gray-100">
+          {data.goals.map((goal) => (
+            <GoalCard
+              {...goal.goal}
+              habits={goal.habits}
+              metrics={goal.metrics}
+              key={goal.goal.id}
+            ></GoalCard>
+          ))}
+        </div>
         {/* Habit Card with Progress Bar */}
-        <h1 className="mb-4 ml-2 text-lg font-semibold uppercase text-slate-600">
+        <h1 className="my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
           Unlinked Items
         </h1>
         <div className="space-y-2">
