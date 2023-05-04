@@ -1,4 +1,4 @@
-import { subYears } from "date-fns";
+import { subMonths, subYears } from "date-fns";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -150,7 +150,7 @@ const value = [
 function HistorySection({ habitId }: { habitId: string }) {
   const completionsQuery = api.habits.getCompletions.useQuery({
     habitId: habitId,
-    timeHorizon: 365,
+    timeHorizon: 30 * 6,
   });
   if (
     completionsQuery.isLoading ||
@@ -160,15 +160,19 @@ function HistorySection({ habitId }: { habitId: string }) {
     return <p>LOADING</p>;
   }
   const completions = completionsQuery.data;
+  const data = completions.map((c) => ({
+    date: c.date.toDateString(),
+    count: 10,
+    content: "",
+  }));
   return (
     <div className="my-8 flex flex-col items-center justify-center">
       <HeatMap
-        value={value}
-        startDate={new Date(subYears(new Date(), 1))}
+        value={data}
+        startDate={subMonths(new Date(), 6)}
         width={600}
         legendCellSize={0}
       />
-      {JSON.stringify(completions)}
     </div>
   );
 }
