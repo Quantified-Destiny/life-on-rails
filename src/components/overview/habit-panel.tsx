@@ -132,21 +132,6 @@ function MetricsSection({ habitId }: { habitId: string }) {
 
 const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
 
-const value = [
-  { date: "2023/01/11", count: 2, content: "" },
-  { date: "2023/01/12", count: 20, content: "" },
-  { date: "2023/01/13", count: 10, content: "" },
-  ...[...Array(17).keys()].map((_, idx) => ({
-    date: `2023/02/${idx + 10}`,
-    count: 10,
-    content: "",
-  })),
-  { date: "2023/04/11", count: 10, content: "" },
-  { date: "2023/05/01", count: 10, content: "" },
-  { date: "2023/05/02", count: 10, content: "" },
-  { date: "2023/05/04", count: 10, content: "" },
-];
-
 function HistorySection({ habitId }: { habitId: string }) {
   const completionsQuery = api.habits.getCompletions.useQuery({
     habitId: habitId,
@@ -168,9 +153,10 @@ function HistorySection({ habitId }: { habitId: string }) {
   return (
     <div className="my-8 flex flex-col items-center justify-center">
       <HeatMap
+        rectSize={12}
         value={data}
         startDate={subMonths(new Date(), 6)}
-        width={600}
+        width={450}
         legendCellSize={0}
       />
     </div>
