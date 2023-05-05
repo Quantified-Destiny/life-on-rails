@@ -31,7 +31,7 @@ function StatsCardRow() {
   let greenHabit = 0;
 
   // for (let i = 0; i < data.goals.length; i++) {         //habit has linked to a goal
-  //   for (let j = 0; j < data.goals.habits.length; j++) {
+  //   for (let j = 0; j < data.goals[i]?.habits?.length; j++) {
   //     const h = data.goals[i]?.habits[j];
   //     if ((h?.score ?? 0) < 0.4) {
   //       redHabit += 1;
@@ -61,8 +61,8 @@ function StatsCardRow() {
   let yellowMetric = 0;
   let greenMetric = 0;
 
-  // for (let i = 0; i < data.goals.length; i++) {   //metric that link to a goal or a habit???
-  //   for (let j = 0; j < data.goals.metrics.length; j++) {
+  // for (let i = 0; i < data.goals.length; i++) {   //metric linked to a goal how about the one linked to a habit???
+  //   for (let j = 0; j < data.goals[i]?.metrics?.length; j++) {
   //     const m = data.goals[i]?.metrics[j];
   //     if ((m?.score ?? 0) < 0.4) {
   //       redMetric += 1;
