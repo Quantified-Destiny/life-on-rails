@@ -12,35 +12,81 @@ function StatsCardRow() {
   let redGoal = 0;
   let yellowGoal = 0;
   let greenGoal = 0;
-
+  
   for (let i = 0; i < data.goals.length; i++) {
     const g = data.goals[i];
-    if (g?.goal.score ?? 0 < 0.4) {
+    if ((g?.goal?.score ?? 0) < 0.4) {
       redGoal += 1;
     }
-    else if (g!.goal.score < 0.7) {
+    else if ((g?.goal?.score ?? 0) < 0.7) {
       yellowGoal += 1;
     }
     else {
       greenGoal += 1;
     }
+  }
 
-  // let redHabit = 0;
-  // let yellowHabit = 0;
-  // let greenHabit = 0;
+  let redHabit = 0;
+  let yellowHabit = 0;
+  let greenHabit = 0;
 
-  // for (let i = 0; i < data.goals.length; i++) {
-  //   const g = data.goals[i];
-  //   if (g?.goal.score ?? 0 < 0.4) {
-  //     redGoal += 1;
-  //   }
-  //   else if (g!.goal.score < 0.7) {
-  //     yellowGoal += 1;
-  //   }
-  //   else {
-  //     greenGoal += 1;
+  // for (let i = 0; i < data.goals.length; i++) {         //habit has linked to a goal
+  //   for (let j = 0; j < data.goals.habits.length; j++) {
+  //     const h = data.goals[i]?.habits[j];
+  //     if ((h?.score ?? 0) < 0.4) {
+  //       redHabit += 1;
+  //     }
+  //     else if ((h?.score ?? 0) < 0.7) {
+  //       yellowHabit += 1;
+  //     }
+  //     else {
+  //       greenHabit += 1;
+  //     }
   //   }
   // }
+  for (let i = 0; i < data.habits.length; i++) {  //standalone habit
+    const h = data.habits[i];
+    if ((h?.score ?? 0) < 0.4) {
+      redHabit += 1;
+    }
+    else if ((h?.score ?? 0) < 0.7) {
+      yellowHabit += 1;
+    }
+    else {
+      greenHabit += 1;
+    }
+  }
+
+  let redMetric = 0;
+  let yellowMetric = 0;
+  let greenMetric = 0;
+
+  // for (let i = 0; i < data.goals.length; i++) {   //metric that link to a goal or a habit???
+  //   for (let j = 0; j < data.goals.metrics.length; j++) {
+  //     const m = data.goals[i]?.metrics[j];
+  //     if ((m?.score ?? 0) < 0.4) {
+  //       redMetric += 1;
+  //     }
+  //     else if ((m?.score ?? 0) < 0.7) {
+  //       yellowMetric += 1;
+  //     }
+  //     else {
+  //       greenMetric += 1;
+  //     }
+  //   }
+  // }
+  for (let i = 0; i < data.metrics.length; i++) {  //standalone metric
+    const m = data.metrics[i];
+    if ((m?.score ?? 0) < 0.4) {
+      redMetric += 1;
+    }
+    else if ((m?.score ?? 0) < 0.7) {
+      yellowMetric += 1;
+    }
+    else {
+      greenMetric += 1;
+    }
+  }
 
   return (
     <div className="mb-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-10">
@@ -62,13 +108,13 @@ function StatsCardRow() {
         <div className="p-4 text-center text-2xl ">Habits</div>
         <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
           <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
-            10
+            {greenHabit}
           </span>
           <span className="flex-1 rounded-sm bg-yellow-400 p-4 text-white">
-            4
+            {yellowHabit}
           </span>
           <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">
-            7
+            {redHabit}
           </span>
         </div>
       </div>
@@ -76,13 +122,13 @@ function StatsCardRow() {
         <div className="p-4 text-center text-2xl ">Metrics</div>
         <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
           <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
-            10
+            {greenMetric}
           </span>
           <span className="flex-1 rounded-sm bg-yellow-400 p-4 text-white">
-            4
+            {yellowMetric}
           </span>
           <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">
-            7
+            {redMetric}
           </span>
         </div>
       </div>
