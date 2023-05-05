@@ -3,6 +3,7 @@ import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { api } from "../utils/api";
 
+import '../styles/Calendar.css';
 import "../styles/globals.css";
 import "@fontsource/raleway/400.css";
 import "@fontsource/raleway/600.css";

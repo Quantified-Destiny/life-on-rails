@@ -6,6 +6,12 @@
   html {
     font-family: Raleway, system-ui, sans-serif;
   }
+  .highlight{
+    font-weight: 900;
+    color:white !important;
+    background-color: green !important;
+  }
+  
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 47.4% 11.2%;
