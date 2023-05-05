@@ -78,7 +78,7 @@ const Habit = ({
       <div className="flex flex-row">
         <input
           type="checkbox"
-          className="mr-1"
+          className= "mr-1" 
           aria-hidden="true"
           checked={completed}
           onChange={(event) => setCompletion(event.target.checked)}
