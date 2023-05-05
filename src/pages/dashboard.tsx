@@ -5,18 +5,57 @@ import type { ExpandedHabit } from "../server/queries";
 import { api } from "../utils/api";
 
 function StatsCardRow() {
+  const goalsQuery = api.goals.getAllGoals.useQuery();
+  if (goalsQuery.isLoading) return <p>Loading...</p>;
+  if (goalsQuery.isError) return <p>Query error</p>;
+  const data = goalsQuery.data;
+  let redGoal = 0;
+  let yellowGoal = 0;
+  let greenGoal = 0;
+
+  for (let i = 0; i < data.goals.length; i++) {
+    const g = data.goals[i];
+    if (g?.goal.score ?? 0 < 0.4) {
+      redGoal += 1;
+    }
+    else if (g!.goal.score < 0.7) {
+      yellowGoal += 1;
+    }
+    else {
+      greenGoal += 1;
+    }
+
+  // let redHabit = 0;
+  // let yellowHabit = 0;
+  // let greenHabit = 0;
+
+  // for (let i = 0; i < data.goals.length; i++) {
+  //   const g = data.goals[i];
+  //   if (g?.goal.score ?? 0 < 0.4) {
+  //     redGoal += 1;
+  //   }
+  //   else if (g!.goal.score < 0.7) {
+  //     yellowGoal += 1;
+  //   }
+  //   else {
+  //     greenGoal += 1;
+  //   }
+  // }
+
   return (
     <div className="mb-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-10">
       <div className=" min-w-10 max-w-50 divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
         <div className="p-4 text-center text-2xl ">Goals</div>
         <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
           <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
-            10
+            {greenGoal}
           </span>
           <span className="flex-1 rounded-sm bg-yellow-400 p-4 text-white">
-            4
+            {yellowGoal}
           </span>
-          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">7</span>
+          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">
+            {redGoal}
+          </span>
         </div>
       </div>
       <div className="divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
@@ -28,7 +67,9 @@ function StatsCardRow() {
           <span className="flex-1 rounded-sm bg-yellow-400 p-4 text-white">
             4
           </span>
-          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">7</span>
+          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">
+            7
+          </span>
         </div>
       </div>
       <div className="divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
@@ -40,7 +81,9 @@ function StatsCardRow() {
           <span className="flex-1 rounded-sm bg-yellow-400 p-4 text-white">
             4
           </span>
-          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">7</span>
+          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">
+            7
+          </span>
         </div>
       </div>
     </div>
