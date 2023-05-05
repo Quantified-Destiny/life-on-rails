@@ -149,6 +149,21 @@ export const journalRouter = createTRPCRouter({
       }
     }),
 
+  editMetric: protectedProcedure
+    .input(z.object({ metricId: z.string(), prompt: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.metric.update({
+        where: { id: input.metricId },
+        data: { prompt: input.prompt },
+      });
+    }),
+
+  deleteMetric: protectedProcedure
+    .input(z.object({ metricId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.metric.delete({ where: { id: input.metricId } });
+    }),
+
   getHabits: protectedProcedure
     .input(
       z.object({
