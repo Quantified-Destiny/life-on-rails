@@ -143,6 +143,10 @@ const menus = [
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
   { name: "Habits", link: "/habits", icon: CalendarRange },
   { name: "Help", link: "/help", icon: HelpCircle },
+  { name: "New Journal", link: "/newjournal", icon: HelpCircle },
+  { name: "Habit Page", link: "/habit", icon: HelpCircle },
+  { name: "Metric Modal", link: "/metric_modal", icon: HelpCircle },
+  { name: "delete account", link: "/deactivate", icon: HelpCircle },
 ];
 
 function Layout({ main }: { main: () => JSX.Element }) {
