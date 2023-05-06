@@ -157,8 +157,8 @@ function Layout({ main }: { main: () => JSX.Element }) {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await router.push("/");
     await signOut();
+    await router.push("/");
   };
 
   // Auto close menu when on mobile
@@ -173,7 +173,7 @@ function Layout({ main }: { main: () => JSX.Element }) {
     };
 
     window.addEventListener("resize", handleResize);
-  }, []);
+  }, [setOpen]);
 
   return (
     <>

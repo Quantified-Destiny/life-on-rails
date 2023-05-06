@@ -163,12 +163,13 @@ export function HabitHeaderLineGrid({
       void context.goals.getAllGoals.invalidate();
     },
   });
-  //const openHabitPanel = useOverviewStore((store) => store.openHabitPanel);
 
   return (
     <>
       <div className={classNames("flex flex-row items-baseline gap-2")}>
-        {linked && <CornerDownRight className="opacity-40"></CornerDownRight>}
+        {linked && (
+          <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
+        )}
         <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
           Habit
         </span>
@@ -451,7 +452,7 @@ export function HabitCard({
         linked={!!linkedGoal}
       ></HabitHeaderLineGrid>
       {metrics.map((m) => (
-        <LinkedMetric {...m} weight={0.5} key={m.id} linked></LinkedMetric>
+        <LinkedMetric {...m} weight={0.5} key={m.id} offset={linkedGoal ? 2 : 1}></LinkedMetric>
       ))}
       {/* <CreateMetricLinkedToHabit habitId={id}></CreateMetricLinkedToHabit> */}
       {/* <HabitFooter

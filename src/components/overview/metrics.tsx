@@ -1,23 +1,23 @@
 import classNames from "classnames";
 import { api } from "../../utils/api";
 import { DropdownMenu } from "../createMenu";
-import { EllipsisIcon } from "../icons";
 import { EditableField } from "../inlineEdit";
 import { textcolor } from "./lib";
 import { CornerDownRight } from "lucide-react";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 export function LinkedMetric({
   id,
   weight,
   prompt,
   score,
-  linked,
+  offset,
 }: {
   id: string;
   weight: number;
   prompt: string;
   score: number;
-  linked: boolean;
+  offset: 0 | 1 | 2;
 }) {
   const context = api.useContext();
   const mutation = api.metrics.editMetric.useMutation({
@@ -33,17 +33,19 @@ export function LinkedMetric({
 
   return (
     <>
-      <div className={classNames("col-span-2 flex flex-row items-center ml-10")}>
-        {linked && <CornerDownRight className="opacity-40"></CornerDownRight>}
-        <div className="mb-2">
-          <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs text-white">
-            Linked Metric
-          </span>
-          {/* <span className="text-gray mb-2 inline-block rounded-full px-2 text-xs ">
-            Weight: {weight.toFixed(2)}
-          </span> */}
-        </div>
-        <div className="ml-2">
+      <div
+        className={classNames("col-span-2 flex flex-row items-baseline gap-2", {
+          "ml-4": offset == 1,
+          "ml-8": offset == 2,
+        })}
+      >
+        {(offset>0) && (
+          <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
+        )}
+        <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs text-white">
+          Metric
+        </span>
+        <div className="">
           <EditableField
             initialText={prompt}
             commit={(text) => {
@@ -53,13 +55,15 @@ export function LinkedMetric({
           ></EditableField>
         </div>
       </div>
-
-      <div className="flex h-full w-fit flex-row space-x-3 justify-self-end">
-        <div className=" h-fit bg-white px-2">
-          <span className={classNames("h-fit text-lg ", textcolor(score))}>
-            {score.toFixed(2)}
-          </span>
-        </div>
+      <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
+        <span
+          className={classNames(
+            "rounded-lg bg-gray-100 p-2 text-xl",
+            textcolor(score)
+          )}
+        >
+          {score.toFixed(2)}
+        </span>
         <DropdownMenu
           options={[
             {
@@ -68,7 +72,7 @@ export function LinkedMetric({
             },
           ]}
           trigger={
-            <EllipsisIcon className="fill-current text-gray-400 hover:text-gray-700"></EllipsisIcon>
+            <EllipsisVerticalIcon className="h-6 w-6 fill-black stroke-black opacity-40"></EllipsisVerticalIcon>
           }
         ></DropdownMenu>
       </div>

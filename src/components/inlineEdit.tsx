@@ -103,7 +103,7 @@ export const EditableField = ({
         <input {...editProps} autoFocus className={className} />
       ) : (
         <>
-          <span>{initialText}</span>
+          <span className={className}>{initialText}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

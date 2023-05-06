@@ -72,7 +72,7 @@ function OverviewPage() {
 
   const data = goalsQuery.data;
   return (
-    <div className="scrollbar-none">
+    <div className="mb-10 scrollbar-none">
       {store.modal?.state === State.CreateGoal && (
         <CreateGoalModal></CreateGoalModal>
       )}
@@ -83,7 +83,7 @@ function OverviewPage() {
         <CreateMetricModal></CreateMetricModal>
       )}
       <Header></Header>
-      <div className="mx-auto grid grid-cols-3 items-center gap-5 bg-slate-50 px-10 py-2 scrollbar-none">
+      <div className="mx-auto mt-5 grid grid-cols-3 items-center gap-5 p-6 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
         {data.goals.map((goal) => (
           <GoalCard
             {...goal.goal}
@@ -105,7 +105,7 @@ function OverviewPage() {
               {...metric}
               weight={0.5}
               key={metric.id}
-              linked={false}
+              offset={0}
             ></LinkedMetric>
           );
         })}

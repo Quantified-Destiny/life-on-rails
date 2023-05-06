@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-misused-promises */
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import type { Metric } from "@prisma/client";
 import { EditableField } from "../../components/inlineEdit";
 import { HabitCard } from "../../components/overview/habits";
@@ -9,8 +8,6 @@ import type {
   ExpandedMetric,
 } from "../../server/queries";
 import { api } from "../../utils/api";
-import { TagList } from "./tags";
-import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { GoalSheet } from "./goal-panel";
 import { LinkedMetric } from "./metrics";
 
@@ -63,12 +60,7 @@ export function GoalCard({
         ></HabitCard>
       ))}
       {metrics.map((m) => (
-        <LinkedMetric
-          {...m}
-          weight={0.4}
-          key={m.id}
-          linked={false}
-        ></LinkedMetric>
+        <LinkedMetric {...m} weight={0.4} key={m.id} offset={0}></LinkedMetric>
       ))}
     </div>
   );

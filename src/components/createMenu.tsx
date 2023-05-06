@@ -42,7 +42,7 @@ export function DropdownMenu({
       <button
         {...triggerProps}
         onClick={() => setOpen(!isOpen)}
-        className="rounded px-2 py-2 hover:bg-gray-200"
+        className="rounded hover:bg-gray-200"
       >
         {trigger}
       </button>
