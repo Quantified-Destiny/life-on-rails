@@ -12,10 +12,11 @@ function StatsCardRow() {
   let redGoal = 0;
   let yellowGoal = 0;
   let greenGoal = 0;
-  
+
   for (let i = 0; i < data.goals.length; i++) {
     const g = data.goals[i];
-    if ((g?.goal?.score ?? 0) < 0.4) {
+    console.log(`goal ${g?.goal.name} - ${g?.goal.score}`)
+    if ((g?.goal?.score ?? 0) < 0.4 || isNaN(g?.goal?.score ?? 0)) {
       redGoal += 1;
     }
     else if ((g?.goal?.score ?? 0) < 0.7) {
@@ -30,20 +31,20 @@ function StatsCardRow() {
   let yellowHabit = 0;
   let greenHabit = 0;
 
-  // for (let i = 0; i < data.goals.length; i++) {         //habit has linked to a goal
-  //   for (let j = 0; j < data.goals[i]?.habits?.length; j++) {
-  //     const h = data.goals[i]?.habits[j];
-  //     if ((h?.score ?? 0) < 0.4) {
-  //       redHabit += 1;
-  //     }
-  //     else if ((h?.score ?? 0) < 0.7) {
-  //       yellowHabit += 1;
-  //     }
-  //     else {
-  //       greenHabit += 1;
-  //     }
-  //   }
-  // }
+  for (let i = 0; i < data.goals.length; i++) {         //habit has linked to a goal
+    for (let j = 0; j < (data.goals[i]?.habits?.length ?? 0); j++) {
+      const h = data.goals[i]?.habits[j];
+      if ((h?.score ?? 0) < 0.4) {
+        redHabit += 1;
+      }
+      else if ((h?.score ?? 0) < 0.7) {
+        yellowHabit += 1;
+      }
+      else {
+        greenHabit += 1;
+      }
+    }
+  }
   for (let i = 0; i < data.habits.length; i++) {  //standalone habit
     const h = data.habits[i];
     if ((h?.score ?? 0) < 0.4) {
@@ -61,20 +62,20 @@ function StatsCardRow() {
   let yellowMetric = 0;
   let greenMetric = 0;
 
-  // for (let i = 0; i < data.goals.length; i++) {   //metric linked to a goal how about the one linked to a habit???
-  //   for (let j = 0; j < data.goals[i]?.metrics?.length; j++) {
-  //     const m = data.goals[i]?.metrics[j];
-  //     if ((m?.score ?? 0) < 0.4) {
-  //       redMetric += 1;
-  //     }
-  //     else if ((m?.score ?? 0) < 0.7) {
-  //       yellowMetric += 1;
-  //     }
-  //     else {
-  //       greenMetric += 1;
-  //     }
-  //   }
-  // }
+  for (let i = 0; i < data.goals.length; i++) {   //metric linked to a goal 
+    for (let j = 0; j < (data.goals[i]?.metrics?.length ?? 0); j++) {
+      const m = data.goals[i]?.metrics[j];
+      if ((m?.score ?? 0) < 0.4) {
+        redMetric += 1;
+      }
+      else if ((m?.score ?? 0) < 0.7) {
+        yellowMetric += 1;
+      }
+      else {
+        greenMetric += 1;
+      }
+    }
+  }
   for (let i = 0; i < data.metrics.length; i++) {  //standalone metric
     const m = data.metrics[i];
     if ((m?.score ?? 0) < 0.4) {
