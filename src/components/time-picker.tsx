@@ -38,11 +38,6 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
   };
 
   const showNextDayButton = date.toDateString() !== maxDate.toDateString();
-  const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
-    <button className="example-custom-input" onClick={onClick} ref={ref}>
-      {value}
-    </button>
-  ));
   return (
     <div
       id="time-selector"
@@ -58,7 +53,6 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
           maxDate={maxDate}
           className="text-center"
           dateFormat="EEEE, MMMM dd, yyyy"
-          customInput={<ExampleCustomInput />}
         />
 
         <button
