@@ -1,10 +1,12 @@
 import type {
   HabitCompletion,
+  HabitTag,
   LinkedMetric,
   Metric,
   MetricAnswer,
+  Tag,
 } from "@prisma/client";
-import { endOfDay, startOfDay } from "date-fns";
+import { endOfDay, startOfDay, subDays } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -163,7 +165,7 @@ export const journalRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       await ctx.prisma.metric.delete({ where: { id: input.metricId } });
     }),
-
+    
   getHabits: protectedProcedure
     .input(
       z.object({
@@ -178,6 +180,7 @@ export const journalRouter = createTRPCRouter({
         }[];
         completions: HabitCompletion[];
         description: string;
+        HabitTag: (HabitTag & {tag: Tag})[];
       }[];
 
       const data: QueryType = await ctx.prisma.habit.findMany({
@@ -187,6 +190,11 @@ export const journalRouter = createTRPCRouter({
         select: {
           id: true,
           description: true,
+          HabitTag: {
+            include: {
+              tag: true
+            }
+          },
           metrics: {
             select: {
               metric: {
@@ -208,11 +216,12 @@ export const journalRouter = createTRPCRouter({
         },
       });
       const habitsData = data.map(
-        ({ id, description, metrics, completions }) => ({
+        ({ id, description, metrics, completions, HabitTag }) => ({
           id,
           description,
           metrics: metrics.map((m) => m.metric),
           completed: completions[0]?.isCompleted == true,
+          tags: HabitTag.map(it => it.tag)
         })
       );
 

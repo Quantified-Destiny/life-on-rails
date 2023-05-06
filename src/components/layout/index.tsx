@@ -139,14 +139,14 @@ function Sidebar(props: {
 
 const menus = [
   { name: "Dashboard", link: "/dashboard", icon: BarChart, gap: true },
-  { name: "Journal", link: "/journal", icon: Book },
+  { name: "Journal", link: "/newjournal", icon: Book },
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
   { name: "Habits", link: "/habits", icon: CalendarRange },
   { name: "Help", link: "/help", icon: HelpCircle },
-  { name: "New Journal", link: "/newjournal", icon: HelpCircle },
-  { name: "Habit Page", link: "/habit", icon: HelpCircle },
-  { name: "Metric Modal", link: "/metric_modal", icon: HelpCircle },
-  { name: "delete account", link: "/deactivate", icon: HelpCircle },
+  // { name: "New Journal", link: "/newjournal", icon: HelpCircle },
+  // { name: "Habit Page", link: "/habit", icon: HelpCircle },
+  // { name: "Metric Modal", link: "/metric_modal", icon: HelpCircle },
+  // { name: "delete account", link: "/deactivate", icon: HelpCircle },
 ];
 
 function Layout({ main }: { main: () => JSX.Element }) {

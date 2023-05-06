@@ -1,4 +1,4 @@
-import type { Metric } from "@prisma/client";
+import type { HabitTag, Metric, Tag } from "@prisma/client";
 import classNames from "classnames";
 import { SetStateAction, useState } from "react";
 import Layout from "../components/layout";
@@ -341,6 +341,7 @@ interface JournalProps {
     completed: boolean;
     editable: boolean;
     metrics: Metric[];
+    tags: Tag[];
   }[];
   date: Date;
   setDate: (date: Date) => void;
