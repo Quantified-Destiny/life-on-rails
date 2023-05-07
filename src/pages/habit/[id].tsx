@@ -25,29 +25,17 @@ const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
 //   { ssr: false }
 // );
 
-import { addDays, differenceInCalendarDays } from "date-fns";
+import { addDays, differenceInCalendarDays, format } from "date-fns";
 import { Value } from "react-calendar/dist/cjs/shared/types";
 import { useRouter } from "next/router";
 import { api } from "../../utils/api";
+import { map } from "zod";
 
 function isSameDay(a: Date, b: Date) {
   return differenceInCalendarDays(a, b) === 0;
 }
 
-const all_event_dates = ["04-22-2023", "04-23-2023", "5-3-2023"];
-const highlightedDates = all_event_dates.map(
-  (dateString) => new Date(dateString)
-);
 
-function tileClassName({ date, view }: { date: Date; view: string }) {
-  if (
-    view === "month" &&
-    highlightedDates.find((dDate) => isSameDay(dDate, date))
-  ) {
-    return "highlight";
-    // return ["add-new-class", "false"];
-  }
-}
 
 // const value = [
 //   { date: "2023/01/11", count: 2 },
@@ -69,22 +57,35 @@ function HabitsPage() {
   const id = router.query.id;
   console.log(router.query.id);
 
-  if (typeof id != "string") return <p>error</p>;
+  if (typeof id != "string") return <p>Error</p>;
   else return <_HabitsPage id={id}></_HabitsPage>
 }
 
 function _HabitsPage({id}: {id: string}) {
   const context = api.useContext();
   const habitData = api.habits.getHabit.useQuery({habitId: id});
-
+  
+  // highlight dates on calendar, 100 days
+  const completionsData = api.habits.getCompletions.useQuery({habitId: id, timeHorizon: 100});
+  const calendarData = completionsData.data?.map((item)=>(item.date))
+  function tileClassName({ date, view }: { date: Date; view: string }) {
+    if (
+      view === "month" &&
+      calendarData?.find((dDate) => isSameDay(dDate, date))
+    ) {
+      return "highlight";
+    }
+  }
 
   const [tgl, setTgl] = useState<Value>();
   const [editMode, setEditMode] = useState(false);
   return (
     <div className="container mx-auto max-w-screen-md px-4 py-8">
-    <p>{JSON.stringify(habitData)}</p>
+    {/* <p>{JSON.stringify(habitData)}</p> */}
+    {/* <p>{JSON.stringify(completionsData)}</p> */}
+
       <h1 className="mb-4 flex flex-row justify-center text-center text-2xl font-bold">
-        Go jogging for 1 hour
+        {habitData.data?.description}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -101,22 +102,14 @@ function _HabitsPage({id}: {id: string}) {
           />
         </svg>
       </h1>
-
-      <p className="mb-4 text-center text-gray-500">
-        Started on December 1st, 2022
-      </p>
-
-      <div className="flex flex-col items-center justify-center">
-        <Calendar
-          className="w-full md:w-auto"
-          onChange={(value, event) => setTgl(value)}
-          value={tgl}
-          tileClassName={tileClassName} //adds highlighted dates
-          calendarType="US"
-          maxDate={new Date()}
-          minDate={new Date("12-01-2022")} //habit created date?
-        />
-      </div>
+      <p>ID: {habitData.data?.id}</p>
+    <p>Created Date: {format(habitData.data?.createdAt ?? new Date(), "MM-dd-yyyy p")}</p>
+    <p>Updated Date: {format(habitData.data?.updatedAt ?? new Date(), "MM-dd-yyyy p")}</p>
+    <p>Frequency: {habitData.data?.frequency}</p>
+    <p>frequencyHorizon: {habitData.data?.frequencyHorizon}</p>
+    <p>Completion Weight: {habitData.data?.completionWeight}</p>
+    <p>Metrics: {habitData.data?.metrics.length}</p>
+    <p>{habitData.data?.tags}</p>
 
       <div className="mt-4 flex flex-wrap">
         <div className="mb-4 mt-2 w-full px-3 lg:w-6/12">
@@ -197,7 +190,7 @@ function _HabitsPage({id}: {id: string}) {
                     Current Score
                   </h5>
                   <span className="text-blueGray-700 text-xl font-semibold">
-                    51.02%{" "}
+                    {habitData.data?.score*100}%
                   </span>
                 </div>
                 <div className="relative w-auto flex-initial pl-4">
@@ -217,6 +210,20 @@ function _HabitsPage({id}: {id: string}) {
           </div>
         </div>
       </div>
+
+      <div className="flex flex-col items-center justify-center">
+        <Calendar
+          className="w-full md:w-auto"
+          onChange={(value, event) => setTgl(value)}
+          value={tgl}
+          tileClassName={tileClassName} //adds highlighted dates
+          calendarType="US"
+          maxDate={new Date()}
+          minDate={new Date("12-01-2022")} //habit created date?
+        />
+      </div>
+
+      
       <div className="mt-6 border border-red-500 p-5 text-center">
         linked metrics
       </div>
