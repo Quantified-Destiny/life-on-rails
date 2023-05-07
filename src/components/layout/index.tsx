@@ -118,7 +118,7 @@ function Sidebar(props: {
       
       <Link
         href="/"
-        onClick={handleSignOut}
+        onClick={void handleSignOut}
         key="logout"
         className={`flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm text-white	hover:bg-white hover:bg-opacity-10 mt-2`}
       >
@@ -154,13 +154,6 @@ function Layout({ main }: { main: () => JSX.Element }) {
 
   const isFetching = useIsFetching();
 
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    await signOut();
-    await router.push("/");
-  };
-
   // Auto close menu when on mobile
 
   useEffect(() => {
@@ -180,7 +173,6 @@ function Layout({ main }: { main: () => JSX.Element }) {
       <Sidebar
         open={open}
         setOpen={setOpen}
-        handleSignOut={handleSignOut}
         Menus={menus}
       ></Sidebar>
       <div
