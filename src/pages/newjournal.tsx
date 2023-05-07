@@ -25,6 +25,7 @@ import { RxExternalLink } from "react-icons/rx";
 import { Button } from "../components/ui/button";
 import { HabitSheet } from "../components/overview/habit-panel";
 import MetricModal from "./metric_modal";
+import Link from "next/link";
 
 interface RowProps {
   id: string;
@@ -175,10 +176,11 @@ function Actions({ id }: { id: string }) {
       <HabitSheet habitId={id}>
         <RxGear className=" cursor-pointer rounded-lg text-xl text-gray-500 focus:outline-none focus:ring-1 hover:bg-gray-300"></RxGear>
       </HabitSheet>
-
-      <button className="text-xl text-gray-500 hover:bg-gray-300">
-        <RxExternalLink></RxExternalLink>
-      </button>
+      <Link href={`/habit/${id}`}>
+        <button className="text-xl text-gray-500 hover:bg-gray-300">
+          <RxExternalLink></RxExternalLink>
+        </button>
+      </Link>
     </div>
   );
 }
