@@ -24,9 +24,11 @@ function PlusIcon() {
 export function DropdownMenu({
   trigger,
   options,
+  className
 }: {
   trigger: JSX.Element;
   options: { name: string; onClick: () => void }[];
+  className?: string
 }) {
   const [isOpen, setOpen] = useState(false);
 
@@ -42,7 +44,7 @@ export function DropdownMenu({
       <button
         {...triggerProps}
         onClick={() => setOpen(!isOpen)}
-        className="rounded hover:bg-gray-200"
+        className={className || "rounded hover:bg-gray-200"}
       >
         {trigger}
       </button>
@@ -67,14 +69,14 @@ export function DropdownMenu({
                 </li>
               ))}
             </ul>
-            <Arrow {...arrowProps} size={10} roundness={2} />
+            <Arrow {...arrowProps} size={13} roundness={1} />
           </div>
         )}
     </>
   );
 }
 
-export function CreateMenu() {
+export function CreateMenu({className, triggerIcon}: {className?: string, triggerIcon?: JSX.Element}) {
   const openCreateGoalModal = useOverviewStore(
     (store) => store.openCreateGoalModal
   );
@@ -90,5 +92,5 @@ export function CreateMenu() {
     { name: "New Habit", onClick: openCreateHabitModal },
     { name: "New Metric", onClick: openCreateMetricModal },
   ];
-  return <DropdownMenu options={options} trigger={<PlusIcon />}></DropdownMenu>;
+  return <DropdownMenu options={options} trigger={triggerIcon || <PlusIcon />} className={className}></DropdownMenu>;
 }

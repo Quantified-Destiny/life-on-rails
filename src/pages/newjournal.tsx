@@ -22,6 +22,7 @@ import { api } from "../utils/api";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { Button } from "../components/ui/button";
+import { CreateMenu } from "../components/createMenu";
 
 interface HabitProps {
   id: string;
@@ -223,7 +224,7 @@ const Habit = ({
               </td>
               <td className="pl-2">
                 <div className="flex items-center">
-                  <RiCalendarCheckLine></RiCalendarCheckLine>
+                  <RiCalendarCheckLine className=" text-xl"></RiCalendarCheckLine>
                   {/* last completed else -   */}
                   <p className="text-sm leading-none text-gray-600 ml-2">
                     05/01
@@ -501,13 +502,8 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
             </div>
           </a>
         </div>
-        <button
-          className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded"
-        >
-          <p className="text-sm font-medium leading-none text-white">
-            Add New
-          </p>
-        </button>
+        <CreateMenu className="px-4 py-1 hover:bg-gray-100 rounded-lg"></CreateMenu>
+       
       </div>
       <div className="mt-7 overflow-x-auto">
         <table className="w-full whitespace-nowrap">

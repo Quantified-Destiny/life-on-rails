@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Layout from "../components/layout";
+import Layout from "../../components/layout";
 import Calendar from "react-calendar";
 // import 'react-calendar/dist/Calendar.css';
 
@@ -27,6 +27,8 @@ const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
 
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { Value } from "react-calendar/dist/cjs/shared/types";
+import { useRouter } from "next/router";
+import { api } from "../../utils/api";
 
 function isSameDay(a: Date, b: Date) {
   return differenceInCalendarDays(a, b) === 0;
@@ -47,26 +49,40 @@ function tileClassName({ date, view }: { date: Date; view: string }) {
   }
 }
 
-const value = [
-  { date: "2023/01/11", count: 2 },
-  { date: "2023/01/12", count: 20 },
-  { date: "2023/01/13", count: 10 },
-  ...[...Array(17).keys()].map((_, idx) => ({
-    date: `2023/02/${idx + 10}`,
-    count: 10,
-    content: "",
-  })),
-  { date: "2023/04/11", count: 10 },
-  { date: "2023/05/01", count: 10 },
-  { date: "2023/05/02", count: 10 },
-  { date: "2023/05/04", count: 10 },
-];
+// const value = [
+//   { date: "2023/01/11", count: 2 },
+//   { date: "2023/01/12", count: 20 },
+//   { date: "2023/01/13", count: 10 },
+//   ...[...Array(17).keys()].map((_, idx) => ({
+//     date: `2023/02/${idx + 10}`,
+//     count: 10,
+//     content: "",
+//   })),
+//   { date: "2023/04/11", count: 10 },
+//   { date: "2023/05/01", count: 10 },
+//   { date: "2023/05/02", count: 10 },
+//   { date: "2023/05/04", count: 10 },
+// ];
 
 function HabitsPage() {
+  let router  = useRouter();
+  const id = router.query.id;
+  console.log(router.query.id);
+
+  if (typeof id != "string") return <p>error</p>;
+  else return <_HabitsPage id={id}></_HabitsPage>
+}
+
+function _HabitsPage({id}: {id: string}) {
+  const context = api.useContext();
+  const habitData = api.habits.getHabit.useQuery({habitId: id});
+
+
   const [tgl, setTgl] = useState<Value>();
   const [editMode, setEditMode] = useState(false);
   return (
     <div className="container mx-auto max-w-screen-md px-4 py-8">
+    <p>{JSON.stringify(habitData)}</p>
       <h1 className="mb-4 flex flex-row justify-center text-center text-2xl font-bold">
         Go jogging for 1 hour
         <svg
