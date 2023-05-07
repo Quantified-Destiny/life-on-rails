@@ -236,7 +236,7 @@ function HabitPanel({ habitId }: { habitId: string }) {
 
   const data = habitQuery.data;
   if (!habitId || habitQuery.isError || habitQuery.isLoading || !data) {
-    return <p>ERROR</p>;
+    return <p>Loading...</p>;
   }
 
   return (

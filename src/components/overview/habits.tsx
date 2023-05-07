@@ -243,6 +243,7 @@ function LinkHabitBox({ id, closeBox }: { id: string; closeBox: () => void }) {
     getItemProps,
     selectedItem,
   } = useCombobox({
+    initialIsOpen: true,
     onInputValueChange({ inputValue }) {
       setItems(goals.filter(getGoalsFilter(inputValue)));
     },
@@ -452,7 +453,12 @@ export function HabitCard({
         linked={!!linkedGoal}
       ></HabitHeaderLineGrid>
       {metrics.map((m) => (
-        <LinkedMetric {...m} weight={0.5} key={m.id} offset={linkedGoal ? 2 : 1}></LinkedMetric>
+        <LinkedMetric
+          {...m}
+          weight={0.5}
+          key={m.id}
+          offset={linkedGoal ? 2 : 1}
+        ></LinkedMetric>
       ))}
       {/* <CreateMetricLinkedToHabit habitId={id}></CreateMetricLinkedToHabit> */}
       {/* <HabitFooter

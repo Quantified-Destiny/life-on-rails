@@ -1,7 +1,6 @@
 import {
   faChevronLeft,
-  faChevronRight,
-  faPlus,
+  faChevronRight
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // fixes zoomed in icons
@@ -11,7 +10,6 @@ import { addDays, subDays } from "date-fns";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { forwardRef } from "react";
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
