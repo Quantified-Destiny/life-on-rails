@@ -6,15 +6,18 @@ import { api } from "../utils/api";
 
 function StatsCardRow() {
   const goalsQuery = api.goals.getAllGoals.useQuery();
-  if (goalsQuery.isLoading) return <p>Loading...</p>;
-  if (goalsQuery.isError) return <p>Query error</p>;
-  const data = goalsQuery.data;
+  const metricsQuery = api.goals.getAllMetrics.useQuery();
+  if (goalsQuery.isLoading || metricsQuery.isLoading) return <p>Loading...</p>;
+  if (goalsQuery.isError || metricsQuery.isError) return <p>Query error</p>;
+  const goalData = goalsQuery.data;
+  const metricData = metricsQuery.data;
+
   let redGoal = 0;
   let yellowGoal = 0;
   let greenGoal = 0;
 
-  for (let i = 0; i < data.goals.length; i++) {
-    const g = data.goals[i];
+  for (let i = 0; i < goalData.goals.length; i++) {
+    const g = goalData.goals[i];
     console.log(`goal ${g?.goal.name} - ${g?.goal.score}`)
     if ((g?.goal?.score ?? 0) < 0.4 || isNaN(g?.goal?.score ?? 0)) {
       redGoal += 1;
@@ -31,9 +34,9 @@ function StatsCardRow() {
   let yellowHabit = 0;
   let greenHabit = 0;
 
-  for (let i = 0; i < data.goals.length; i++) {         //habit has linked to a goal
-    for (let j = 0; j < (data.goals[i]?.habits?.length ?? 0); j++) {
-      const h = data.goals[i]?.habits[j];
+  for (let i = 0; i < goalData.goals.length; i++) {         //habit that links to a goal
+    for (let j = 0; j < (goalData.goals[i]?.habits?.length ?? 0); j++) {
+      const h = goalData.goals[i]?.habits[j];
       if ((h?.score ?? 0) < 0.4) {
         redHabit += 1;
       }
@@ -45,8 +48,8 @@ function StatsCardRow() {
       }
     }
   }
-  for (let i = 0; i < data.habits.length; i++) {  //standalone habit
-    const h = data.habits[i];
+  for (let i = 0; i < goalData.habits.length; i++) {  //standalone habit
+    const h = goalData.habits[i];
     if ((h?.score ?? 0) < 0.4) {
       redHabit += 1;
     }
@@ -61,33 +64,46 @@ function StatsCardRow() {
   let redMetric = 0;
   let yellowMetric = 0;
   let greenMetric = 0;
+  const metric = metricData.metrics;
 
-  for (let i = 0; i < data.goals.length; i++) {   //metric linked to a goal 
-    for (let j = 0; j < (data.goals[i]?.metrics?.length ?? 0); j++) {
-      const m = data.goals[i]?.metrics[j];
-      if ((m?.score ?? 0) < 0.4) {
-        redMetric += 1;
-      }
-      else if ((m?.score ?? 0) < 0.7) {
-        yellowMetric += 1;
-      }
-      else {
-        greenMetric += 1;
-      }
-    }
-  }
-  for (let i = 0; i < data.metrics.length; i++) {  //standalone metric
-    const m = data.metrics[i];
-    if ((m?.score ?? 0) < 0.4) {
+  for (let i = 0; i < metric.length; i++) {
+    if ((metric[i]?.score ?? 0) < 0.4) {
       redMetric += 1;
     }
-    else if ((m?.score ?? 0) < 0.7) {
+    else if ((metric[i]?.score ?? 0) < 0.7) {
       yellowMetric += 1;
     }
     else {
       greenMetric += 1;
     }
   }
+
+  // for (let i = 0; i < goalData.goals.length; i++) {   //metric linked to a goal 
+  //   for (let j = 0; j < (goalData.goals[i]?.metrics?.length ?? 0); j++) {
+  //     const m = goalData.goals[i]?.metrics[j];
+  //     if ((m?.score ?? 0) < 0.4) {
+  //       redMetric += 1;
+  //     }
+  //     else if ((m?.score ?? 0) < 0.7) {
+  //       yellowMetric += 1;
+  //     }
+  //     else {
+  //       greenMetric += 1;
+  //     }
+  //   }
+  // }
+  // for (let i = 0; i < goalData.metrics.length; i++) {  //standalone metric
+  //   const m = goalData.metrics[i];
+  //   if ((m?.score ?? 0) < 0.4) {
+  //     redMetric += 1;
+  //   }
+  //   else if ((m?.score ?? 0) < 0.7) {
+  //     yellowMetric += 1;
+  //   }
+  //   else {
+  //     greenMetric += 1;
+  //   }
+  // }
 
   return (
     <div className="mb-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-10">
@@ -182,15 +198,14 @@ function HabitTableRow({
 }
 
 function HabitsTable() {
-  const query = api.habits.getHabits.useQuery();
-  if (query.isLoading) {
+  const habitsQuery = api.habits.getHabits.useQuery();
+  if (habitsQuery.isLoading) {
     return <div>Loading...</div>;
-  } else if (query.error) {
+  } else if (habitsQuery.error) {
     return <div>Error!</div>;
   }
 
-  const habits = query.data;
-
+  const habits = habitsQuery.data;
   return (
     <div className="relative flex flex-col overflow-auto rounded-xl bg-white bg-clip-border text-gray-700 shadow-md xl:col-span-2">
       <div className="relative m-0 flex items-center justify-between overflow-hidden rounded-xl bg-transparent bg-clip-border p-6 text-gray-700 shadow-none">
@@ -281,6 +296,7 @@ function HabitsTable() {
 }
 
 export function Home() {
+
   return (
     <div className="">
       <div className="m-auto mx-20 h-full pt-10">

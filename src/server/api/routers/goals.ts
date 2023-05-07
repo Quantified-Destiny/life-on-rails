@@ -103,6 +103,18 @@ export const goalsRouter = createTRPCRouter({
     };
   }),
 
+  getAllMetrics: protectedProcedure.query(async ({ ctx }) => {
+    const [metrics, metricsMap] = await getMetrics({
+      prisma: ctx.prisma,
+      userId: ctx.session.user.id,
+    });
+
+    return {
+      metrics: metrics,
+      metricsMap: metricsMap,
+    };
+  }),
+
   editGoal: protectedProcedure
     .input(
       z.object({
