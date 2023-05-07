@@ -32,6 +32,7 @@ import { useRouter } from "next/router";
 import { api } from "../../utils/api";
 import { map } from "zod";
 import { DropDown, EditableNumberField } from "../../components/inlineEdit";
+import { LinkedMetric } from "../../components/overview/metrics";
 
 function isSameDay(a: Date, b: Date) {
   return differenceInCalendarDays(a, b) === 0;
@@ -69,6 +70,7 @@ function _HabitsPage({id}: {id: string}) {
   // highlight dates on calendar, 100 days
   const completionsData = api.habits.getCompletions.useQuery({habitId: id, timeHorizon: 100});
   const calendarData = completionsData.data?.map((item)=>(item.date));
+  console.log(completionsData);
   const maxDate = calendarData?.reduce(function (a, b) { return a > b ? a : b; });
   function tileClassName({ date, view }: { date: Date; view: string }) {
     if (
@@ -89,8 +91,10 @@ function _HabitsPage({id}: {id: string}) {
     },
   });
   const [tgl, setTgl] = useState<Value>();
+  const [date, setDate] = useState(new Date());
   const [editMode, setEditMode] = useState(false);
-  return (
+  return (<>
+    
     <div className="container mx-auto max-w-screen-md px-4 py-8">
     {/* <p>{JSON.stringify(habitData)}</p> */}
     {/* <p>{JSON.stringify(completionsData)}</p> */}
@@ -144,8 +148,6 @@ function _HabitsPage({id}: {id: string}) {
           </span>))}
         </div>
       </div>
-    
-    
 
       <div className="mt-4 flex flex-wrap">
         <div className="mb-4 mt-2 w-full px-3 lg:w-6/12">
@@ -248,27 +250,76 @@ function _HabitsPage({id}: {id: string}) {
       </div>
 
       <div className="flex flex-col items-center justify-center">
+      <p className="text-sm mb-2 font-bold">{date.toDateString()}</p>
         <Calendar
           className="w-full md:w-auto"
-          onChange={(value, event) => setTgl(value)}
-          value={tgl}
+          onChange={(date:Date) => setDate(date)}
+          value={date}
           tileClassName={tileClassName} //adds highlighted dates
           calendarType="US"
           maxDate={new Date()}
-          minDate={new Date("12-01-2022")} //habit created date?
+          minDate={habitData.data?.createdAt} //habit created date?
         />
       </div>
 
       
-      <div className="mt-6 border border-red-500 p-5 text-center">
-        linked metrics
+      <div className="mt-5 text-center">
+        <h3 className="font-semibold">Linked Metrics</h3>
+        {habitData.data?.metrics.map((metric) => {
+          return (
+            <div className="flex flex-row lg:w-6/12 justify-between w-full rounded-lg px-3 py-2 bg-gray-50">
+            <LinkedMetric
+              {...metric}
+              weight={0.5}
+              key={metric.id}
+              offset={0}
+            ></LinkedMetric>
+            </div>
+          );
+        })}
       </div>
 
       {/* https://www.tailwindtoolbox.com/components/responsive-table */}
       <div className="mt-6 border border-red-500 p-10 text-center">
-        activity table
+        <p>activity table for {date.toISOString()}</p>
+        {/* filter for date and show only those activities  */}
+        {completionsData.data?.map((it) => (
+          <p>{it.date.toString()}-{it.memo ?? "no memo"}-{it.isCompleted.toString()}</p>
+        ))}
+<ol className="pt-1 relative border-l border-gray-300 dark:border-gray-700">                  
+    <li className="mb-2 ml-4">            
+        <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-4 ring-white dark:ring-gray-900 dark:bg-blue-900">
+        </span>
+        <div className="items-center justify-between p-4 bg-white border border-gray-300 rounded-lg shadow-sm sm:flex dark:bg-gray-700 dark:border-gray-600">
+            <time className="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">10:30 am</time>
+            <div className="text-sm font-normal text-gray-500 dark:text-gray-300">You completed this habit.</div>
+        </div>
+    </li>
+    <li className="mb-2 ml-4">            
+        <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-4 ring-white dark:ring-gray-900 dark:bg-blue-900">
+        </span>
+        <div className="items-center justify-between p-4 bg-white border border-gray-300 rounded-lg shadow-sm sm:flex dark:bg-gray-700 dark:border-gray-600">
+            <time className="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">10:40 am</time>
+            <div className="text-sm font-normal text-gray-500 dark:text-gray-300">You unchecked this habit.</div>
+        </div>
+    </li>
+    <li className="mb-2 ml-4">
+        <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-4 ring-white dark:ring-gray-900 dark:bg-blue-900">
+
+        </span>
+        <div className="p-4 bg-white border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600">
+            <div className="items-center justify-between mb-3 sm:flex">
+                <time className="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">10:45 am</time>
+                <div className="text-sm font-normal text-gray-500 dark:text-gray-300">You completed this habit with a memo.</div>
+            </div>
+            <div className="p-3 text-xs italic text-left font-normal text-gray-500 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad quo, aspernatur pariatur in sequi aliquam aliquid dolor est alias molestiae, amet odio iure sapiente nulla id recusandae accusantium consectetur nam.</div>
+        </div>
+    </li>
+
+</ol>
+
       </div>
-      <div className="mt-3 text-sm">
+      <div className="mt-3 text-sm italic">
         <p>Date Created: {format(habitData.data?.createdAt ?? new Date(), "MM-dd-yyyy p")}</p>
         <p>Last Updated: {format(habitData.data?.updatedAt ?? new Date(), "MM-dd-yyyy p")}</p>
       </div>
@@ -279,6 +330,7 @@ function _HabitsPage({id}: {id: string}) {
         {/* <button className="bg-blue-500 text-white py-2 px-4 rounded-lg">Edit</button> */}
       </div>
     </div>
+    </>
   );
 }
 
