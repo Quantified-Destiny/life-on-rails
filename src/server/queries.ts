@@ -6,6 +6,7 @@ import type {
   LinkedMetric,
   Metric,
   MetricAnswer,
+  MetricMeasuresGoal,
   MetricTag,
   Tag,
 } from "@prisma/client";
@@ -137,6 +138,7 @@ export async function getHabits({
       metric: Metric & {
         metricAnswers: MetricAnswer[];
         MetricTag: { tag: Tag }[];
+        goals: {goal: Goal}[];
       };
     })[];
     goals: HabitMeasuresGoal[];
@@ -162,6 +164,7 @@ export async function getHabits({
         include: {
           metric: {
             include: {
+              goals: {include: {goal: true}},
               MetricTag: { include: { tag: true } },
               metricAnswers: {
                 where: {
@@ -198,8 +201,8 @@ export async function getHabits({
     const expandedMetrics = habit.metrics.map((m) => {
       const score = avg(m.metric.metricAnswers.map((it) => it.value));
       const tags = m.metric.MetricTag.map((it) => it.tag);
-
-      return { ...m.metric, score, tags, linkedHabits: [] };
+      const goals = m.metric.goals.map(it => it.goal);
+      return { ...m.metric, score, tags, linkedHabits: [], goals };
     });
 
     const normalizedFrequency =
@@ -237,6 +240,7 @@ export interface ExpandedMetric extends Metric {
   linkedHabits: string[];
   tags: Tag[];
   score: number;
+  goals: Goal[];
 }
 
 export async function getMetrics({
@@ -261,6 +265,7 @@ export async function getMetrics({
   const metrics: (Metric & {
     completionMetric: LinkedMetric[];
     MetricTag: (MetricTag & { tag: Tag })[];
+    goals: (MetricMeasuresGoal & { goal: Goal })[];
   })[] = await prisma.metric.findMany({
     where: {
       ownerId: userId,
@@ -270,6 +275,9 @@ export async function getMetrics({
       completionMetric: true,
       MetricTag: {
         include: { tag: true },
+      },
+      goals: {
+        include: {goal: true}
       },
     },
   });
@@ -304,6 +312,7 @@ export async function getMetrics({
     ...m,
     linkedHabits: m.completionMetric.map((it) => it.habitId),
     tags: m.MetricTag.map((mt) => mt.tag),
+    goals: m.goals.map((g) => g.goal),
     score: metricScores.get(m.id) ?? 0,
   }));
 
