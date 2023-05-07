@@ -66,7 +66,7 @@ function StatsCardRow() {
   let greenMetric = 0;
   const metric = metricData.metrics;
 
-  for (let i = 0; i < metric.length; i++) {
+  for (let i = 0; i < metric.length; i++) {   //all metrics
     if ((metric[i]?.score ?? 0) < 0.4) {
       redMetric += 1;
     }
@@ -77,33 +77,6 @@ function StatsCardRow() {
       greenMetric += 1;
     }
   }
-
-  // for (let i = 0; i < goalData.goals.length; i++) {   //metric linked to a goal 
-  //   for (let j = 0; j < (goalData.goals[i]?.metrics?.length ?? 0); j++) {
-  //     const m = goalData.goals[i]?.metrics[j];
-  //     if ((m?.score ?? 0) < 0.4) {
-  //       redMetric += 1;
-  //     }
-  //     else if ((m?.score ?? 0) < 0.7) {
-  //       yellowMetric += 1;
-  //     }
-  //     else {
-  //       greenMetric += 1;
-  //     }
-  //   }
-  // }
-  // for (let i = 0; i < goalData.metrics.length; i++) {  //standalone metric
-  //   const m = goalData.metrics[i];
-  //   if ((m?.score ?? 0) < 0.4) {
-  //     redMetric += 1;
-  //   }
-  //   else if ((m?.score ?? 0) < 0.7) {
-  //     yellowMetric += 1;
-  //   }
-  //   else {
-  //     greenMetric += 1;
-  //   }
-  // }
 
   return (
     <div className="mb-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-10">
