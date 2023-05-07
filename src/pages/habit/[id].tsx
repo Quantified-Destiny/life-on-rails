@@ -2,6 +2,7 @@ import { useState } from "react";
 import Layout from "../../components/layout";
 import Calendar from "react-calendar";
 // import 'react-calendar/dist/Calendar.css';
+import formatDistance from "date-fns/formatDistance";
 
 import dynamic from "next/dynamic";
 
@@ -25,11 +26,12 @@ const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
 //   { ssr: false }
 // );
 
-import { addDays, differenceInCalendarDays, format } from "date-fns";
+import { addDays, differenceInCalendarDays, differenceInDays, format, max } from "date-fns";
 import { Value } from "react-calendar/dist/cjs/shared/types";
 import { useRouter } from "next/router";
 import { api } from "../../utils/api";
 import { map } from "zod";
+import { DropDown, EditableNumberField } from "../../components/inlineEdit";
 
 function isSameDay(a: Date, b: Date) {
   return differenceInCalendarDays(a, b) === 0;
@@ -64,10 +66,10 @@ function HabitsPage() {
 function _HabitsPage({id}: {id: string}) {
   const context = api.useContext();
   const habitData = api.habits.getHabit.useQuery({habitId: id});
-  
   // highlight dates on calendar, 100 days
   const completionsData = api.habits.getCompletions.useQuery({habitId: id, timeHorizon: 100});
-  const calendarData = completionsData.data?.map((item)=>(item.date))
+  const calendarData = completionsData.data?.map((item)=>(item.date));
+  const maxDate = calendarData?.reduce(function (a, b) { return a > b ? a : b; });
   function tileClassName({ date, view }: { date: Date; view: string }) {
     if (
       view === "month" &&
@@ -76,7 +78,16 @@ function _HabitsPage({id}: {id: string}) {
       return "highlight";
     }
   }
-
+  const editFrequency = api.habits.editFrequency.useMutation({
+    onSuccess: () => {
+      void context.habits.getHabit.invalidate();
+    },
+  });
+  const editFrequencyHorizon = api.habits.editFrequencyHorizon.useMutation({
+    onSuccess: () => {
+      void context.habits.getHabit.invalidate();
+    },
+  });
   const [tgl, setTgl] = useState<Value>();
   const [editMode, setEditMode] = useState(false);
   return (
@@ -102,14 +113,39 @@ function _HabitsPage({id}: {id: string}) {
           />
         </svg>
       </h1>
-      <p>ID: {habitData.data?.id}</p>
-    <p>Created Date: {format(habitData.data?.createdAt ?? new Date(), "MM-dd-yyyy p")}</p>
-    <p>Updated Date: {format(habitData.data?.updatedAt ?? new Date(), "MM-dd-yyyy p")}</p>
-    <p>Frequency: {habitData.data?.frequency}</p>
-    <p>frequencyHorizon: {habitData.data?.frequencyHorizon}</p>
-    <p>Completion Weight: {habitData.data?.completionWeight}</p>
-    <p>Metrics: {habitData.data?.metrics.length}</p>
-    <p>{habitData.data?.tags}</p>
+      <h2 className="mb-4 flex flex-row justify-center text-center text-lg">
+        <EditableNumberField
+          initial={habitData.data?.frequency}
+          commit={(number) =>
+            editFrequency.mutate({ habitId: id, frequency: number })
+          }
+          className="mr-1"
+        ></EditableNumberField>
+        <span className="text-md">{" "}times per</span>
+          <DropDown
+            frequencyHorizon={habitData.data?.frequencyHorizon}
+            commit={(freq) =>
+              editFrequencyHorizon.mutate({
+                habitId: id,
+                frequencyHorizon: freq,
+              })
+            }
+            className="lowercase"
+          ></DropDown>
+      </h2>
+
+      
+      <div className="mt-4 flex flex-wrap">
+        <div className="mb-2 mt-2 w-full px-3 lg:w-6/12 flex justify-start flex-auto gap-x-3">
+          {/* <p>Completion Weight: {habitData.data?.completionWeight}</p>
+          <p>Metrics: {habitData.data?.metrics.length}</p> */}
+          {habitData.data?.tags.map((it)=>(<span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded text-slate-600 bg-slate-200 last:mr-0 mr-1">
+            {it}
+          </span>))}
+        </div>
+      </div>
+    
+    
 
       <div className="mt-4 flex flex-wrap">
         <div className="mb-4 mt-2 w-full px-3 lg:w-6/12">
@@ -168,7 +204,7 @@ function _HabitsPage({id}: {id: string}) {
                     Last Completed
                   </h5>
                   <span className="text-blueGray-700 text-xl font-semibold">
-                    May 3
+                    {maxDate?.toDateString()}
                   </span>
                 </div>
                 <div className="relative w-auto flex-initial pl-4">
@@ -176,7 +212,7 @@ function _HabitsPage({id}: {id: string}) {
                 </div>
               </div>
               <p className="text-blueGray-400 mt-4 text-sm">
-                <span className="whitespace-nowrap"> 1 day ago</span>
+                <span className="whitespace-nowrap"> {differenceInCalendarDays(new Date(), maxDate)} day ago</span>
               </p>
             </div>
           </div>
@@ -190,7 +226,7 @@ function _HabitsPage({id}: {id: string}) {
                     Current Score
                   </h5>
                   <span className="text-blueGray-700 text-xl font-semibold">
-                    {habitData.data?.score*100}%
+                    {(habitData.data?.score*100).toFixed(2)}%
                   </span>
                 </div>
                 <div className="relative w-auto flex-initial pl-4">
@@ -232,9 +268,13 @@ function _HabitsPage({id}: {id: string}) {
       <div className="mt-6 border border-red-500 p-10 text-center">
         activity table
       </div>
-
-      <div className="mt-6 text-center">
-        <button className="mt-10 text-red-500">Delete this Habit</button>
+      <div className="mt-3 text-sm">
+        <p>Date Created: {format(habitData.data?.createdAt ?? new Date(), "MM-dd-yyyy p")}</p>
+        <p>Last Updated: {format(habitData.data?.updatedAt ?? new Date(), "MM-dd-yyyy p")}</p>
+      </div>
+      <div className="mt-10 text-center">
+      
+        <button className=" text-red-500 text-md">Delete this Habit</button>
         {/* <button className="bg-red-500 text-white py-1 px-4 mt-5 rounded-lg">Delete this Habit</button> */}
         {/* <button className="bg-blue-500 text-white py-2 px-4 rounded-lg">Edit</button> */}
       </div>
