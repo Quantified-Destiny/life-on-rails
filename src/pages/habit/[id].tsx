@@ -31,7 +31,7 @@ import { Value } from "react-calendar/dist/cjs/shared/types";
 import { useRouter } from "next/router";
 import { api } from "../../utils/api";
 import { map } from "zod";
-import { DropDown, EditableNumberField } from "../../components/inlineEdit";
+import { DropDown, EditableField, EditableNumberField } from "../../components/inlineEdit";
 import { LinkedMetric } from "../../components/overview/metrics";
 
 function isSameDay(a: Date, b: Date) {
@@ -93,6 +93,11 @@ function _HabitsPage({id}: {id: string}) {
   const [tgl, setTgl] = useState<Value>();
   const [date, setDate] = useState(new Date());
   const [editMode, setEditMode] = useState(false);
+  const mutation = api.habits.editHabit.useMutation({
+    onSuccess: () => {
+      void context.habits.getHabits.invalidate();
+    },
+  });
   return (<>
     
     <div className="container mx-auto max-w-screen-md px-4 py-8">
@@ -100,22 +105,13 @@ function _HabitsPage({id}: {id: string}) {
     {/* <p>{JSON.stringify(completionsData)}</p> */}
 
       <h1 className="mb-4 flex flex-row justify-center text-center text-2xl font-bold">
-        {habitData.data?.description}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="mx-1 mt-1 h-6 w-6 cursor-pointer fill-green-100 pl-1 hover:fill-green-300"
-          onClick={() => setEditMode(true)}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-          />
-        </svg>
+        <EditableField
+            initialText={habitData.data?.description}
+            commit={(text) => {
+              mutation.mutate({ habitId: id, description: text });
+            }}
+            className="ml-2 font-semibold"
+          ></EditableField>
       </h1>
       <h2 className="mb-4 flex flex-row justify-center text-center text-lg">
         <EditableNumberField
@@ -255,10 +251,10 @@ function _HabitsPage({id}: {id: string}) {
           className="w-full md:w-auto"
           onChange={(date:Date) => setDate(date)}
           value={date}
-          tileClassName={tileClassName} //adds highlighted dates
+          tileClassName={tileClassName} 
           calendarType="US"
           maxDate={new Date()}
-          minDate={habitData.data?.createdAt} //habit created date?
+          minDate={habitData.data?.createdAt} 
         />
       </div>
 
@@ -267,7 +263,7 @@ function _HabitsPage({id}: {id: string}) {
         <h3 className="font-semibold">Linked Metrics</h3>
         {habitData.data?.metrics.map((metric) => {
           return (
-            <div className="flex flex-row lg:w-6/12 justify-between w-full rounded-lg px-3 py-2 bg-gray-50">
+            <div className="flex flex-row justify-between w-full rounded-lg px-3 py-2 bg-gray-50">
             <LinkedMetric
               {...metric}
               weight={0.5}
