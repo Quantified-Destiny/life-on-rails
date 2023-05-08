@@ -141,7 +141,7 @@ const menus = [
   { name: "Dashboard", link: "/dashboard", icon: BarChart, gap: true },
   { name: "Journal", link: "/newjournal", icon: Book },
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
-  { name: "Habits", link: "/habits", icon: CalendarRange },
+  // { name: "Habits", link: "/habits", icon: CalendarRange },
   { name: "Help", link: "/help", icon: HelpCircle },
   // { name: "New Journal", link: "/newjournal", icon: HelpCircle },
   // { name: "Habit Page", link: "/habit", icon: HelpCircle },
