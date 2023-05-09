@@ -6,10 +6,11 @@
   html {
     font-family: Raleway, system-ui, sans-serif;
   }
+  
   .highlight{
     font-weight: 900;
-    color:white !important;
-    background-color: green !important;
+    color:white;
+    background-color: green;
   }
   
   :root {
