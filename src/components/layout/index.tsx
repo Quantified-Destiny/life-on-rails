@@ -118,7 +118,7 @@ function Sidebar(props: {
       
       <Link
         href="/"
-        onClick={void handleSignOut}
+        onClick={sessionData ? handleSignOut : undefined}
         key="logout"
         className={`flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm text-white	hover:bg-white hover:bg-opacity-10 mt-2`}
       >
