@@ -138,7 +138,7 @@ export async function getHabits({
       metric: Metric & {
         metricAnswers: MetricAnswer[];
         MetricTag: { tag: Tag }[];
-        goals: {goal: Goal}[];
+        goals: { goal: Goal }[];
       };
     })[];
     goals: HabitMeasuresGoal[];
@@ -164,7 +164,7 @@ export async function getHabits({
         include: {
           metric: {
             include: {
-              goals: {include: {goal: true}},
+              goals: { include: { goal: true } },
               MetricTag: { include: { tag: true } },
               metricAnswers: {
                 where: {
@@ -201,7 +201,7 @@ export async function getHabits({
     const expandedMetrics = habit.metrics.map((m) => {
       const score = avg(m.metric.metricAnswers.map((it) => it.value));
       const tags = m.metric.MetricTag.map((it) => it.tag);
-      const goals = m.metric.goals.map(it => it.goal);
+      const goals = m.metric.goals.map((it) => it.goal);
       return { ...m.metric, score, tags, linkedHabits: [], goals };
     });
 
@@ -277,7 +277,7 @@ export async function getMetrics({
         include: { tag: true },
       },
       goals: {
-        include: {goal: true}
+        include: { goal: true },
       },
     },
   });
@@ -390,3 +390,4 @@ export async function getGoals(
   });
   return goalsData;
 }
+
