@@ -64,7 +64,7 @@ export const goalsRouter = createTRPCRouter({
         goalIds: [input.id],
       });
 
-      const metrics = await getMetrics({
+      const [metrics, _map] = await getMetrics({
         prisma: ctx.prisma,
         userId: ctx.session.user.id,
         goalIds: [goal.id],
