@@ -527,6 +527,7 @@ function DataTable({
 
 function Journal({ date, setDate, habits, metrics }: JournalProps) {
   const context = api.useContext();
+  const [Tgl, setTgl] = useState<boolean>(true);
   const setScore = api.journal.setSubjectiveScore.useMutation({
     onSuccess() {
       void context.journal.getMetrics.invalidate();
@@ -544,56 +545,15 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
               >
                 Daily Journal
               </p>
-              {/* <div className="flex cursor-pointer items-center rounded bg-gray-200 px-2 py-2 text-sm font-medium leading-none text-gray-600 hover:bg-gray-300">
-                <p>Sort By:</p>
-                <select
-                  aria-label="select"
-                  className="ml-1 bg-transparent focus:text-indigo-600 focus:outline-none"
-                >
-                  <option className="text-sm text-indigo-800">Urgency</option>
-                  <option className="text-sm text-indigo-800">Oldest</option>
-                  <option className="text-sm text-indigo-800">Newest</option>
-                </select>
-              </div> */}
+              <CreateMenu className="mt-4 inline-flex items-start justify-start rounded bg-gray-200 px-6 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hover:bg-indigo-600 sm:mt-0"></CreateMenu>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between w-auto">
               <TimePicker date={date} setDate={setDate}></TimePicker>
             </div>
           </div>
           <div className="bg-white px-4 py-3 md:px-6 md:py-4 xl:px-10">
             <div className="items-center justify-between sm:flex">
-              <div className="flex items-center">
-                <a
-                  className="rounded-full focus:bg-indigo-50 focus:outline-none  focus:ring-2 focus:ring-indigo-800"
-                  href=" javascript:void(0)"
-                >
-                  <div className="rounded-full bg-indigo-100 px-4 py-2 text-indigo-700">
-                    <p>All</p>
-                  </div>
-                </a>
-                {/* <a
-                  className="ml-4 rounded-full focus:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-800 sm:ml-8"
-                  href="javascript:void(0)"
-                >
-                  <div className="rounded-full px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-700 ">
-                    <p>Completed</p>
-                  </div>
-                </a>
-                <a
-                  className="ml-4 rounded-full focus:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-800 sm:ml-8"
-                  href="javascript:void(0)"
-                >
-                  <div className="rounded-full px-4 py-2 text-gray-600 hover:bg-indigo-100 hover:text-indigo-700 ">
-                    <p>Pending</p>
-                  </div>
-                </a> */}
-              </div>
-              {/* <button className="mt-4 inline-flex items-start justify-start rounded bg-indigo-700 px-6 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hover:bg-indigo-600 sm:mt-0">
-                <p className="text-sm font-medium leading-none text-white">
-                  Add New
-                </p>
-              </button> */}
-              <CreateMenu className="mt-4 inline-flex items-start justify-start rounded bg-gray-200 px-6 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hover:bg-indigo-600 sm:mt-0"></CreateMenu>
+              Pending Tasks
             </div>
             <div className="mt-7 overflow-x-auto">
               <DataTable
@@ -602,6 +562,22 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
                 date={date}
               ></DataTable>
             </div>
+            <div className="mt-7 transition delay-150flex flex-row justify-center">
+              <div className=" text-center text-md mb-5">
+              <button className="rounded-full focus:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-800" onClick={() => setTgl(!Tgl)}>
+                <div className="transition delay-150 rounded-full bg-indigo-100 px-4 py-1 text-indigo-700">
+                  {Tgl ?
+                    (<p>Show Compeleted Items</p>) : (<p>Hide Compeleted Items</p>) }
+                </div>
+              </button>
+              </div>
+            </div>
+            {Tgl ?
+                    (<></>) : (<DataTable
+                      habits={habits}
+                      metrics={metrics}
+                      date={date}
+                    ></DataTable>) }
           </div>
         </div>
         <style

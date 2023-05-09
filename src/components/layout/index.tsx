@@ -57,7 +57,7 @@ function Sidebar(props: {
       </div>
 
       <div className="flex items-center gap-x-4">
-        <Link href="/journal">
+        <Link href="/newjournal">
           <img
             src="lor-logo.png"
             alt=""
@@ -138,10 +138,10 @@ function Sidebar(props: {
 }
 
 const menus = [
-  { name: "Dashboard", link: "/dashboard", icon: BarChart, gap: true },
-  { name: "Journal", link: "/newjournal", icon: Book },
+  { name: "Journal", link: "/newjournal", icon: Book , gap: true },
+  { name: "Legacy Journal", link: "/journal", icon: CalendarRange },
+  { name: "Dashboard", link: "/dashboard", icon: BarChart},
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
-  // { name: "Habits", link: "/habits", icon: CalendarRange },
   { name: "Help", link: "/help", icon: HelpCircle },
   // { name: "New Journal", link: "/newjournal", icon: HelpCircle },
   // { name: "Habit Page", link: "/habit", icon: HelpCircle },
