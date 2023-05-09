@@ -73,7 +73,8 @@ export function HabitHeaderLine({
 
   return (
     <>
-      <div className="flex flex-row items-center justify-around">
+    <div className="flex flex-col">
+      <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row items-baseline gap-2">
           <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
             Habit
@@ -86,7 +87,22 @@ export function HabitHeaderLine({
             className="font-semibold"
           ></EditableField>
         </div>
-        <span className="text-sm lowercase text-gray-500">
+        <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
+          <span
+            className={classNames(
+              "rounded-lg bg-gray-100 p-2 text-xl",
+              textcolor(score)
+            )}
+          >
+            {score.toFixed(2)}
+          </span>
+          <HabitSheet habitId={id}>
+            <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+          </HabitSheet>
+        </div>
+      </div>
+      <div className="flex flex-row">
+      <span className="text-sm lowercase text-gray-500">
           <span className="space-x-1 text-sm">
             <span className="text-md ">Completed</span>
             <span className="text-md ">{completions}</span>
@@ -111,19 +127,7 @@ export function HabitHeaderLine({
             ></DropDown>
           </span>
         </span>
-        <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
-          <span
-            className={classNames(
-              "rounded-lg bg-gray-100 p-2 text-xl",
-              textcolor(score)
-            )}
-          >
-            {score.toFixed(2)}
-          </span>
-          <HabitSheet habitId={id}>
-            <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
-          </HabitSheet>
-        </div>
+      </div>
       </div>
     </>
   );

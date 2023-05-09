@@ -58,7 +58,7 @@ function GoalsSection({ habitId }: { habitId: string }) {
               <div>
                 Weight: <span className="ml-2">{scoreWeight}</span>
               </div>
-              <div className="space-x-2 text-right">
+              <div className="space-y-2 text-right">
                 <Button
                   onClick={() =>
                     unlinkGoalMutation.mutate({
@@ -69,7 +69,8 @@ function GoalsSection({ habitId }: { habitId: string }) {
                 >
                   Unlink
                 </Button>
-                <Button>Manage</Button>
+                <Button className="bg-gray-500">
+                  Manage</Button>
               </div>
             </>
           );
@@ -133,6 +134,7 @@ function MetricsSection({ habitId }: { habitId: string }) {
 const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
 
 function HistorySection({ habitId }: { habitId: string }) {
+  const [range, setRange] = useState(0);
   const completionsQuery = api.habits.getCompletions.useQuery({
     habitId: habitId,
     timeHorizon: 30 * 6,
@@ -150,6 +152,8 @@ function HistorySection({ habitId }: { habitId: string }) {
     count: 10,
     content: "",
   }));
+  
+
   return (
     <div className="my-8 flex flex-col items-center justify-center">
       <HeatMap
@@ -158,7 +162,12 @@ function HistorySection({ habitId }: { habitId: string }) {
         startDate={subMonths(new Date(), 6)}
         width={450}
         legendCellSize={0}
+        legendRender={(props) => <rect {...props} y={props.y + 10} rx={range} />}
+        rectProps={{
+          rx: range
+        }}
       />
+      <input type="range" min="0" max="5" step="0.1" value={range} onChange={(e) => setRange(e.target.value)} /> Rect Radius: {range}
     </div>
   );
 }
@@ -307,7 +316,7 @@ export function HabitSheet({
   return (
     <Sheet>
       <SheetTrigger>{children}</SheetTrigger>
-      <SheetContent position="right" size="lg" className="overflow-scroll">
+      <SheetContent position="right" size="lg" className="overflow-scroll  max-md:w-full">
         <HabitPanel habitId={habitId}></HabitPanel>
       </SheetContent>
     </Sheet>

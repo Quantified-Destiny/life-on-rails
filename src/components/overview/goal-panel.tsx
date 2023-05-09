@@ -424,7 +424,7 @@ export function GoalSheet({
   return (
     <Sheet>
       <SheetTrigger>{children}</SheetTrigger>
-      <SheetContent position="right" size="lg" className="overflow-scroll">
+      <SheetContent position="right" size="lg" className="overflow-scroll max-md:w-full">
         <GoalPanel goalId={goalId}></GoalPanel>
       </SheetContent>
     </Sheet>
