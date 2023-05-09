@@ -1,6 +1,6 @@
 // import dynamic from "next/dynamic";
 import Layout from "../components/layout";
-// import GaugeChart from 'react-gauge-chart';
+
 import type { ExpandedHabit } from "../server/queries";
 import { api } from "../utils/api";
 
@@ -80,10 +80,11 @@ function StatsCardRow() {
   
   return (
     <div className="mb-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-10">
+      
       <div className=" min-w-10 max-w-50 divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
         <div className="p-4 text-center text-2xl ">Goals</div>
         <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
-        {/* <GaugeChart id="gauge-chart1" /> */}
+        
           <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
             {greenGoal}
           </span>
