@@ -20,10 +20,14 @@ import { api } from "../utils/api";
 
 // fixes zoomed in icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { Cog6ToothIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import { CheckCircle, CircleIcon } from "lucide-react";
+import Link from "next/link";
 import { RxExternalLink } from "react-icons/rx";
 import { Button } from "../components/ui/button";
 import { HabitSheet } from "../components/overview/habit-panel";
+import { Button } from "../components/ui/button";
+import { Toggle } from "../components/ui/toggle";
 import MetricModal from "./metric_modal";
 import Link from "next/link";
 import { CreateMenu } from "../components/createMenu";
@@ -45,33 +49,17 @@ function Checkbox(props: {
 }) {
   return (
     <td>
-      <div className="ml-5">
-        <div className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm bg-gray-200">
-          <input
-            placeholder="checkbox"
-            type="checkbox"
-            className="checkbox absolute h-full w-full cursor-pointer opacity-0 focus:opacity-100"
-            checked={props.completed}
-            onChange={(event) => props.setCompletion(event.target.checked)}
-          />
-          <div className="check-icon hidden rounded-sm bg-indigo-700 text-white">
-            <svg
-              className="icon icon-tabler icon-tabler-check"
-              xmlns="http://www.w3.org/2000/svg"
-              width={20}
-              height={20}
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" />
-              <path d="M5 12l5 5l10 -10" />
-            </svg>
-          </div>
-        </div>
+      <div className="relative rounded-sm px-5">
+        <Toggle
+          pressed={props.completed}
+          onPressedChange={(pressed) => props.setCompletion(pressed)}
+        >
+          {props.completed ? (
+            <CheckCircle></CheckCircle>
+          ) : (
+            <CircleIcon></CircleIcon>
+          )}
+        </Toggle>
       </div>
     </td>
   );
@@ -218,19 +206,7 @@ const Row = ({
       className="h-12 rounded border border-gray-100 focus:outline-none"
       key={id}
     >
-      {metrics && metrics.length > 0 ? (
-        <MetricModal>
-          <Checkbox
-            completed={completed}
-            setCompletion={setCompletion}
-          ></Checkbox>
-        </MetricModal>
-      ) : (
-        <Checkbox
-          completed={completed}
-          setCompletion={setCompletion}
-        ></Checkbox>
-      )}
+      <Checkbox completed={completed} setCompletion={setCompletion}></Checkbox>
 
       <TypeIcon type={type}></TypeIcon>
       <td className="pl-2">
@@ -457,71 +433,90 @@ function DataTable({
   metrics: MetricType[];
 }) {
   const context = api.useContext();
-  const deleteHabit = api.journal.deleteHabit.useMutation({
-    onSuccess() {
-      void context.journal.getHabits.invalidate();
-    },
-  });
-  const editHabit = api.journal.editHabit.useMutation({
-    onSuccess() {
-      void context.journal.getHabits.invalidate();
-    },
-  });
   const setHabitCompletion = api.journal.setCompletion.useMutation({
     onSuccess() {
       void context.journal.getHabits.invalidate();
     },
   });
+  const [modalMetrics, setMetrics] = useState<Metric[] | undefined>();
+  const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <table className="w-full whitespace-nowrap">
-      <thead>
-        <tr className="justify-between text-center text-xs font-semibold">
-          <td></td>
-          <td>Type</td>
-          <td>Score</td>
-          <td>Name</td>
-          <td></td>
-          <td>Last</td>
-          <td>Done</td>
-          <td></td>
-          <td></td>
-        </tr>
-      </thead>
-      <tbody>
-        {habits.map((habit) => {
-          return (
-            <Row
-              type="Habit"
-              {...habit}
-              date={date}
-              key={habit.id}
-              setCompletion={(completed) =>
-                setHabitCompletion.mutate({
-                  date: date,
-                  habitId: habit.id,
-                  completed,
-                })
-              }
-            ></Row>
-          );
-        })}
-        {metrics.map((metric) => {
-          return (
-            <Row
-              type="Metric"
-              description={metric.prompt}
-              completed={false}
-              id={metric.id}
-              tags={[]}
-              date={date}
-              key={metric.id}
-              setCompletion={console.log}
-            ></Row>
-          );
-        })}
-      </tbody>
-    </table>
+    <>
+      <MetricModal
+        open={open}
+        onOpenChange={setOpen}
+        metrics={modalMetrics}
+      ></MetricModal>
+
+      <table className="w-full whitespace-nowrap">
+        <thead>
+          <tr className="justify-between text-center text-xs font-semibold">
+            <td></td>
+            <td>Type</td>
+            <td>Score</td>
+            <td>Name</td>
+            <td></td>
+            <td>Last</td>
+            <td>Done</td>
+            <td></td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody>
+          {habits.map((habit) => {
+            if (habit.metrics.length > 0) {
+              return (
+                <Row
+                  type="Habit"
+                  {...habit}
+                  date={date}
+                  key={habit.id}
+                  setCompletion={(completed) => {
+                    setMetrics(habit.metrics);
+                    setOpen(true);
+                    return setHabitCompletion.mutate({
+                      date: date,
+                      habitId: habit.id,
+                      completed,
+                    });
+                  }}
+                ></Row>
+              );
+            } else
+              return (
+                <Row
+                  type="Habit"
+                  {...habit}
+                  date={date}
+                  key={habit.id}
+                  setCompletion={(completed) =>
+                    setHabitCompletion.mutate({
+                      date: date,
+                      habitId: habit.id,
+                      completed,
+                    })
+                  }
+                ></Row>
+              );
+          })}
+          {metrics.map((metric) => {
+            return (
+              <Row
+                type="Metric"
+                description={metric.prompt}
+                completed={false}
+                id={metric.id}
+                tags={[]}
+                date={date}
+                key={metric.id}
+                setCompletion={console.log}
+              ></Row>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 }
 
@@ -604,8 +599,6 @@ const JournalPage = () => {
     ...habit,
   }));
   const metricsData = metrics.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
-  console.log(`Got subjectives ${JSON.stringify(metricsData)}`);
-  console.log(`Got habits ${JSON.stringify(habitsData)}`);
   return (
     <Journal
       habits={habitsData}
