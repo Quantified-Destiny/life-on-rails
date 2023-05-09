@@ -28,7 +28,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
-import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, SpaceIcon } from "lucide-react";
 import { TbSquareRoundedLetterH } from "react-icons/tb";
 import { InlineEdit } from "../../pages/journal";
 
@@ -324,14 +324,20 @@ function GoalPanel({ goalId }: { goalId: string }) {
     },
   });
   const goalQuery = api.goals.getGoal.useQuery({ id: goalId });
+  const habitGoalWeightQuery = api.goals.getHabitGoalWeight.useQuery({ goalId: goalId});
+  const metricGoalWeightQuery = api.goals.getMetricGoalWeight.useQuery({ goalId: goalId});
 
   const data = goalQuery.data;
-  if (goalQuery.isError) {
+  const habitGoalWeightMap = habitGoalWeightQuery.data;
+  const metricGoalWeightMap = metricGoalWeightQuery.data;
+  if (goalQuery.isError || habitGoalWeightQuery.isError || metricGoalWeightQuery.isError) {
     return <p>Error</p>;
   }
-  if (goalQuery.isLoading || !data) {
+  if (goalQuery.isLoading || !data || habitGoalWeightQuery.isLoading || metricGoalWeightQuery.isLoading) {
     return <p>LOADING</p>;
   }
+  
+
   return (
     <div className="relative h-full">
       <div className="flex h-full flex-col gap-2">
@@ -367,11 +373,11 @@ function GoalPanel({ goalId }: { goalId: string }) {
               <ScoringSection
                 habits={goalQuery.data.habits.map((it) => ({
                   ...it,
-                  weight: 1,
+                  weight: (habitGoalWeightMap?.get(it.id) ?? 0),
                 }))}
                 metrics={goalQuery.data.metrics.map((it) => ({
                   ...it,
-                  weight: 1,
+                  weight: (metricGoalWeightMap?.get(it.id) ?? 0),
                 }))}
               ></ScoringSection>
             </AccordionContent>

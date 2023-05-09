@@ -6,7 +6,7 @@ import {
   getGoals,
   getHabits,
   getHabitsWithMetricsMap,
-  getMetrics
+  getMetrics,
 } from "../../queries";
 
 export const goalsRouter = createTRPCRouter({
@@ -99,7 +99,9 @@ export const goalsRouter = createTRPCRouter({
     return {
       goals: goalsData,
       habits: habits.filter((h) => h.goals.length == 0),
-      metrics: metrics.filter((m) => m.linkedHabits.length == 0 && m.goals.length == 0),
+      metrics: metrics.filter(
+        (m) => m.linkedHabits.length == 0 && m.goals.length == 0
+      ),
     };
   }),
 
@@ -166,5 +168,53 @@ export const goalsRouter = createTRPCRouter({
         },
       });
       return goal;
+    }),
+
+  getHabitGoalWeight: protectedProcedure
+    .input(z.object({ goalId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const goals: { habitId: string; weight: number }[] =
+        await ctx.prisma.habitMeasuresGoal.findMany({
+          where: {
+            goalId: input.goalId,
+          },
+          select: {
+            habitId: true,
+            weight: true,
+          },
+        });
+
+      const HabitGoalWeightMap = new Map();
+      goals.map((g) => {
+        HabitGoalWeightMap.set(g.habitId, g.weight);
+      });
+
+      return {
+        HabitGoalWeightMap: HabitGoalWeightMap,
+      };
+    }),
+
+  getMetricGoalWeight: protectedProcedure
+    .input(z.object({ goalId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const goals: { metricId: string; weight: number }[] =
+        await ctx.prisma.metricMeasuresGoal.findMany({
+          where: {
+            goalId: input.goalId,
+          },
+          select: {
+            metricId: true,
+            weight: true,
+          },
+        });
+
+      const MetricGoalWeightMap = new Map();
+      goals.map((g) => {
+        MetricGoalWeightMap.set(g.metricId, g.weight);
+      });
+
+      return {
+        MetricGoalWeightMap: MetricGoalWeightMap,
+      };
     }),
 });
