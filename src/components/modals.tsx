@@ -73,23 +73,26 @@ export function CreateGoalModal() {
           </button>
           <div className="px-6 py-6 lg:px-8">
             <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-              Create a goal
+              Create a new Goal
             </h3>
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <input
                   type="text"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
-                  placeholder="name"
+                  placeholder="Goal Name"
                   required
                   {...register("name")}
                 />
+              </div>
+              <div>
+                <p>Link Existing Habit or Metric</p>
               </div>
               <button
                 type="submit"
                 className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
-                Create
+                Create Goal
               </button>
             </form>
           </div>
@@ -144,23 +147,39 @@ export function CreateHabitModal() {
           </button>
           <div className="px-6 py-6 lg:px-8">
             <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-              Create a habit
+              Create a new Habit
             </h3>
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <input
                   type="text"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
-                  placeholder="name"
+                  placeholder="Habit Name"
                   required
                   {...register("description")}
                 />
+              </div>
+              <div>
+                <p>Select Horizon (week or day)</p>
+                <p>Select Frequency i.e. 3, choose 3 days below</p>
+                <div className="flex flex-row justify-between">
+                  <p>S</p>
+                  <p>M</p>
+                  <p>T</p>
+                  <p>W</p>
+                  <p>Th</p>
+                  <p>F</p>
+                  <p>S</p>
+                </div>
+                <p>Link an existing metric or create a new one</p>
+                <hr />
+                <p>Link to existing Goal</p>
               </div>
               <button
                 type="submit"
                 className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
-                Create
+                Create Habit
               </button>
             </form>
           </div>
@@ -215,23 +234,28 @@ export function CreateMetricModal() {
           </button>
           <div className="px-6 py-6 lg:px-8">
             <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-              Create a metric
+              Create a new Metric
             </h3>
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <input
                   type="text"
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400"
-                  placeholder="name"
+                  placeholder="Metric Name"
                   required
                   {...register("prompt")}
                 />
+              </div>
+              <div>
+                <p>Link an existing habit</p>
+                <hr />
+                <p>Link to existing Goal</p>
               </div>
               <button
                 type="submit"
                 className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
-                Create
+                Create Metric
               </button>
             </form>
           </div>
