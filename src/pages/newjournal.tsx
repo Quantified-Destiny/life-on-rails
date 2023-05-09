@@ -137,7 +137,7 @@ function TagsTooltip({ tags }: { tags: Tag[] }) {
           <div
             className="item"
             data-tooltip-id="tag-tooltip"
-            data-tooltip-content={tags.map((it) => it.name).join(",")}
+            data-tooltip-content={tags.map((it) => it.name).join(", ")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -8,7 +8,7 @@ export function CreateTag({ commit }: { commit: (name: string) => void }) {
   const [text, setText] = useState<string>("");
   return (
     <div
-      className="cursor-pointer rounded-r-full bg-gray-200 px-2 py-1 text-xs hover:bg-gray-200"
+      className="cursor-pointer rounded-r-full bg-gray-200  text-xs hover:bg-gray-200"
       onClick={() => setActive(true)}
     >
       {active ? (
@@ -65,7 +65,6 @@ export function TagList(props: {
           </button>
         </div>
       ))}
-      {/* TODO add combobox features */}
       <CreateTag commit={(name: string) => props.link(name)}></CreateTag>
     </div>
   );
