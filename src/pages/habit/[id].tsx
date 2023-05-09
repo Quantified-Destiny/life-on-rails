@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Calendar from "react-calendar";
-import 'react-calendar/dist/Calendar.css';
+// import 'react-calendar/dist/Calendar.css';
 import Layout from "../../components/layout";
 import dynamic from "next/dynamic";
 
@@ -10,8 +10,8 @@ import { MdArrowUpward, MdScoreboard } from "react-icons/md";
 // import HeatMap from '@uiw/react-heat-map';
 
 
-import "@uiw/react-heat-map/dist.css";
-import "@uiw/react-heat-map/esm/style/index.css";
+// import "@uiw/react-heat-map/dist.css";
+// import "@uiw/react-heat-map/esm/style/index.css";
 
 // import '@uiw/react-tooltip/esm/style/index.css';
 // import '@uiw/react-tooltip/dist.css';
@@ -56,9 +56,9 @@ function ActivityTable({ date, completions }: { date: Date, completions: HabitCo
 
   return (
     <div className="mt-6 text-center">
-      <p className="font-semibold">Activity Table for {date.toDateString()}</p>
+      <p className="font-semibold">Activity Log</p>
       {todaysCompletions.length == 0 && <div className="items-center justify-center p-4 bg-white  rounded-lg sm:flex text-center">
-          <div className="text-sm font-normal text-gray-500 dark:text-gray-300">No activity today.</div>
+          <div className="text-sm font-normal text-gray-500 dark:text-gray-300">No activity on {date.toLocaleDateString()}.</div>
         </div>}
 
       {/* filter for date and show only those activities  */}
@@ -67,17 +67,16 @@ function ActivityTable({ date, completions }: { date: Date, completions: HabitCo
           .map((it) => (
             it.memo == null ? (
               <li className="mb-2">
-
-                <div className="items-center justify-between p-4 bg-white border border-gray-300 rounded-lg shadow-sm sm:flex dark:bg-gray-700 dark:border-gray-600">
-                  <time className="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">{it.date?.toTimeString()}</time>
+                <div className="items-center justify-between p-2 bg-white border border-gray-300 rounded-lg shadow-sm sm:flex dark:bg-gray-700 dark:border-gray-600">
+                  <time className="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">{it.date.toLocaleString()}</time>
                   <div className="text-sm font-normal text-gray-500 dark:text-gray-300">You completed this habit.</div>
                 </div>
               </li>
             ) : (
               <li className="mb-2">
-                <div className="p-4 bg-white border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                <div className="p-2 bg-white border border-gray-300 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600">
                   <div className="items-center justify-between mb-3 sm:flex">
-                    <time className="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">{it.date?.toTimeString()}</time>
+                    <time className="mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">{it.date?.toLocaleString()}</time>
                     <div className="text-sm font-normal text-gray-500 dark:text-gray-300">You completed this habit with a memo.</div>
                   </div>
                   <div className="p-3 text-xs italic text-left font-normal text-gray-500 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-300">{it.memo}</div>
@@ -175,7 +174,7 @@ function _HabitsPage({ id }: { id: string }) {
             className="lowercase"
           ></DropDown>
         </h2>
-
+       
 
         <div className="mt-4 flex flex-wrap">
           <div className="mb-2 mt-2 w-full px-3 lg:w-6/12 flex justify-start flex-auto gap-x-3">
@@ -277,6 +276,7 @@ function _HabitsPage({ id }: { id: string }) {
               
             </div> */}
                     <MdScoreboard className="text-2xl"></MdScoreboard>
+                    
                   </div>
                 </div>
                 <p className="text-blueGray-400 mt-4 text-sm">
@@ -305,16 +305,18 @@ function _HabitsPage({ id }: { id: string }) {
             maxDate={new Date()}
             minDate={habitData.data?.createdAt}
           />
-
         </div>
         <ActivityTable date={date} completions={completionsData.data}></ActivityTable>
 
 
         <div className="mt-5 text-center">
           <h3 className="font-semibold">Linked Metrics</h3>
-          {habitData.data?.metrics.map((metric) => {
+          {habitData.data.metrics.length == 0 && <div className="items-center justify-center p-4 bg-white  rounded-lg sm:flex text-center">
+          <div className="text-sm font-normal text-gray-500 dark:text-gray-300">No linked metrics.</div>
+        </div>}
+          {habitData.data.metrics.map((metric) => {
             return (
-              <div className="flex flex-row justify-between w-full rounded-lg px-3 py-2 bg-gray-50">
+              <div className="flex flex-row justify-between w-full rounded-lg px-3 py-2 mt-2 bg-gray-50">
                 <LinkedMetric
                   {...metric}
                   weight={0.5}
@@ -328,8 +330,11 @@ function _HabitsPage({ id }: { id: string }) {
 
         <div className="mt-5 text-center">
           <h3 className="font-semibold">Linked Goals</h3>
-          {goalQuery.data?.map((goal) => (
-            <div className="flex flex-row justify-between w-full rounded-lg px-3 py-2 bg-gray-50">
+          {goalQuery.data.length == 0 && <div className="items-center justify-center p-4 bg-white  rounded-lg sm:flex text-center">
+          <div className="text-sm font-normal text-gray-500 dark:text-gray-300">No linked metrics.</div>
+        </div>}
+          {goalQuery.data.map((goal) => (
+            <div className="flex flex-row justify-between w-full rounded-lg px-3 py-2 mt-2 bg-gray-50">
 
               <div
                 className={"col-span-2 flex flex-row items-baseline gap-2"}
@@ -377,7 +382,7 @@ function _HabitsPage({ id }: { id: string }) {
 
 
 
-        <div className="mt-8 text-sm italic">
+        <div className="mt-8 text-sm italic text-gray-500 ">
           <p>Date Created: {format(habitData.data?.createdAt ?? new Date(), "MM-dd-yyyy p")}</p>
           <p>Last Updated: {format(habitData.data?.updatedAt ?? new Date(), "MM-dd-yyyy p")}</p>
         </div>
