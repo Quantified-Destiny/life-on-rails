@@ -18,14 +18,12 @@ function StatsCardRow() {
 
   for (let i = 0; i < goalData.goals.length; i++) {
     const g = goalData.goals[i];
-    console.log(`goal ${g?.goal.name} - ${g?.goal.score}`)
+    //console.log(`goal ${g?.goal.name} - ${g?.goal.score}`)
     if ((g?.goal?.score ?? 0) < 0.4 || isNaN(g?.goal?.score ?? 0)) {
       redGoal += 1;
-    }
-    else if ((g?.goal?.score ?? 0) < 0.7) {
+    } else if ((g?.goal?.score ?? 0) < 0.7) {
       yellowGoal += 1;
-    }
-    else {
+    } else {
       greenGoal += 1;
     }
   }
@@ -34,29 +32,27 @@ function StatsCardRow() {
   let yellowHabit = 0;
   let greenHabit = 0;
 
-  for (let i = 0; i < goalData.goals.length; i++) {         //habit that links to a goal
+  for (let i = 0; i < goalData.goals.length; i++) {
+    //habit that links to a goal
     for (let j = 0; j < (goalData.goals[i]?.habits?.length ?? 0); j++) {
       const h = goalData.goals[i]?.habits[j];
       if ((h?.score ?? 0) < 0.4) {
         redHabit += 1;
-      }
-      else if ((h?.score ?? 0) < 0.7) {
+      } else if ((h?.score ?? 0) < 0.7) {
         yellowHabit += 1;
-      }
-      else {
+      } else {
         greenHabit += 1;
       }
     }
   }
-  for (let i = 0; i < goalData.habits.length; i++) {  //standalone habit
+  for (let i = 0; i < goalData.habits.length; i++) {
+    //standalone habit
     const h = goalData.habits[i];
     if ((h?.score ?? 0) < 0.4) {
       redHabit += 1;
-    }
-    else if ((h?.score ?? 0) < 0.7) {
+    } else if ((h?.score ?? 0) < 0.7) {
       yellowHabit += 1;
-    }
-    else {
+    } else {
       greenHabit += 1;
     }
   }
@@ -66,14 +62,13 @@ function StatsCardRow() {
   let greenMetric = 0;
   const metric = metricData.metrics;
 
-  for (let i = 0; i < metric.length; i++) {   //all metrics
+  for (let i = 0; i < metric.length; i++) {
+    //all metrics
     if ((metric[i]?.score ?? 0) < 0.4) {
       redMetric += 1;
-    }
-    else if ((metric[i]?.score ?? 0) < 0.7) {
+    } else if ((metric[i]?.score ?? 0) < 0.7) {
       yellowMetric += 1;
-    }
-    else {
+    } else {
       greenMetric += 1;
     }
   }
@@ -271,7 +266,6 @@ function HabitsTable() {
 }
 
 export function Home() {
-
   return (
     <div className="">
       <div className="m-auto mx-20 h-full pt-10">
