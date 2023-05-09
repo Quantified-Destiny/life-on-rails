@@ -29,6 +29,8 @@ import {
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
+import { TbSquareRoundedLetterH } from "react-icons/tb";
+import { InlineEdit } from "../../pages/journal";
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
@@ -110,7 +112,32 @@ function MetricsSection({ goalId }: { goalId: string }) {
   );
 }
 
-function HabitsSection({ habits }: { habits: Habit[] }) {
+function InlineCreateHabit({ goalId }: { goalId: string }) {
+  const context = api.useContext();
+  const addHabit = api.journal.addHabit.useMutation({
+    onSuccess() {
+      void context.journal.getHabits.invalidate();
+    },
+  });
+
+  return (
+    <InlineEdit
+      placeholder="New habit"
+      initialText=""
+      commit={(text: string) =>
+        addHabit.mutate({ description: text, goal: goalId })
+      }
+    />
+  );
+}
+
+function HabitsSection({
+  goalId,
+  habits,
+}: {
+  goalId: string;
+  habits: Habit[];
+}) {
   const context = api.useContext();
   const deleteMetric = api.metrics.deleteMetric.useMutation({
     onSuccess() {
@@ -150,6 +177,7 @@ function HabitsSection({ habits }: { habits: Habit[] }) {
             </>
           );
         })}
+        <InlineCreateHabit goalId={goalId}></InlineCreateHabit>
       </div>
       {/* <CreateHabitLinkedToGoal goalId={goalId}></CreateHabitLinkedToGoal> */}
     </>
@@ -227,15 +255,18 @@ function ScoringSection({
           <Tooltip key={habit.id} delayDuration={0}>
             <div
               key={habit.id}
-              className="inline-flex h-full flex-col gap-3 text-center"
+              className="inline-flex h-full flex-col items-center gap-3 text-center"
               style={{
                 width: `${(habit.weight / totalWeight) * 100}%`,
               }}
             >
-              <p>{habit.description}</p>
+              <span className="flex flex-row items-baseline justify-center gap-2">
+                <TbSquareRoundedLetterH></TbSquareRoundedLetterH>
+                {habit.description}
+              </span>
               <TooltipTrigger asChild>
                 <div
-                  className="h-5 hover:scale-110 hover:scale-y-150 animate-[scale] animate-in animate-out"
+                  className="h-5 w-full animate-[scale] animate-in animate-out hover:scale-110 hover:scale-y-150"
                   style={{
                     backgroundColor: `hsl(0deg 0% ${40 + ((i * 15) % 60)}%)`,
                   }}
@@ -354,7 +385,10 @@ function GoalPanel({ goalId }: { goalId: string }) {
           <AccordionItem value="habits">
             <AccordionTrigger>Habits</AccordionTrigger>
             <AccordionContent>
-              <HabitsSection habits={data.habits}></HabitsSection>
+              <HabitsSection
+                habits={data.habits}
+                goalId={goalId}
+              ></HabitsSection>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="metrics">

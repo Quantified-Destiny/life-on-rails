@@ -21,11 +21,11 @@ const onDay = (date: Date) => {
 
 export const journalRouter = createTRPCRouter({
   addHabit: protectedProcedure
-    .input(z.string())
+    .input(z.object({ description: z.string(), goal: z.string().optional() }))
     .mutation(async ({ input, ctx }) => {
       await ctx.prisma.habit.create({
         data: {
-          description: input,
+          description: input.description,
           ownerId: ctx.session.user.id,
         },
       });
@@ -165,7 +165,7 @@ export const journalRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       await ctx.prisma.metric.delete({ where: { id: input.metricId } });
     }),
-    
+
   getHabits: protectedProcedure
     .input(
       z.object({
@@ -180,7 +180,7 @@ export const journalRouter = createTRPCRouter({
         }[];
         completions: HabitCompletion[];
         description: string;
-        HabitTag: (HabitTag & {tag: Tag})[];
+        HabitTag: (HabitTag & { tag: Tag })[];
       }[];
 
       const data: QueryType = await ctx.prisma.habit.findMany({
@@ -192,8 +192,8 @@ export const journalRouter = createTRPCRouter({
           description: true,
           HabitTag: {
             include: {
-              tag: true
-            }
+              tag: true,
+            },
           },
           metrics: {
             select: {
@@ -221,7 +221,7 @@ export const journalRouter = createTRPCRouter({
           description,
           metrics: metrics.map((m) => m.metric),
           completed: completions[0]?.isCompleted == true,
-          tags: HabitTag.map(it => it.tag)
+          tags: HabitTag.map((it) => it.tag),
         })
       );
 

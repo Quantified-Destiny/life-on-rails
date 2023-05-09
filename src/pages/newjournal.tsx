@@ -24,13 +24,11 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { CheckCircle, CircleIcon } from "lucide-react";
 import Link from "next/link";
 import { RxExternalLink } from "react-icons/rx";
-import { Button } from "../components/ui/button";
+import { CreateMenu } from "../components/createMenu";
 import { HabitSheet } from "../components/overview/habit-panel";
 import { Button } from "../components/ui/button";
 import { Toggle } from "../components/ui/toggle";
 import MetricModal from "./metric_modal";
-import Link from "next/link";
-import { CreateMenu } from "../components/createMenu";
 
 interface RowProps {
   id: string;
@@ -371,7 +369,7 @@ function InlineCreateHabit() {
     <InlineEdit
       placeholder="New habit"
       initialText=""
-      commit={(text: string) => addHabit.mutate(text)}
+      commit={(text: string) => addHabit.mutate({ description: text })}
     />
   );
 }
@@ -542,7 +540,7 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
               </p>
               <CreateMenu className="mt-4 inline-flex items-start justify-start rounded bg-gray-200 px-6 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hover:bg-indigo-600 sm:mt-0"></CreateMenu>
             </div>
-            <div className="flex items-center justify-between w-auto">
+            <div className="flex w-auto items-center justify-between">
               <TimePicker date={date} setDate={setDate}></TimePicker>
             </div>
           </div>
@@ -557,22 +555,32 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
                 date={date}
               ></DataTable>
             </div>
-            <div className="mt-7 transition delay-150flex flex-row justify-center">
-              <div className=" text-center text-md mb-5">
-              <button className="rounded-full focus:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-800" onClick={() => setTgl(!Tgl)}>
-                <div className="transition delay-150 rounded-full bg-indigo-100 px-4 py-1 text-indigo-700">
-                  {Tgl ?
-                    (<p>Show Compeleted Items</p>) : (<p>Hide Compeleted Items</p>) }
-                </div>
-              </button>
+
+            <div className="delay-150flex mt-7 flex-row justify-center transition">
+              <div className=" text-md mb-5 text-center">
+                <button
+                  className="rounded-full focus:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-800"
+                  onClick={() => setTgl(!Tgl)}
+                >
+                  <div className="rounded-full bg-indigo-100 px-4 py-1 text-indigo-700 transition delay-150">
+                    {Tgl ? (
+                      <p>Show Compeleted Items</p>
+                    ) : (
+                      <p>Hide Compeleted Items</p>
+                    )}
+                  </div>
+                </button>
               </div>
             </div>
-            {Tgl ?
-                    (<></>) : (<DataTable
-                      habits={habits}
-                      metrics={metrics}
-                      date={date}
-                    ></DataTable>) }
+            {Tgl ? (
+              <></>
+            ) : (
+              <DataTable
+                habits={habits}
+                metrics={metrics}
+                date={date}
+              ></DataTable>
+            )}
           </div>
         </div>
         <style

@@ -78,7 +78,7 @@ const Habit = ({
       <div className="flex flex-row">
         <input
           type="checkbox"
-          className= "mr-1" 
+          className="mr-1"
           aria-hidden="true"
           checked={completed}
           onChange={(event) => setCompletion(event.target.checked)}
@@ -122,7 +122,6 @@ const Habit = ({
       </div>
       {metrics.length != 0 && (
         <div className="ml-4 py-2 pl-2 shadow-md">
-
           {metrics.map((metric) => (
             <>
               <span className="">{metric.prompt}</span>
@@ -131,10 +130,10 @@ const Habit = ({
                 {[...Array(5).keys()].map((score) => (
                   <button
                     className="rounded-l bg-gray-300 px-2 font-semibold text-gray-800 hover:bg-gray-400"
-                    onClick={() => setScore(metric.id, score+1)}
-                    key={score+1}
+                    onClick={() => setScore(metric.id, score + 1)}
+                    key={score + 1}
                   >
-                    {score+1}
+                    {score + 1}
                   </button>
                 ))}
               </div>
@@ -155,7 +154,14 @@ interface SubjectiveProps {
   deleteMetric: () => void;
 }
 
-const Subjective = ({ id, prompt, score, setScore, editMetric, deleteMetric }: SubjectiveProps) => {
+const Subjective = ({
+  id,
+  prompt,
+  score,
+  setScore,
+  editMetric,
+  deleteMetric,
+}: SubjectiveProps) => {
   const [editMode, setEditMode] = useState(false);
   const [text, setText] = useState(prompt);
 
@@ -254,7 +260,7 @@ const Subjective = ({ id, prompt, score, setScore, editMetric, deleteMetric }: S
   );
 };
 
-const InlineEdit = ({
+export const InlineEdit = ({
   placeholder,
   initialText,
   commit,
@@ -329,7 +335,7 @@ function InlineCreateHabit() {
     <InlineEdit
       placeholder="New habit"
       initialText=""
-      commit={(text: string) => addHabit.mutate(text)}
+      commit={(text: string) => addHabit.mutate({ description: text })}
     />
   );
 }
