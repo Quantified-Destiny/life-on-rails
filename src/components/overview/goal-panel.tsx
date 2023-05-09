@@ -1,8 +1,9 @@
-import type { Habit, Metric } from "@prisma/client";
+import type { Habit } from "@prisma/client";
 import { subYears } from "date-fns";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import type { ExpandedHabit, ExpandedMetric } from "../../server/queries";
 import { api } from "../../utils/api";
 import { CreateLinkedMetricInline, EditableField } from "../inlineEdit";
 import {
@@ -20,8 +21,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
-import { Slider } from "../ui/slider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { GoalTagList } from "./tags";
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
@@ -192,50 +199,83 @@ function HistorySection({ habitId }: { habitId: string }) {
   );
 }
 
-const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
-
 function ScoringSection({
-  habitId,
-  completionWeight,
+  habits,
   metrics,
 }: {
-  habitId: string;
-  completionWeight: number;
-  metrics: Metric[];
+  habits: (ExpandedHabit & { weight: number })[];
+  metrics: (ExpandedMetric & { weight: number })[];
 }) {
-  const context = api.useContext();
-  const editCompletionWeight = api.habits.editCompletionWeight.useMutation({
-    onSuccess() {
-      void context.invalidate();
-    },
-  });
-  const [cw, setcw] = useState(completionWeight);
+  const totalWeight =
+    habits.reduce((acc, cur) => acc + cur.weight, 0) +
+    metrics.reduce((acc, cur) => acc + cur.weight, 0);
 
-  const metricWeight = (1 - cw) / metrics.length;
-  const data = metrics.map((it) => ({ label: it.prompt, value: metricWeight }));
-  data.push({ label: "Completions", value: cw });
-
+  if (totalWeight == 0) {
+    return (
+      <div className="h-10 w-full bg-gray-100">
+        <p>
+          No linked habits or metrics! Goals need linked items to calculate
+          scores.
+        </p>
+      </div>
+    );
+  }
   return (
-    <>
-      <div className="space-y-4 p-2">
-        <Label className="my-4">Completion weight</Label>
-        <Slider
-          value={[cw]}
-          onValueChange={(v) => setcw(v[0]!)}
-          min={0}
-          max={1}
-          step={0.01}
-          onValueCommit={(val) =>
-            editCompletionWeight.mutate({ habitId, completionWeight: val[0]! })
-          }
-        ></Slider>
+    <TooltipProvider>
+      <div className="relative w-full">
+        {habits.map((habit, i) => (
+          <Tooltip key={habit.id} delayDuration={0}>
+            <div
+              key={habit.id}
+              className="inline-flex h-full flex-col gap-3 text-center"
+              style={{
+                width: `${(habit.weight / totalWeight) * 100}%`,
+              }}
+            >
+              <p>{habit.description}</p>
+              <TooltipTrigger asChild>
+                <div
+                  className="h-5 hover:scale-110 hover:scale-y-150 animate-[scale] animate-in animate-out"
+                  style={{
+                    backgroundColor: `hsl(0deg 0% ${40 + ((i * 15) % 60)}%)`,
+                  }}
+                ></div>
+              </TooltipTrigger>
+              <p> Weight: {habit.weight}</p>
+              <span>
+                <Button variant="ghost" disabled={habit.weight <= 1}>
+                  <ArrowDownIcon></ArrowDownIcon>
+                </Button>
+                <Button variant="ghost">
+                  <ArrowUpIcon></ArrowUpIcon>
+                </Button>
+              </span>
+            </div>
+            <TooltipContent>
+              {((habit.weight / totalWeight) * 100).toFixed(2)}%
+            </TooltipContent>
+          </Tooltip>
+        ))}
+        {metrics.map((metric, i) => (
+          <Tooltip key={metric.id} delayDuration={0}>
+            <TooltipTrigger asChild>
+              <div
+                key={metric.id}
+                className="inline-block h-full bg-gray-200"
+                style={{
+                  width: `${(metric.weight / totalWeight) * 100}%`,
+                  backgroundColor: `hsl(0deg 0% ${50 + ((i * 15) % 50)}%)`,
+                }}
+              ></div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {metric.prompt} -{" "}
+              {((metric.weight / totalWeight) * 100).toFixed(2)}%
+            </TooltipContent>
+          </Tooltip>
+        ))}
       </div>
-      <div className="my-8 flex flex-col items-center justify-center">
-        <div className="">
-          <DonutChart data={data} width={400} height={280} />
-        </div>
-      </div>
-    </>
+    </TooltipProvider>
   );
 }
 
@@ -291,13 +331,18 @@ function GoalPanel({ goalId }: { goalId: string }) {
           type="multiple"
         >
           <AccordionItem value="scoring">
-            <AccordionTrigger>Scoring and metrics</AccordionTrigger>
+            <AccordionTrigger>Scoring</AccordionTrigger>
             <AccordionContent>
-              {/* <ScoringSection
-                    habitId={habitId}
-                    completionWeight={data.completionWeight}
-                    metrics={data.metrics}
-                  ></ScoringSection> */}
+              <ScoringSection
+                habits={goalQuery.data.habits.map((it) => ({
+                  ...it,
+                  weight: 1,
+                }))}
+                metrics={goalQuery.data.metrics.map((it) => ({
+                  ...it,
+                  weight: 1,
+                }))}
+              ></ScoringSection>
             </AccordionContent>
           </AccordionItem>
           {/* <AccordionItem value="history">
