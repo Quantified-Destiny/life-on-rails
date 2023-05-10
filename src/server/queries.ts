@@ -1,6 +1,7 @@
 import type {
   Goal,
   Habit,
+  HabitCompletion,
   HabitMeasuresGoal,
   HabitTag,
   LinkedMetric,
@@ -11,7 +12,7 @@ import type {
   Tag,
 } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
-import { subDays, subWeeks } from "date-fns";
+import { isSameDay, subDays, subWeeks } from "date-fns";
 
 import type { prisma as prismaClient } from "./db";
 
@@ -61,6 +62,7 @@ export async function getHabitsWithMetricsMap({
       metrics: true,
       HabitTag: { include: { tag: true } },
       goals: true,
+      completions: { where: { date: { gt: subDays(new Date(), 7) } } },
     },
   });
   const habitsMap = new Map<string, HabitType>(habits.map((h) => [h.id, h]));
@@ -134,6 +136,7 @@ export async function getHabits({
     HabitTag: (HabitTag & {
       tag: Tag;
     })[];
+    completions: HabitCompletion[];
     metrics: (LinkedMetric & {
       metric: Metric & {
         metricAnswers: MetricAnswer[];
@@ -160,17 +163,17 @@ export async function getHabits({
       ...whereConditions,
     },
     include: {
+      completions: {
+        where: {
+          date: { gt: subWeeks(new Date(), 1) },
+        },
+      },
       metrics: {
         include: {
           metric: {
             include: {
               goals: { include: { goal: true } },
               MetricTag: { include: { tag: true } },
-              metricAnswers: {
-                where: {
-                  createdAt: { gt: subWeeks(new Date(), user.scoringWeeks) },
-                },
-              },
             },
           },
         },
@@ -223,13 +226,18 @@ export async function getHabits({
       habit.completionWeight * completionScore +
       (1 - habit.completionWeight) * metricsScore;
 
+    const completions = habit.completions;
+    const completionsCount =
+      habit.frequencyHorizon == FrequencyHorizon.DAY
+        ? completions.filter(({ date }) => isSameDay(new Date(), date)).length
+        : completions.length;
     return {
       ...habit,
       score,
       metrics: expandedMetrics,
       goals: habit.goals.map((it) => it.goalId),
       tags: habit.HabitTag.map((it) => it.tag.name),
-      completions: habitCompletionsCount.get(habit.id) ?? 0,
+      completions: completionsCount,
     };
   });
 
@@ -390,4 +398,3 @@ export async function getGoals(
   });
   return goalsData;
 }
-
