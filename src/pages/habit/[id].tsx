@@ -166,9 +166,9 @@ function _HabitsPage({ id }: { id: string }) {
 
   if (!completionsData.data || !goalQuery.data || !habitData.data) {
     return (
-      <p>
-        <RxRocket></RxRocket>
-      </p>
+      <div className="h-screen flex items-center justify-center">
+        <RxRocket className="text-2xl animate-spin"></RxRocket>
+      </div>
     );
   }
 
