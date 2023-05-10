@@ -69,8 +69,7 @@ function GoalsSection({ habitId }: { habitId: string }) {
                 >
                   Unlink
                 </Button>
-                <Button className="bg-gray-500">
-                  Manage</Button>
+                <Button className="bg-gray-500">Manage</Button>
               </div>
             </>
           );
@@ -103,7 +102,7 @@ function MetricsSection({ habitId }: { habitId: string }) {
         {metricsQuery.data.length == 0 && <div>No linked metrics</div>}
         {metricsQuery.data.map((metric) => {
           return (
-            <>
+            <div key={metric.id} className="contents">
               <div>
                 <p className="text-lg">{metric.prompt}</p>
                 <p className="text-sm text-gray-300">
@@ -122,7 +121,7 @@ function MetricsSection({ habitId }: { habitId: string }) {
                   Delete
                 </Button>
               </div>
-            </>
+            </div>
           );
         })}
       </div>
@@ -152,7 +151,6 @@ function HistorySection({ habitId }: { habitId: string }) {
     count: 10,
     content: "",
   }));
-  
 
   return (
     <div className="my-8 flex flex-col items-center justify-center">
@@ -162,12 +160,22 @@ function HistorySection({ habitId }: { habitId: string }) {
         startDate={subMonths(new Date(), 6)}
         width={450}
         legendCellSize={0}
-        legendRender={(props) => <rect {...props} y={props.y + 10} rx={range} />}
+        legendRender={(props) => (
+          <rect {...props} y={props.y + 10} rx={range} />
+        )}
         rectProps={{
-          rx: range
+          rx: range,
         }}
       />
-      <input type="range" min="0" max="5" step="0.1" value={range} onChange={(e) => setRange(e.target.value)} /> Rect Radius: {range}
+      <input
+        type="range"
+        min="0"
+        max="5"
+        step="0.1"
+        value={range}
+        onChange={(e) => setRange(e.target.value)}
+      />{" "}
+      Rect Radius: {range}
     </div>
   );
 }
@@ -316,7 +324,11 @@ export function HabitSheet({
   return (
     <Sheet>
       <SheetTrigger>{children}</SheetTrigger>
-      <SheetContent position="right" size="lg" className="overflow-scroll  max-md:w-full">
+      <SheetContent
+        position="right"
+        size="lg"
+        className="overflow-scroll  max-md:w-full"
+      >
         <HabitPanel habitId={habitId}></HabitPanel>
       </SheetContent>
     </Sheet>

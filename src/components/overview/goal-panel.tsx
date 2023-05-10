@@ -409,10 +409,19 @@ function GoalPanel({ goalId }: { goalId: string }) {
   const data = goalQuery.data;
   const habitGoalWeightMap = habitGoalWeightQuery.data;
   const metricGoalWeightMap = metricGoalWeightQuery.data;
-  if (goalQuery.isError || habitGoalWeightQuery.isError || metricGoalWeightQuery.isError) {
+  if (
+    goalQuery.isError ||
+    habitGoalWeightQuery.isError ||
+    metricGoalWeightQuery.isError
+  ) {
     return <p>Error</p>;
   }
-  if (goalQuery.isLoading || !data || habitGoalWeightQuery.isLoading || metricGoalWeightQuery.isLoading) {
+  if (
+    goalQuery.isLoading ||
+    !data ||
+    habitGoalWeightQuery.isLoading ||
+    metricGoalWeightQuery.isLoading
+  ) {
     return <p>LOADING</p>;
   }
 
@@ -453,11 +462,13 @@ function GoalPanel({ goalId }: { goalId: string }) {
                 goalId={goalId}
                 habits={goalQuery.data.habits.map((it) => ({
                   ...it,
-                  weight: (habitGoalWeightMap?.HabitGoalWeightMap.get(it.id) ?? 0),
+                  weight:
+                    habitGoalWeightMap?.HabitGoalWeightMap.get(it.id) ?? 0,
                 }))}
                 metrics={goalQuery.data.metrics.map((it) => ({
                   ...it,
-                  weight: (metricGoalWeightMap?.MetricGoalWeightMap.get(it.id) ?? 0),
+                  weight:
+                    metricGoalWeightMap?.MetricGoalWeightMap.get(it.id) ?? 0,
                 }))}
               ></ScoringSection>
             </AccordionContent>
@@ -510,8 +521,11 @@ export function GoalSheet({
   return (
     <Sheet>
       <SheetTrigger>{children}</SheetTrigger>
-      <SheetContent position="right" className="overflow-scroll">
-      <SheetContent position="right" size="lg" className="overflow-scroll max-md:w-full">
+      <SheetContent
+        position="right"
+        size="lg"
+        className="overflow-scroll max-md:w-full"
+      >
         <GoalPanel goalId={goalId}></GoalPanel>
       </SheetContent>
     </Sheet>
