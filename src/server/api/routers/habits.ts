@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { LinkedMetric, Metric } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
-import { subDays } from "date-fns";
+import { endOfDay, startOfDay, subDays } from "date-fns";
 import { getHabitsWithMetricsMap, getMetrics } from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -64,6 +64,27 @@ export const habitsRouter = createTRPCRouter({
         },
       });
       return completions;
+    }),
+
+  getCompletionsOnDay: protectedProcedure
+    .input(z.object({ habitId: z.string(), date: z.date() }))
+    .query(async ({ input, ctx }) => {
+      const completions = await ctx.prisma.habitCompletion.findMany({
+        where: {
+          habitId: input.habitId,
+          date: { gt: startOfDay(input.date), lt: endOfDay(input.date) },
+        },
+      });
+      return completions;
+    }),
+
+    deleteCompletion: protectedProcedure.input(z.object({ completionId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.habitCompletion.delete({
+        where: {
+          id: input.completionId,
+        }
+      })
     }),
 
   getMetrics: protectedProcedure
@@ -181,23 +202,23 @@ export const habitsRouter = createTRPCRouter({
     }),
 
   getHabits: protectedProcedure
-  .input(z.object({date: z.date()}))
-  .query(async ({ input, ctx }) => {
-    const [_, metricsMap] = await getMetrics({
-      prisma: ctx.prisma,
-      userId: ctx.session.user.id,
-      date: input.date
-    });
+    .input(z.object({ date: z.date() }))
+    .query(async ({ input, ctx }) => {
+      const [_, metricsMap] = await getMetrics({
+        prisma: ctx.prisma,
+        userId: ctx.session.user.id,
+        date: input.date,
+      });
 
-    const [habits, _habitsMap] = await getHabitsWithMetricsMap({
-      prisma: ctx.prisma,
-      metricsMap,
-      userId: ctx.session.user.id,
-      date: input.date
-    });
-    habits.sort((a, b)=>a.score-b.score); //to sort by urgency on habits page
-    return habits;
-  }),
+      const [habits, _habitsMap] = await getHabitsWithMetricsMap({
+        prisma: ctx.prisma,
+        metricsMap,
+        userId: ctx.session.user.id,
+        date: input.date,
+      });
+      habits.sort((a, b) => a.score - b.score); //to sort by urgency on habits page
+      return habits;
+    }),
 
   getHabit: protectedProcedure
     .input(z.object({ habitId: z.string() }))

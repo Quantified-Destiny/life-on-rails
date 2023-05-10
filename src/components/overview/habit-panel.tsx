@@ -157,7 +157,13 @@ function transpose<T>(matrix: T[][]): T[][] {
   return matrix[0]!.map((col, i) => matrix.map((row) => row[i]!));
 }
 
-function CompletionsGrid({ completions }: { completions: HabitCompletion[] }) {
+function CompletionsGrid({
+  habitId,
+  completions,
+}: {
+  habitId: string;
+  completions: HabitCompletion[];
+}) {
   const windowed_data = useMemo(() => {
     const date = startOfDay(new Date());
 
@@ -174,6 +180,16 @@ function CompletionsGrid({ completions }: { completions: HabitCompletion[] }) {
     return transpose(window(data, 7));
   }, [completions]);
   const [date, setDate] = useState<undefined | Date>(undefined);
+  const completionsQuery = api.habits.getCompletionsOnDay.useQuery(
+    { habitId: habitId, date: date! },
+    { enabled: date !== undefined }
+  );
+  const context = api.useContext();
+  const deleteCompletion = api.habits.deleteCompletion.useMutation({
+    onSuccess() {
+      void context.habits.invalidate();
+    },
+  });
 
   return (
     <>
@@ -216,7 +232,35 @@ function CompletionsGrid({ completions }: { completions: HabitCompletion[] }) {
           ))}
         </tbody>
       </table>
-      <div>{date?.toISOString()}</div>
+      <div>
+        <div className="pt-10">
+          <ol className="relative pt-1 dark:border-gray-700">
+            {completionsQuery.data?.map((it) => (
+              <li className="mb-2" key={it.id}>
+                <div className="flex items-center justify-between gap-10 rounded-lg border border-gray-300 bg-white p-2 shadow-sm">
+                  <div className="text-sm font-normal text-gray-500 dark:text-gray-300">
+                    You completed this habit.
+                  </div>
+                  <div className="mb-1 text-xs font-normal text-gray-400">
+                    {it.date.toLocaleString()}
+                  </div>
+                  <XCircle
+                    className="opacity-50 hover:bg-red-100"
+                    onClick={() =>
+                      deleteCompletion.mutate({ completionId: it.id })
+                    }
+                  ></XCircle>
+                </div>
+                {it.memo && (
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs font-normal italic text-gray-500 dark:border-gray-500 dark:bg-gray-600 dark:text-gray-300">
+                    {it.memo}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
     </>
   );
 }
@@ -237,7 +281,7 @@ function HistorySection({ habitId }: { habitId: string }) {
 
   return (
     <div className="my-8 flex flex-col items-center justify-center">
-      <CompletionsGrid completions={completions} />
+      <CompletionsGrid habitId={habitId} completions={completions} />
     </div>
   );
 }
@@ -248,6 +292,7 @@ import { cn } from "../../lib/utils";
 import { Slider } from "../ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider } from "../ui/tooltip";
 import { TagList } from "./tags";
+import { XCircle } from "lucide-react";
 
 const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
 
