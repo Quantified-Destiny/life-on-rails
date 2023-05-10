@@ -1,71 +1,64 @@
 import { useState } from "react";
-import { Tooltip } from "react-tooltip";
-import "react-tooltip/dist/react-tooltip.css";
 import Layout from "../components/layout";
 import TimePicker from "../components/time-picker";
 
 import { RxGear } from "react-icons/rx";
 import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 
-import type { Metric, Tag } from "@prisma/client";
+import type { HabitCompletion, Tag } from "@prisma/client";
+import { Metric } from "@prisma/client";
 import classNames from "classnames";
-import { differenceInCalendarDays } from "date-fns";
 import { RiCalendarCheckLine } from "react-icons/ri";
-
-function isSameDay(a: Date, b: Date) {
-  return differenceInCalendarDays(a, b) === 0;
-}
 
 import { api } from "../utils/api";
 
 // fixes zoomed in icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { CheckCircle, CircleIcon } from "lucide-react";
+import { CheckCircle, CircleDot, CircleIcon } from "lucide-react";
 import Link from "next/link";
 import { RxExternalLink } from "react-icons/rx";
 import { CreateMenu } from "../components/createMenu";
 import { HabitSheet } from "../components/overview/habit-panel";
 import { Button } from "../components/ui/button";
-import { Toggle } from "../components/ui/toggle";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../components/ui/tooltip";
 import MetricModal from "./metric_modal";
 
 interface RowProps {
   id: string;
   description: string;
   date: Date;
-  completed: boolean;
+  state: RowState;
   metrics?: Metric[];
   tags: Tag[];
-  setCompletion: (completed: boolean) => void;
+  complete: () => void;
   type: "Habit" | "Metric";
 }
 
-function Checkbox(props: {
-  completed: boolean;
-  setCompletion: (completed: boolean) => void;
-}) {
-  return (
-    <td>
-      <div className="relative rounded-sm px-5">
-        <Toggle
-          pressed={props.completed}
-          onPressedChange={(pressed) => props.setCompletion(pressed)}
-        >
-          {props.completed ? (
-            <CheckCircle></CheckCircle>
-          ) : (
-            <CircleIcon></CircleIcon>
-          )}
-        </Toggle>
-      </div>
-    </td>
-  );
+function Status(props: { status: RowState; complete: () => void }) {
+  switch (props.status) {
+    case RowState.COMPLETED:
+      return <CheckCircle></CheckCircle>;
+    case RowState.INCOMPLETE:
+      return (
+        <CircleIcon
+          onClick={props.complete}
+          className="cursor-pointer"
+        ></CircleIcon>
+      );
+    case RowState.PARTIAL:
+      return <CircleDot></CircleDot>;
+  }
 }
 
 function TypeIcon({ type }: { type: "Habit" | "Metric" }) {
   return (
-    <td className="pl-2">
+    <td className="">
       <div className="flex items-center">
         {type == "Habit" ? (
           <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
@@ -81,34 +74,35 @@ function MetricsIcon({ metrics }: { metrics?: Metric[] }) {
   if (metrics && metrics.length > 0)
     return (
       <>
-        <div
-          className="item"
-          data-tooltip-id="metric-tooltip"
-          data-tooltip-content={metrics.map((m) => m.prompt).join(", ")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={16}
-            height={16}
-            viewBox="0 0 16 16"
-            fill="none"
-          >
-            <path
-              d="M6.66669 9.33342C6.88394 9.55515 7.14325 9.73131 7.42944 9.85156C7.71562 9.97182 8.02293 10.0338 8.33335 10.0338C8.64378 10.0338 8.95108 9.97182 9.23727 9.85156C9.52345 9.73131 9.78277 9.55515 10 9.33342L12.6667 6.66676C13.1087 6.22473 13.357 5.62521 13.357 5.00009C13.357 4.37497 13.1087 3.77545 12.6667 3.33342C12.2247 2.89139 11.6251 2.64307 11 2.64307C10.3749 2.64307 9.77538 2.89139 9.33335 3.33342L9.00002 3.66676"
-              stroke="#3B82F6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M9.33336 6.66665C9.11611 6.44492 8.8568 6.26876 8.57061 6.14851C8.28442 6.02825 7.97712 5.96631 7.66669 5.96631C7.35627 5.96631 7.04897 6.02825 6.76278 6.14851C6.47659 6.26876 6.21728 6.44492 6.00003 6.66665L3.33336 9.33332C2.89133 9.77534 2.64301 10.3749 2.64301 11C2.64301 11.6251 2.89133 12.2246 3.33336 12.6666C3.77539 13.1087 4.37491 13.357 5.00003 13.357C5.62515 13.357 6.22467 13.1087 6.66669 12.6666L7.00003 12.3333"
-              stroke="#3B82F6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-
-        <Tooltip id="metric-tooltip" />
+        <TooltipProvider>
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={16}
+                height={16}
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <path
+                  d="M6.66669 9.33342C6.88394 9.55515 7.14325 9.73131 7.42944 9.85156C7.71562 9.97182 8.02293 10.0338 8.33335 10.0338C8.64378 10.0338 8.95108 9.97182 9.23727 9.85156C9.52345 9.73131 9.78277 9.55515 10 9.33342L12.6667 6.66676C13.1087 6.22473 13.357 5.62521 13.357 5.00009C13.357 4.37497 13.1087 3.77545 12.6667 3.33342C12.2247 2.89139 11.6251 2.64307 11 2.64307C10.3749 2.64307 9.77538 2.89139 9.33335 3.33342L9.00002 3.66676"
+                  stroke="#3B82F6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9.33336 6.66665C9.11611 6.44492 8.8568 6.26876 8.57061 6.14851C8.28442 6.02825 7.97712 5.96631 7.66669 5.96631C7.35627 5.96631 7.04897 6.02825 6.76278 6.14851C6.47659 6.26876 6.21728 6.44492 6.00003 6.66665L3.33336 9.33332C2.89133 9.77534 2.64301 10.3749 2.64301 11C2.64301 11.6251 2.89133 12.2246 3.33336 12.6666C3.77539 13.1087 4.37491 13.357 5.00003 13.357C5.62515 13.357 6.22467 13.1087 6.66669 12.6666L7.00003 12.3333"
+                  stroke="#3B82F6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </TooltipTrigger>
+            <TooltipContent>
+              {metrics.map((m) => m.prompt).join(", ")}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </>
     );
   else return <></>;
@@ -117,42 +111,50 @@ function MetricsIcon({ metrics }: { metrics?: Metric[] }) {
 function TagsTooltip({ tags }: { tags: Tag[] }) {
   return (
     <>
-      <div className="flex items-center">
-        {/* only show if there's tags */}
-        {tags.length > 0 && (
-          <div
-            className="item"
-            data-tooltip-id="tag-tooltip"
-            data-tooltip-content={tags.map((it) => it.name).join(", ")}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width={20}
-              height={20}
-              viewBox="0 0 20 20"
-              fill="none"
-            >
-              <path
-                d="M9.16667 2.5L16.6667 10C17.0911 10.4745 17.0911 11.1922 16.6667 11.6667L11.6667 16.6667C11.1922 17.0911 10.4745 17.0911 10 16.6667L2.5 9.16667V5.83333C2.5 3.99238 3.99238 2.5 5.83333 2.5H9.16667"
-                stroke="#52525B"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle
-                cx="7.50004"
-                cy="7.49967"
-                r="1.66667"
-                stroke="#52525B"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-        )}
-      </div>
-      <Tooltip id="tag-tooltip" />
+      <TooltipProvider>
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger>
+            <div className="flex items-center">
+              {/* only show if there's tags */}
+              {tags.length > 0 && (
+                <div
+                  className="item"
+                  data-tooltip-id="tag-tooltip"
+                  data-tooltip-content={tags.map((it) => it.name).join(", ")}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={20}
+                    height={20}
+                    viewBox="0 0 20 20"
+                    fill="none"
+                  >
+                    <path
+                      d="M9.16667 2.5L16.6667 10C17.0911 10.4745 17.0911 11.1922 16.6667 11.6667L11.6667 16.6667C11.1922 17.0911 10.4745 17.0911 10 16.6667L2.5 9.16667V5.83333C2.5 3.99238 3.99238 2.5 5.83333 2.5H9.16667"
+                      stroke="#52525B"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <circle
+                      cx="7.50004"
+                      cy="7.49967"
+                      r="1.66667"
+                      stroke="#52525B"
+                      strokeWidth="1.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            {tags.map((it) => it.name).join(", ")}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </>
   );
 }
@@ -181,7 +183,7 @@ function Schedule({
 }) {
   return (
     <div className="flex items-center">
-      <p className="ml-2 text-sm leading-none text-gray-600">
+      <p className="ml-2 text-sm leading-none text-gray-600/40">
         {/* based off the frequency, if multiple times a day */}
         {currentCompletions}/{target}
       </p>
@@ -193,10 +195,10 @@ const Row = ({
   type,
   id,
   description,
-  completed,
+  state,
   metrics,
   tags,
-  setCompletion,
+  complete,
 }: RowProps): JSX.Element => {
   return (
     <tr
@@ -204,9 +206,13 @@ const Row = ({
       className="h-12 rounded border border-gray-100 focus:outline-none"
       key={id}
     >
-      <Checkbox completed={completed} setCompletion={setCompletion}></Checkbox>
-
       <TypeIcon type={type}></TypeIcon>
+      <td className="">
+        <div className="flex flex-row items-center justify-center">
+          <Status status={state} complete={complete}></Status>
+          <Schedule currentCompletions={1} target={3}></Schedule>
+        </div>
+      </td>
       <td className="pl-2">
         <div className="flex items-center text-sm">0.8</div>
       </td>
@@ -218,7 +224,7 @@ const Row = ({
           <p
             className={classNames(
               "mr-2 text-base font-medium leading-none text-gray-700",
-              { "line-through": completed }
+              { "line-through": state === RowState.COMPLETED }
             )}
           >
             {description}
@@ -239,9 +245,6 @@ const Row = ({
           <p className="ml-2 text-sm leading-none text-gray-600">05/01</p>
         </div>
       </td>
-      <td className="pl-2">
-        <Schedule currentCompletions={1} target={3}></Schedule>
-      </td>
       <td>{type === "Habit" && <Actions id={id}></Actions>}</td>
     </tr>
   );
@@ -251,13 +254,27 @@ interface SubjectiveProps {
   id: string;
   prompt: string;
   score: number | undefined;
-  setScore: (score: number) => void;
 }
 
-const Subjective = ({ id, prompt, score, setScore }: SubjectiveProps) => {
+const Metric = ({ id, prompt, score: serverScore }: SubjectiveProps) => {
+  const setScoreMutation = api.metrics.setScore.useMutation();
+  const [score, setScoreState] = useState<undefined | number>(serverScore);
+
+  const setScore = (score: number) => {
+    setScoreState(score);
+    setScoreMutation.mutate({
+      metricId: id,
+      score: score / 5,
+      date: new Date(),
+    });
+  };
+
   return (
     <div className="mb-1 py-1">
-      <p>{prompt}</p>
+      <span className="flex flex-row items-center justify-center gap-2">
+        <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
+        <p>{prompt}</p>
+      </span>
       <div className="flex flex-row flex-nowrap gap-2 p-2">
         <Button
           onClick={() => setScore(1)}
@@ -378,8 +395,7 @@ interface JournalProps {
   habits: {
     id: string;
     description: string;
-    completed: boolean;
-    editable: boolean;
+    completions: HabitCompletion[];
     metrics: Metric[];
     tags: Tag[];
   }[];
@@ -389,6 +405,7 @@ interface JournalProps {
     id: string;
     prompt: string;
     score: number | undefined;
+    tags: Tag[];
   }[];
 }
 
@@ -409,9 +426,8 @@ interface JournalProps {
 type HabitType = {
   id: string;
   description: string;
-  completed: boolean;
-  editable: boolean;
   metrics: Metric[];
+  completions: HabitCompletion[];
   tags: Tag[];
 };
 
@@ -419,7 +435,103 @@ type MetricType = {
   id: string;
   prompt: string;
   score: number | undefined;
+  tags: Tag[];
 };
+
+enum RowState {
+  INCOMPLETE,
+  PARTIAL,
+  COMPLETED,
+}
+
+function HabitRows({ habit, date }: { habit: HabitType; date: Date }) {
+  const [state, setState] = useState<RowState>(RowState.INCOMPLETE);
+
+  return (
+    <>
+      <Row
+        type="Habit"
+        {...habit}
+        date={date}
+        key={habit.id}
+        state={state}
+        complete={
+          habit.metrics.length > 0
+            ? () => setState(RowState.PARTIAL)
+            : () => setState(RowState.COMPLETED)
+        }
+      ></Row>
+      {state !== RowState.INCOMPLETE && (
+        <tr>
+          <td colSpan={7} className="rounded border border-gray-100">
+            <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
+              <form className="">
+                <div className="flex items-center">
+                  {habit.metrics.map((metric) => (
+                    <Metric key={metric.id} {...metric} score={0.5}></Metric>
+                  ))}
+                </div>
+                <div className="">
+                  <textarea
+                    placeholder="Memo"
+                    className="h-14 w-full resize-none rounded border border-gray-200 py-3 pl-3 focus:h-20 focus:overflow-auto focus:outline-none"
+                    defaultValue={""}
+                  />
+                </div>
+                <div className="items-right mt-2 flex justify-end gap-2">
+                  <Button variant="link">Cancel</Button>
+                  <Button variant="outline">Done</Button>
+                </div>
+              </form>
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
+function MetricRows({ metric, date }: { metric: MetricType; date: Date }) {
+  const [state, setState] = useState<RowState>(RowState.INCOMPLETE);
+  return (
+    <>
+      <Row
+        type="Metric"
+        description={metric.prompt}
+        id={metric.id}
+        tags={metric.tags}
+        date={date}
+        key={metric.id}
+        state={state}
+        complete={() => setState(RowState.PARTIAL)}
+      ></Row>
+      {state === RowState.PARTIAL && (
+        <tr>
+          <td colSpan={7} className="rounded border border-gray-100">
+            <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
+              <form className="">
+                <div className="flex items-center">
+                  <Metric key={metric.id} {...metric} score={0.5}></Metric>
+                </div>
+                <div className="">
+                  <textarea
+                    placeholder="Memo"
+                    className="h-14 w-full resize-none rounded border border-gray-200 py-3 pl-3 focus:h-20 focus:overflow-auto focus:outline-none"
+                    defaultValue={""}
+                  />
+                </div>
+                <div className="items-right mt-2 flex justify-end gap-2">
+                  <Button variant="link">Cancel</Button>
+                  <Button variant="outline">Done</Button>
+                </div>
+              </form>
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
 
 function DataTable({
   habits,
@@ -431,7 +543,7 @@ function DataTable({
   metrics: MetricType[];
 }) {
   const context = api.useContext();
-  const setHabitCompletion = api.journal.setCompletion.useMutation({
+  const complete = api.journal.complete.useMutation({
     onSuccess() {
       void context.journal.getHabits.invalidate();
     },
@@ -449,69 +561,27 @@ function DataTable({
 
       <table className="w-full whitespace-nowrap">
         <thead>
-          <tr className="justify-between text-center text-xs font-semibold">
+          <tr className="font-semisbold justify-between text-center text-xs">
             <td></td>
-            <td>Type</td>
+            <td>Completions</td>
             <td>Score</td>
             <td>Name</td>
             <td></td>
             <td>Last</td>
-            <td>Done</td>
-            <td></td>
             <td></td>
           </tr>
         </thead>
         <tbody>
-          {habits.map((habit) => {
-            if (habit.metrics.length > 0) {
-              return (
-                <Row
-                  type="Habit"
-                  {...habit}
-                  date={date}
-                  key={habit.id}
-                  setCompletion={(completed) => {
-                    setMetrics(habit.metrics);
-                    setOpen(true);
-                    return setHabitCompletion.mutate({
-                      date: date,
-                      habitId: habit.id,
-                      completed,
-                    });
-                  }}
-                ></Row>
-              );
-            } else
-              return (
-                <Row
-                  type="Habit"
-                  {...habit}
-                  date={date}
-                  key={habit.id}
-                  setCompletion={(completed) =>
-                    setHabitCompletion.mutate({
-                      date: date,
-                      habitId: habit.id,
-                      completed,
-                    })
-                  }
-                ></Row>
-              );
-          })}
-          {metrics.map((metric) => {
-            return (
-              <Row
-                type="Metric"
-                description={metric.prompt}
-                completed={false}
-                id={metric.id}
-                tags={[]}
-                date={date}
-                key={metric.id}
-                setCompletion={console.log}
-              ></Row>
-            );
-          })}
+          {habits.map((habit) => (
+            <HabitRows habit={habit} date={date} key={habit.id}></HabitRows>
+          ))}
+          {metrics.map((metric) => (
+            <MetricRows
+              metric={metric}
+              date={date}
+              key={metric.id}
+            ></MetricRows>
+          ))}
         </tbody>
       </table>
     </>
@@ -521,11 +591,6 @@ function DataTable({
 function Journal({ date, setDate, habits, metrics }: JournalProps) {
   const context = api.useContext();
   const [Tgl, setTgl] = useState<boolean>(true);
-  const setScore = api.journal.setSubjectiveScore.useMutation({
-    onSuccess() {
-      void context.journal.getMetrics.invalidate();
-    },
-  });
   return (
     <>
       <div className="container flex max-w-5xl justify-center">
@@ -556,7 +621,7 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
               ></DataTable>
             </div>
 
-            <div className="delay-150flex mt-7 flex-row justify-center transition">
+            {/* <div className="delay-150 flex mt-7 flex-row justify-center transition">
               <div className=" text-md mb-5 text-center">
                 <button
                   className="rounded-full focus:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-800"
@@ -580,14 +645,9 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
                 metrics={metrics}
                 date={date}
               ></DataTable>
-            )}
+            )} */}
           </div>
         </div>
-        <style
-          dangerouslySetInnerHTML={{
-            __html: ".checkbox: checked + .check-icon {\n  display: flex;\n}\n",
-          }}
-        />
       </div>
     </>
   );
@@ -602,14 +662,11 @@ const JournalPage = () => {
   const metrics = api.journal.getMetrics.useQuery({ date });
   if (habits.isLoading || metrics.isLoading) return <p>Loading...</p>;
   if (habits.isError || metrics.isError) return <p>Query error</p>;
-  const habitsData = habits.data.habits.map((habit) => ({
-    editable: true,
-    ...habit,
-  }));
+  const habitsData = habits.data;
   const metricsData = metrics.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
   return (
     <Journal
-      habits={habitsData}
+      habits={habitsData.habits}
       date={date}
       setDate={setDate}
       metrics={metricsData}
