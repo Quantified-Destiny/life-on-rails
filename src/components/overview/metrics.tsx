@@ -35,7 +35,7 @@ export function LinkedMetric({
   return (
     <>
       <div
-        className={classNames("col-span-2 flex flex-row items-baseline gap-2", {
+        className={classNames("col-span-1 flex flex-row items-baseline gap-2", {
           "ml-4": offset == 1,
           "ml-8": offset == 2,
         })}
@@ -43,14 +43,14 @@ export function LinkedMetric({
         {offset > 0 && (
           <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
         )}
-        <div className="flex flex-row items-center">
-          <TbSquareRoundedLetterM className="h-6 w-6 stroke-purple-500"></TbSquareRoundedLetterM>
+        <div className="flex flex-row items-center gap-2">
+          <TbSquareRoundedLetterM className="text-2xl stroke-purple-500"></TbSquareRoundedLetterM>
           <EditableField
             initialText={prompt}
             commit={(text) => {
               mutation.mutate({ metricId: id, prompt: text });
             }}
-            className="ml-2 font-semibold"
+            className="font-semibold"
           ></EditableField>
         </div>
       </div>

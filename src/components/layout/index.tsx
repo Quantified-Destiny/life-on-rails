@@ -139,7 +139,7 @@ function Sidebar(props: {
 
 const menus = [
   { name: "Journal", link: "/newjournal", icon: Book , gap: true },
-  { name: "Legacy Journal", link: "/journal", icon: CalendarRange },
+  // { name: "Legacy Journal", link: "/journal", icon: CalendarRange },
   { name: "Dashboard", link: "/dashboard", icon: BarChart},
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
   { name: "Help", link: "/help", icon: HelpCircle },
