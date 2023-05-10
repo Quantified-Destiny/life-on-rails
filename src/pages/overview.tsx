@@ -14,6 +14,7 @@ import { HabitCard } from "../components/overview/habits";
 import { LinkedMetric } from "../components/overview/metrics";
 import { State, useOverviewStore } from "../components/overviewState";
 import { api } from "../utils/api";
+import { RxRocket } from "react-icons/rx";
 
 
 function Header() {
@@ -68,7 +69,9 @@ function Header() {
 function OverviewPage() {
   const store = useOverviewStore();
   const goalsQuery = api.goals.getAllGoals.useQuery();
-  if (goalsQuery.isLoading) return <p>Loading...</p>;
+  if (goalsQuery.isLoading) return (<div className="h-screen flex items-center justify-center">
+  <RxRocket className="text-2xl animate-spin"></RxRocket>
+</div>);
   if (goalsQuery.isError) return <p>Query error</p>;
 
   const data = goalsQuery.data;

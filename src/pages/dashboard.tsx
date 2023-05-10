@@ -1,4 +1,5 @@
 // import dynamic from "next/dynamic";
+import { RxRocket } from "react-icons/rx";
 import Layout from "../components/layout";
 
 import type { ExpandedHabit } from "../server/queries";
@@ -7,7 +8,7 @@ import { api } from "../utils/api";
 function StatsCardRow() {
   const goalsQuery = api.goals.getAllGoals.useQuery();
   const metricsQuery = api.goals.getAllMetrics.useQuery();
-  if (goalsQuery.isLoading || metricsQuery.isLoading) return <p>Loading...</p>;
+  if (goalsQuery.isLoading || metricsQuery.isLoading) return <p>Loading dashboard...</p>;
   if (goalsQuery.isError || metricsQuery.isError) return <p>Query error</p>;
   const goalData = goalsQuery.data;
   const metricData = metricsQuery.data;
@@ -184,7 +185,9 @@ function HabitsTable() {
   // api.habits.getHabits.useQuery();
 
   if (query.isLoading) {
-    return <div>Loading...</div>;
+    return <div className="h-screen flex items-center justify-center">
+    <RxRocket className="text-2xl animate-spin"></RxRocket>
+  </div>;
   } else if (query.error) {
     return <div>Error!</div>;
   }

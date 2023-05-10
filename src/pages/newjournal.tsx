@@ -2,7 +2,7 @@ import { useState } from "react";
 import Layout from "../components/layout";
 import TimePicker from "../components/time-picker";
 
-import { RxGear } from "react-icons/rx";
+import { RxGear, RxRocket } from "react-icons/rx";
 import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 
 import type { HabitCompletion, Tag } from "@prisma/client";
@@ -660,7 +660,9 @@ const JournalPage = () => {
 
   const habits = api.journal.getHabits.useQuery({ date });
   const metrics = api.journal.getMetrics.useQuery({ date });
-  if (habits.isLoading || metrics.isLoading) return <p>Loading...</p>;
+  if (habits.isLoading || metrics.isLoading) return <div className="h-screen flex items-center justify-center">
+  <RxRocket className="text-2xl animate-spin"></RxRocket>
+</div>;
   if (habits.isError || metrics.isError) return <p>Query error</p>;
   const habitsData = habits.data;
   const metricsData = metrics.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));

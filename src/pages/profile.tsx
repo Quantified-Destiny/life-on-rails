@@ -2,11 +2,14 @@
 import { format } from 'date-fns';
 import Layout from "../components/layout";
 import { api } from "../utils/api";
+import { RxRocket } from 'react-icons/rx';
 
 const ProfilePage = () => {
   const query = api.profile.getProfile.useQuery();
 
-  if (query.isLoading) return <p>Loading</p>;
+  if (query.isLoading) return <div className="h-screen flex items-center justify-center">
+  <RxRocket className="text-2xl animate-spin"></RxRocket>
+</div>;
   if (query.isError) return <p>Error</p>;
 
   const profile = query.data;
