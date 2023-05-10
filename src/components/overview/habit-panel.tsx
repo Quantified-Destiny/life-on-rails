@@ -161,7 +161,11 @@ function HistorySection({ habitId }: { habitId: string }) {
         width={450}
         legendCellSize={0}
         legendRender={(props) => (
-          <rect {...props} y={props.y + 10} rx={range} />
+          <rect
+            {...props}
+            y={typeof props.y === "number" ? props.y + 10 : props.y}
+            rx={range}
+          />
         )}
         rectProps={{
           rx: range,
@@ -173,7 +177,7 @@ function HistorySection({ habitId }: { habitId: string }) {
         max="5"
         step="0.1"
         value={range}
-        onChange={(e) => setRange(e.target.value)}
+        onChange={(e) => setRange(parseInt(e.target.value))}
       />{" "}
       Rect Radius: {range}
     </div>
