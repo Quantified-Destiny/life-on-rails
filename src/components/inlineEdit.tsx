@@ -247,3 +247,47 @@ export function CreateLinkedMetricInline({
     </div>
   );
 }
+
+export type CreateLinkedHabit = {
+  description: string;
+};
+
+export function CreateLinkedHabitInline({
+  createHabit,
+  closeEdit,
+}: {
+  createHabit: (description: string) => void;
+  closeEdit: () => void;
+}) {
+  const { register, handleSubmit } = useForm<CreateLinkedHabit>();
+
+  const onSubmit = (formData: CreateLinkedHabit) => {
+    createHabit(formData.description);
+    closeEdit();
+  };
+
+  return (
+    <div className="mt-2 w-full rounded-lg p-4">
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex flex-row flex-nowrap gap-2">
+          <div className="flex-grow">
+            <input
+              type="text"
+              id="description"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Description"
+              required
+              {...register("description")}
+            />
+          </div>
+          <div className="space-x-2 text-right">
+            <Button onClick={closeEdit} variant="outline" type="button">
+              Cancel
+            </Button>
+            <Button type="submit">Create</Button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
