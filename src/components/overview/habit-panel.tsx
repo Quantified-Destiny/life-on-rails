@@ -234,7 +234,7 @@ function CompletionsGrid({
       <div>
         <div className="pt-10">
           <ol className="pt-1 dark:border-gray-700">
-            {completionsQuery.isLoading && <Loader></Loader>}
+            {completionsQuery.isFetching && <Loader></Loader>}
             {completionsQuery.data?.map((it) => (
               <li className="mb-2" key={it.id}>
                 <div className="flex items-center justify-between gap-10 rounded-lg border border-gray-300 bg-white p-2 shadow-sm">
@@ -271,16 +271,14 @@ function HistorySection({ habitId }: { habitId: string }) {
     timeHorizon: 30 * 6,
   });
   if (
-    completionsQuery.isLoading ||
+    completionsQuery.isFetching ||
+    completionsQuery.isRefetching ||
     completionsQuery.error ||
     !completionsQuery.data
   ) {
-    return <p>LOADING</p>;
-  }
-  const completions = completionsQuery.data;
-  if (!completions) {
     return <Loader></Loader>;
   }
+  const completions = completionsQuery.data;
 
   return (
     <div className="my-8 flex flex-col items-center justify-center">

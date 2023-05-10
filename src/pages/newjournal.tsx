@@ -387,6 +387,7 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
         key={habit.id}
         tags={habit.tags}
         date={date}
+        metrics={habit.metrics}
         score={habit.score}
         actions={<Actions id={habit.id}></Actions>}
         completion={{
