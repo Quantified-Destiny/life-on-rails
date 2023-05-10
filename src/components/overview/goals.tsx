@@ -10,6 +10,7 @@ import type {
 import { api } from "../../utils/api";
 import { GoalSheet } from "./goal-panel";
 import { LinkedMetric } from "./metrics";
+import { TbSquareRoundedLetterG, TbSquareRoundedLetterH } from "react-icons/tb";
 
 export function GoalCard({
   id,
@@ -35,9 +36,7 @@ export function GoalCard({
   return (
     <div className="contents" onClick={console.log}>
       <div className="col-span-2 flex flex-row items-center">
-        <span className="inline-block h-fit w-fit rounded-full bg-yellow-500 px-2 py-1 text-xs text-white">
-          Goal
-        </span>
+        <TbSquareRoundedLetterG></TbSquareRoundedLetterG>
         <EditableField
           initialText={name}
           commit={(name) => editGoal.mutate({ goalId: id, name })}

@@ -4,9 +4,10 @@ import type {
   LinkedMetric,
   Metric,
   MetricAnswer,
+  MetricTag,
   Tag,
 } from "@prisma/client";
-import { endOfDay, startOfDay, subDays } from "date-fns";
+import { endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -42,44 +43,25 @@ export const journalRouter = createTRPCRouter({
       });
     }),
 
-  setCompletion: protectedProcedure
-    .input(
-      z.object({ date: z.date(), habitId: z.string(), completed: z.boolean() })
-    )
+  complete: protectedProcedure
+    .input(z.object({ date: z.date(), habitId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const existingCompletion = await ctx.prisma.habitCompletion.findFirst({
-        where: {
+      return await ctx.prisma.habitCompletion.create({
+        data: {
+          date: input.date,
           habitId: input.habitId,
-          date: onDay(input.date),
         },
       });
-      // console.log(
-      //   `Found completion: ${existingCompletion} for habit ${input.habitId}`
-      // );
+    }),
 
-      if (existingCompletion) {
-        // console.log(`Marking ${existingCompletion.id} as ${input.completed}`);
-        return await ctx.prisma.habitCompletion.update({
-          where: {
-            id: existingCompletion.id,
-          },
-          data: {
-            date: input.date,
-            isCompleted: input.completed,
-          },
-        });
-      } else {
-        // console.log(
-        //   `Creating new completion for ${input.habitId} as ${input.completed}`
-        // );
-        return await ctx.prisma.habitCompletion.create({
-          data: {
-            date: input.date,
-            habitId: input.habitId,
-            isCompleted: input.completed,
-          },
-        });
-      }
+  deleteCompletion: protectedProcedure
+    .input(z.object({ habitCompletionId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.habitCompletion.delete({
+        where: {
+          id: input.habitCompletionId,
+        },
+      });
     }),
 
   deleteHabit: protectedProcedure
@@ -116,40 +98,6 @@ export const journalRouter = createTRPCRouter({
           },
         })
     ),
-
-  setSubjectiveScore: protectedProcedure
-    .input(
-      z.object({
-        metricId: z.string(),
-        score: z.number(),
-        date: z.date(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const existing = await ctx.prisma.metricAnswer.findFirst({
-        where: {
-          metricId: input.metricId,
-          createdAt: onDay(input.date),
-        },
-      });
-      if (existing === null) {
-        await ctx.prisma.metricAnswer.create({
-          data: {
-            metricId: input.metricId,
-            value: input.score,
-          },
-        });
-      } else {
-        await ctx.prisma.metricAnswer.update({
-          where: {
-            id: existing.id,
-          },
-          data: {
-            value: input.score,
-          },
-        });
-      }
-    }),
 
   editMetric: protectedProcedure
     .input(z.object({ metricId: z.string(), prompt: z.string() }))
@@ -220,7 +168,7 @@ export const journalRouter = createTRPCRouter({
           id,
           description,
           metrics: metrics.map((m) => m.metric),
-          completed: completions[0]?.isCompleted == true,
+          completions,
           tags: HabitTag.map((it) => it.tag),
         })
       );
@@ -238,12 +186,15 @@ export const journalRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      const data: {
+      type QueryType = {
         id: string;
         prompt: string;
         metricAnswers: MetricAnswer[];
         completionMetric: LinkedMetric[];
-      }[] = await ctx.prisma.metric.findMany({
+        MetricTag: (MetricTag & { tag: Tag })[];
+      };
+
+      const data: QueryType[] = await ctx.prisma.metric.findMany({
         where: {
           ownerId: ctx.session.user.id,
         },
@@ -251,6 +202,7 @@ export const journalRouter = createTRPCRouter({
           id: true,
           prompt: true,
           completionMetric: true,
+          MetricTag: { include: { tag: true } },
           metricAnswers: {
             where: {
               createdAt: onDay(input.date),
@@ -263,9 +215,10 @@ export const journalRouter = createTRPCRouter({
       });
 
       const metrics = data.map(
-        ({ id, prompt, metricAnswers, completionMetric }) => ({
+        ({ id, prompt, metricAnswers, completionMetric, MetricTag }) => ({
           id,
           prompt,
+          tags: MetricTag.map((it) => it.tag),
           score: metricAnswers[0]?.value,
           habits: completionMetric.map((m) => m.habitId),
         })

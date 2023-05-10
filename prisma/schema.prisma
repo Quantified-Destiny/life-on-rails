@@ -181,7 +181,7 @@ model Metric {
 
 model MetricAnswer {
   id        String   @id @default(cuid())
-  value     Int
+  value     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   metricId  String

@@ -5,6 +5,7 @@ import { EditableField } from "../inlineEdit";
 import { textcolor } from "./lib";
 import { CornerDownRight } from "lucide-react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { TbSquareRoundedLetterM } from "react-icons/tb";
 
 export function LinkedMetric({
   id,
@@ -39,13 +40,11 @@ export function LinkedMetric({
           "ml-8": offset == 2,
         })}
       >
-        {(offset>0) && (
+        {offset > 0 && (
           <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
         )}
-        <span className="inline-block rounded-full bg-purple-500 px-2 py-1 text-xs text-white">
-          Metric
-        </span>
-        <div className="">
+        <div className="flex flex-row items-center">
+          <TbSquareRoundedLetterM className="h-6 w-6 stroke-purple-500"></TbSquareRoundedLetterM>
           <EditableField
             initialText={prompt}
             commit={(text) => {

@@ -20,6 +20,7 @@ import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";
 import { TagList } from "./tags";
 import { CornerDownRight } from "lucide-react";
+import { TbSquareRoundedLetterH } from "react-icons/tb";
 
 function getGoalsFilter(
   inputValue: string | undefined
@@ -174,9 +175,7 @@ export function HabitHeaderLineGrid({
         {linked && (
           <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
         )}
-        <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
-          Habit
-        </span>
+        <TbSquareRoundedLetterH></TbSquareRoundedLetterH>
         <EditableField
           initialText={description}
           commit={(text) => mutation.mutate({ habitId: id, description: text })}
