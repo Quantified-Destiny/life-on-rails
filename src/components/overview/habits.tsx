@@ -73,7 +73,7 @@ export function HabitHeaderLine({
 
   return (
     <>
-    <div className="flex flex-col">
+    <div className="flexflex-col">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row items-baseline gap-2">
           <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
@@ -97,7 +97,7 @@ export function HabitHeaderLine({
             {score.toFixed(2)}
           </span>
           <HabitSheet habitId={id}>
-            <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+            {/* <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon> */}
           </HabitSheet>
         </div>
       </div>
