@@ -7,7 +7,7 @@ import { useState } from "react";
 import { TbSquareRoundedLetterH } from "react-icons/tb";
 import type { ExpandedHabit, ExpandedMetric } from "../../server/queries";
 import { api } from "../../utils/api";
-import { CreateLinkedMetricInline, EditableField } from "../inlineEdit";
+import { CreateLinkedMetricInline, EditableField, CreateLinkedHabitInline } from "../inlineEdit";
 import {
   Accordion,
   AccordionContent,
@@ -111,7 +111,7 @@ function MetricsSection({ goalId }: { goalId: string }) {
   );
 }
 
-export const InlineEdit = ({
+/* export const InlineEdit = ({
   placeholder,
   initialText,
   commit,
@@ -175,6 +175,33 @@ function InlineCreateHabit({ goalId }: { goalId: string }) {
       }
     />
   );
+} */
+
+function CreateHabitLinkedToGoal({ goalId }: { goalId: string }) {
+  const context = api.useContext();
+
+  const createLinkedHabit = api.create.createLinkedHabit.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
+
+
+  const [active, setActive] = useState(false);
+
+  return active ? (
+    <CreateLinkedHabitInline
+      createHabit={(description) => createLinkedHabit.mutate({ description, goalId })}
+      closeEdit={() => setActive(false)}
+    ></CreateLinkedHabitInline>
+  ) : (
+    <button
+      className="mx-auto mt-2 block w-full rounded bg-gray-100 p-2 text-sm  text-gray-600 hover:bg-gray-200"
+      onClick={() => setActive(true)}
+    >
+      + Create a new Linked Habit
+    </button>
+  );
 }
 
 function HabitsSection({
@@ -223,9 +250,8 @@ function HabitsSection({
             </>
           );
         })}
-        <InlineCreateHabit goalId={goalId}></InlineCreateHabit>
       </div>
-      {/* <CreateHabitLinkedToGoal goalId={goalId}></CreateHabitLinkedToGoal> */}
+      <CreateHabitLinkedToGoal goalId={goalId}></CreateHabitLinkedToGoal> 
     </>
   );
 }
