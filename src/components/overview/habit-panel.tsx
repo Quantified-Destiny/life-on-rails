@@ -1,6 +1,12 @@
-import { subMonths } from "date-fns";
+import {
+  addDays,
+  differenceInCalendarDays,
+  isSameDay,
+  startOfDay,
+  subMonths,
+} from "date-fns";
 import dynamic from "next/dynamic";
-import type { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { useState } from "react";
 import { api } from "../../utils/api";
 import {
@@ -19,9 +25,9 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 import {
+  CreateMetricLinkedToHabit,
   HabitHeaderLine,
   LinkHabit,
-  CreateMetricLinkedToHabit,
 } from "./habits";
 
 function GoalsSection({ habitId }: { habitId: string }) {
@@ -130,10 +136,92 @@ function MetricsSection({ habitId }: { habitId: string }) {
   );
 }
 
-const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
+const BadHeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
+
+function window<T>(input: T[], windowSize: number): T[][] {
+  return input.reduce((resultArray: T[][], item, index) => {
+    const chunkIndex = Math.floor(index / windowSize);
+
+    if (!resultArray[chunkIndex]) {
+      resultArray[chunkIndex] = []; // start a new chunk
+    }
+
+    resultArray[chunkIndex]!.push(item);
+
+    return resultArray;
+  }, []);
+}
+
+function transpose<T>(matrix: T[][]): T[][] {
+  if (matrix.length == 0) return matrix;
+  return matrix[0]!.map((col, i) => matrix.map((row) => row[i]!));
+}
+
+function CompletionsGrid({ completions }: { completions: HabitCompletion[] }) {
+  const windowed_data = useMemo(() => {
+    const date = startOfDay(new Date());
+
+    const startDate = subMonths(new Date(), 6);
+    const totalDays = differenceInCalendarDays(date, startDate) + 1;
+
+    const data = new Array(totalDays).fill(0).map((_, i) => {
+      const date = addDays(startDate, i);
+      return {
+        date: date,
+        completions: completions.filter((it) => isSameDay(it.date, date)),
+      };
+    });
+    return transpose(window(data, 7));
+  }, [completions]);
+  const [date, setDate] = useState<undefined | Date>(undefined);
+
+  return (
+    <>
+      <table className="max-w-fit table-fixed border-separate border-spacing-[2px] border-gray-300">
+        <tbody>
+          {windowed_data.map((row, i) => (
+            <tr key={i}>
+              {row.map((c, j) => {
+                const completions = c?.completions.length ?? 0;
+                return (
+                  <td key={j}>
+                    <TooltipProvider>
+                      <Tooltip delayDuration={5}>
+                        <TooltipTrigger>
+                          <div
+                            className={cn(
+                              "h-[16px] w-[16px] rounded-sm bg-gray-300 text-xs",
+                              completions > 0
+                                ? "cursor-pointer bg-green-500"
+                                : "cursor-default bg-gray-300"
+                            )}
+                            onClick={
+                              completions > 0
+                                ? () => setDate(c.date)
+                                : undefined
+                            }
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {completions > 0 ? completions.toString() : "No"}{" "}
+                          completion{completions != 1 && "s"} on{" "}
+                          {c?.date.toDateString()}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div>{date?.toISOString()}</div>
+    </>
+  );
+}
 
 function HistorySection({ habitId }: { habitId: string }) {
-  const [range, setRange] = useState(0);
   const completionsQuery = api.habits.getCompletions.useQuery({
     habitId: habitId,
     timeHorizon: 30 * 6,
@@ -146,46 +234,19 @@ function HistorySection({ habitId }: { habitId: string }) {
     return <p>LOADING</p>;
   }
   const completions = completionsQuery.data;
-  const data = completions.map((c) => ({
-    date: c.date.toDateString(),
-    count: 10,
-    content: "",
-  }));
 
   return (
     <div className="my-8 flex flex-col items-center justify-center">
-      <HeatMap
-        rectSize={12}
-        value={data}
-        startDate={subMonths(new Date(), 6)}
-        width={450}
-        legendCellSize={0}
-        legendRender={(props) => (
-          <rect
-            {...props}
-            y={typeof props.y === "number" ? props.y + 10 : props.y}
-            rx={range}
-          />
-        )}
-        rectProps={{
-          rx: range,
-        }}
-      />
-      <input
-        type="range"
-        min="0"
-        max="5"
-        step="0.1"
-        value={range}
-        onChange={(e) => setRange(parseInt(e.target.value))}
-      />{" "}
-      Rect Radius: {range}
+      <CompletionsGrid completions={completions} />
     </div>
   );
 }
 
-import type { Metric } from "@prisma/client";
+import type { HabitCompletion, Metric } from "@prisma/client";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { cn } from "../../lib/utils";
 import { Slider } from "../ui/slider";
+import { Tooltip, TooltipContent, TooltipProvider } from "../ui/tooltip";
 import { TagList } from "./tags";
 
 const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
