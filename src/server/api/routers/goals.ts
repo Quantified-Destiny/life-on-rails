@@ -217,4 +217,48 @@ export const goalsRouter = createTRPCRouter({
         MetricGoalWeightMap: MetricGoalWeightMap,
       };
     }),
+
+  updateHabitWeight: protectedProcedure
+    .input(
+      z.object({
+        goalId: z.string(),
+        habitId: z.string(),
+        weight: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.habitMeasuresGoal.update({
+        where: {
+          goalId_habitId: {
+            goalId: input.goalId,
+            habitId: input.habitId,
+          },
+        },
+        data: {
+          weight: input.weight,
+        },
+      });
+    }),
+
+  updateMetricWeight: protectedProcedure
+    .input(
+      z.object({
+        goalId: z.string(),
+        metricId: z.string(),
+        weight: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.metricMeasuresGoal.update({
+        where: {
+          goalId_metricId: {
+            goalId: input.goalId,
+            metricId: input.metricId,
+          },
+        },
+        data: {
+          weight: input.weight,
+        },
+      });
+    }),
 });

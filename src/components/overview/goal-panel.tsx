@@ -238,7 +238,12 @@ function ScoringSection({
   metrics: (ExpandedMetric & { weight: number })[];
 }) {
   const context = api.useContext();
-  const updateHabitWeight = api.goals.habitMeasureGoal.updateHabitWeight.useMutation({
+  const updateHabitWeight = api.goals.updateHabitWeight.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
+  const updateMetricWeight = api.goals.updateMetricWeight.useMutation({
     onSuccess() {
       void context.invalidate();
     },
@@ -284,21 +289,20 @@ function ScoringSection({
               <p> Weight: {habit.weight}</p>
               <span>
                 <Button variant="ghost" disabled={habit.weight <= 1}
-                onClick={() =>
-                  updateHabitWeight.mutate({
-                    goalId: goalId,
-                    metricId: habit.id,
-                    weight: habit.weight-1
-                  })}>
+                  onClick={() =>
+                    updateHabitWeight.mutate({
+                      goalId: goalId,
+                      habitId: habit.id,
+                      weight: habit.weight - 1
+                    })}>
                   <ArrowDownIcon></ArrowDownIcon>
                 </Button>
-                <Button variant="ghost" onClick={
-                  () =>
+                <Button variant="ghost" onClick={() =>
                   updateHabitWeight.mutate({
-                      goalId: goalId,
-                      metricId: habit.id,
-                      weight: habit.weight+1
-                    })
+                    goalId: goalId,
+                    habitId: habit.id,
+                    weight: habit.weight + 1
+                  })
                 }>
                   <ArrowUpIcon></ArrowUpIcon>
                 </Button>
@@ -346,8 +350,8 @@ function GoalPanel({ goalId }: { goalId: string }) {
     },
   });
   const goalQuery = api.goals.getGoal.useQuery({ id: goalId });
-  const habitGoalWeightQuery = api.goals.getHabitGoalWeight.useQuery({ goalId: goalId});
-  const metricGoalWeightQuery = api.goals.getMetricGoalWeight.useQuery({ goalId: goalId});
+  const habitGoalWeightQuery = api.goals.getHabitGoalWeight.useQuery({ goalId: goalId });
+  const metricGoalWeightQuery = api.goals.getMetricGoalWeight.useQuery({ goalId: goalId });
 
   const data = goalQuery.data;
   const habitGoalWeightMap = habitGoalWeightQuery.data;
@@ -358,7 +362,7 @@ function GoalPanel({ goalId }: { goalId: string }) {
   if (goalQuery.isLoading || !data || habitGoalWeightQuery.isLoading || metricGoalWeightQuery.isLoading) {
     return <p>LOADING</p>;
   }
-  
+
 
   return (
     <div className="relative h-full">
@@ -393,6 +397,7 @@ function GoalPanel({ goalId }: { goalId: string }) {
             <AccordionTrigger>Scoring</AccordionTrigger>
             <AccordionContent>
               <ScoringSection
+                goalId={goalId}
                 habits={goalQuery.data.habits.map((it) => ({
                   ...it,
                   weight: (habitGoalWeightMap?.HabitGoalWeightMap.get(it.id) ?? 0),
