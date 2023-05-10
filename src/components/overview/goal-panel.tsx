@@ -115,8 +115,9 @@ function MetricsSection({ goalId }: { goalId: string }) {
 
 function InlineCreateHabit({ goalId }: { goalId: string }) {
   const context = api.useContext();
-  const addHabit = api.journal.addHabit.useMutation({
+  const addHabit = api.create.createLinkedHabit.useMutation({
     onSuccess() {
+      void context.invalidate();
       void context.journal.getHabits.invalidate();
     },
   });
@@ -126,7 +127,7 @@ function InlineCreateHabit({ goalId }: { goalId: string }) {
       placeholder="New habit"
       initialText=""
       commit={(text: string) =>
-        addHabit.mutate({ description: text, goal: goalId })
+        addHabit.mutate({ description: text, goalId: goalId })
       }
     />
   );
