@@ -74,51 +74,54 @@ function StatsCardRow() {
   }
   
   return (
-    <div className="mb-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-10">
-      
-      <div className=" min-w-10 max-w-50 divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl ">Goals</div>
-        <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
-        
-          <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
+    <div className="container mx-auto px-4 py-2 max-w-screen-lg ">
+
+    
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+      <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
+        <div className="p-4 text-center text-2xl text-white bg-indigo-800 rounded-t-xl">Goals</div>
+        <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center  border-indigo-800 border-2 rounded-b-xl">
+          <span className="flex-1 m-1 rounded-sm bg-green-500 p-4 text-white font-semibold">
             {greenGoal}
           </span>
-          <span className="flex-1 rounded-sm bg-yellow-400 p-4 text-white">
+          <span className="flex-1 m-1 rounded-sm bg-yellow-500 p-4 text-white font-semibold">
             {yellowGoal}
           </span>
-          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">
+          <span className="flex-1 m-1 rounded-sm bg-red-500 p-4 text-white font-semibold">
             {redGoal}
           </span>
         </div>
       </div>
-      <div className="divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl ">Habits</div>
-        <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
-          <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
+      
+      <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
+        <div className="p-4 text-center text-2xl text-white bg-indigo-800 rounded-t-xl">Habits</div>
+        <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center  border-indigo-800 border-2 rounded-b-xl">
+          <span className="flex-1 m-1 rounded-sm bg-green-500 p-4 text-white font-semibold">
             {greenHabit}
           </span>
-          <span className="flex-1 rounded-sm bg-yellow-400 p-4 text-white">
+          <span className="flex-1 m-1 rounded-sm bg-yellow-500 p-4 text-white font-semibold">
             {yellowHabit}
           </span>
-          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">
+          <span className="flex-1 m-1 rounded-sm bg-red-500 p-4 text-white font-semibold">
             {redHabit}
           </span>
         </div>
       </div>
-      <div className="divide-y-black relative flex flex-1 flex-col divide-y-2 rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl ">Metrics</div>
-        <div className="flex w-full flex-row content-stretch justify-stretch divide-x-2 p-1 text-center">
-          <span className="flex-1 rounded-sm bg-green-400 p-4 text-white">
+      <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
+        <div className="p-4 text-center text-2xl text-white bg-indigo-800 rounded-t-xl">Metrics</div>
+        <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center  border-indigo-800 border-2 rounded-b-xl">
+          <span className="flex-1 m-1 rounded-sm bg-green-500 p-4 text-white font-semibold">
             {greenMetric}
           </span>
-          <span className="flex-1 rounded-sm bg-yellow-400 p-4 text-white">
+          <span className="flex-1 m-1 rounded-sm bg-yellow-500 p-4 text-white font-semibold">
             {yellowMetric}
           </span>
-          <span className="flex-1 rounded-sm bg-red-400 p-4 text-white">
+          <span className="flex-1 m-1 rounded-sm bg-red-500 p-4 text-white font-semibold">
             {redMetric}
           </span>
         </div>
       </div>
+    </div>
     </div>
   );
 }
@@ -129,33 +132,26 @@ function HabitTableRow({
   frequencyHorizon,
   score,
   completions,
+  metrics
 }: ExpandedHabit) {
   return (
     <tr>
-      <td className="border-blue-gray-50 border-b px-5 py-3">
+      <td className="border-blue-gray-50  px-5 py-3">
         <div className="flex items-center gap-4">
-          <p className="text-blue-gray-900 block font-sans text-sm  leading-normal antialiased">
+          <p className="text-blue-gray-900 block text-sm leading-normal antialiased">
             {description}
           </p>
         </div>
       </td>
-      <td className="border-blue-gray-50 border-b px-5 py-3">
-        {frequency}x per {frequencyHorizon}
-      </td>
-      <td className="border-blue-gray-50 border-b px-5 py-3">
-        <p className="text-blue-gray-600 block font-sans text-xs font-medium antialiased">
-          {completions}
-        </p>
-      </td>
-      <td className="border-blue-gray-50 border-b px-5 py-3">
+      <td className="border-blue-gray-50 px-5 py-3">
         <div className="w-10/12">
-          <p className="text-blue-gray-600 mb-1 block font-sans text-xs font-medium antialiased">
+          <p className="text-blue-gray-600  mb-1 block font-sans text-xs text-center font-medium antialiased">
             {(score * 100).toFixed(1)}
             {/* */}%
           </p>
-          <div className="flex-start bg-blue-gray-50 flex h-1 w-full overflow-hidden rounded-sm font-sans text-xs font-medium">
+          <div className="flex-start bg-blue-gray-50 bg-gray-200 flex h-1 w-full overflow-hidden rounded-sm font-sans text-xs font-medium">
             <div
-              className="flex h-full items-baseline justify-center overflow-hidden break-all bg-gradient-to-tr from-blue-600 to-blue-400 text-white"
+              className="flex h-full items-baseline justify-center overflow-hidden break-all bg-gradient-to-tr from-red-600 to-red-400 text-white"
               style={{
                 width: `${score * 100}%`,
               }}
@@ -163,116 +159,100 @@ function HabitTableRow({
           </div>
         </div>
       </td>
+      <td className="border-blue-gray-50 font-sans text-sm px-1 py-3 text-center">
+        <p className="text-blue-gray-900 block text-xs leading-normal antialiased">
+        {metrics.length}
+        </p>
+      </td>
+      <td className="border-blue-gray-50 font-sans text-sm  px-1 py-3">
+        <p className="text-blue-gray-900 block text-xs text-center leading-normal antialiased">
+          {frequency}x per {frequencyHorizon.toLowerCase()}
+        </p>
+      </td>
+      <td className="border-blue-gray-50 font-sans text-sm px-1 py-3 text-center">
+        <p className="text-blue-gray-900 block text-xs leading-normal antialiased">
+        {completions}
+        </p>
+      </td>
     </tr>
   );
-}
+};
 
 function HabitsTable() {
-  const habitsQuery = api.habits.getHabits.useQuery();
-  if (habitsQuery.isLoading) {
+  const query = api.habits.getHabits.useQuery();
+
+  // api.habits.getHabits.useQuery();
+
+  if (query.isLoading) {
     return <div>Loading...</div>;
-  } else if (habitsQuery.error) {
+  } else if (query.error) {
     return <div>Error!</div>;
   }
+  const habits = query.data;
 
-  const habits = habitsQuery.data;
   return (
-    <div className="relative flex flex-col overflow-auto rounded-xl bg-white bg-clip-border text-gray-700 shadow-md xl:col-span-2">
-      <div className="relative m-0 flex items-center justify-between overflow-hidden rounded-xl bg-transparent bg-clip-border p-6 text-gray-700 shadow-none">
-        <div>
-          <h6 className="text-blue-gray-900 mb-1 block font-sans text-base font-semibold leading-relaxed tracking-normal antialiased">
-            Habits at risk
-          </h6>
-          <p className="text-blue-gray-600 flex items-center gap-1 font-sans text-sm font-normal leading-normal antialiased">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={3}
-              stroke="currentColor"
-              aria-hidden="true"
-              className="h-4 w-4 text-blue-500"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.5 12.75l6 6 9-13.5"
-              />
-            </svg>
-            <strong>30 archived</strong> this month
-          </p>
+    <div className="container mx-auto px-4 py-2 max-w-screen-lg ">
+      <div className="relative flex flex-col overflow-auto rounded-xl bg-white border border-indigo-800 bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
+        <div className="relative m-0 flex items-center justify-between overflow-hidden p-6 text-gray-700 shadow-none border-b-2 bg-indigo-800">
+          <div>
+            <h6 className="text-white text-xl mb-1 block font-sans font-semibold leading-relaxed tracking-normal antialiased">
+              Habits at Risk
+            </h6>
+          </div>
         </div>
-        <button
-          aria-expanded="false"
-          aria-haspopup="menu"
-          id=":R15umH2:"
-          className="text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 relative h-8 max-h-[32px] w-8 max-w-[32px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase transition-all disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-          type="button"
-        >
-          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currenColor"
-              viewBox="0 0 24 24"
-              strokeWidth={3}
-              stroke="currentColor"
-              aria-hidden="true"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"
-              />
-            </svg>
-          </span>
-        </button>
-      </div>
-      <div className="overflow-x-scroll p-6 px-0 pb-2 pt-0">
-        <table className="w-full min-w-[640px] table-auto">
-          <thead>
-            <tr>
-              <th className="border-blue-gray-50 border-b px-6 py-3 text-left">
-                <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
-                  Habits
-                </p>
-              </th>
-              <th className="border-blue-gray-50 border-b px-6 py-3 text-left">
-                <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
-                  Schedule
-                </p>
-              </th>
-              <th className="border-blue-gray-50 border-b px-6 py-3 text-left">
-                <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
-                  Completions this period
-                </p>
-              </th>
-              <th className="border-blue-gray-50 border-b px-6 py-3 text-left">
-                <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
-                  Score
-                </p>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {habits.map((habit) => (
-              <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
-            ))}
-          </tbody>
-        </table>
+        <div className="overflow-x-scroll p-6 px-0 pb-2 pt-0">
+          <table className="w-full min-w-[640px] table-auto">
+            <thead>
+              <tr>
+                <th className="border-blue-gray-50 border-b px-6 py-3 text-left">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Habits
+                  </p>
+                </th>
+                <th className="border-blue-gray-50 border-b px-6 py-3 text-center">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Score
+                  </p>
+                </th>
+                <th className="border-blue-gray-50 border-b px-1 py-3 text-center">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Metrics
+                  </p>
+                </th>
+                <th className="border-blue-gray-50 border-b px-6 py-3 text-center">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Schedule
+                  </p>
+                </th>
+                <th className="border-blue-gray-50 border-b px-1 py-3 text-center">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Completions
+                  </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {habits.map((habit) => {
+                if (habit.score < 0.5) return (
+                  <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
-}
+};
+
 
 export function Home() {
   return (
     <div className="">
-      <div className="m-auto mx-20 h-full pt-10">
+      <div className="m-auto h-full max-w-3xl pt-2">
         <StatsCardRow></StatsCardRow>
-
         <HabitsTable></HabitsTable>
-
+      
         {/* <div className="mb-6 mt-5 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 xl:grid-cols-3">
           {statisticsChartsData.map((props) => (
             <StatisticsChart

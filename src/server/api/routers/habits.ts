@@ -191,6 +191,7 @@ export const habitsRouter = createTRPCRouter({
       metricsMap,
       userId: ctx.session.user.id,
     });
+    habits.sort((a, b)=>a.score-b.score); //to sort by urgency on habits page
     return habits;
   }),
 
