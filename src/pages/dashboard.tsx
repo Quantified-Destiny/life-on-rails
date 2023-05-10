@@ -4,6 +4,7 @@ import Layout from "../components/layout";
 
 import type { ExpandedHabit } from "../server/queries";
 import { api } from "../utils/api";
+import { Loader } from "../components/ui/loader";
 
 function StatsCardRow() {
   const goalsQuery = api.goals.getAllGoals.useQuery();
@@ -190,11 +191,7 @@ function HabitsTable() {
   // api.habits.getHabits.useQuery();
 
   if (query.isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <RxRocket className="animate-spin text-2xl"></RxRocket>
-      </div>
-    );
+    return <Loader></Loader>;
   } else if (query.error) {
     return <div>Error!</div>;
   }

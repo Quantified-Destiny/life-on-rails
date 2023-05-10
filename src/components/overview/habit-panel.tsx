@@ -6,7 +6,8 @@ import {
   subMonths,
 } from "date-fns";
 import dynamic from "next/dynamic";
-import { ReactNode, useMemo } from "react";
+import type { ReactNode } from "react";
+import { useMemo } from "react";
 import { useState } from "react";
 import { api } from "../../utils/api";
 import {
@@ -136,8 +137,6 @@ function MetricsSection({ habitId }: { habitId: string }) {
   );
 }
 
-const BadHeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
-
 function window<T>(input: T[], windowSize: number): T[][] {
   return input.reduce((resultArray: T[][], item, index) => {
     const chunkIndex = Math.floor(index / windowSize);
@@ -235,6 +234,7 @@ function CompletionsGrid({
       <div>
         <div className="pt-10">
           <ol className="relative pt-1 dark:border-gray-700">
+            {completionsQuery.isLoading && <Loader></Loader>}
             {completionsQuery.data?.map((it) => (
               <li className="mb-2" key={it.id}>
                 <div className="flex items-center justify-between gap-10 rounded-lg border border-gray-300 bg-white p-2 shadow-sm">
@@ -278,6 +278,9 @@ function HistorySection({ habitId }: { habitId: string }) {
     return <p>LOADING</p>;
   }
   const completions = completionsQuery.data;
+  if (!completions) {
+    return <Loader></Loader>;
+  }
 
   return (
     <div className="my-8 flex flex-col items-center justify-center">
@@ -293,6 +296,7 @@ import { Slider } from "../ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider } from "../ui/tooltip";
 import { TagList } from "./tags";
 import { XCircle } from "lucide-react";
+import { Loader } from "../ui/loader";
 
 const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
 
@@ -363,7 +367,7 @@ function HabitPanel({ habitId }: { habitId: string }) {
 
   const data = habitQuery.data;
   if (!habitId || habitQuery.isError || habitQuery.isLoading || !data) {
-    return <p>Loading...</p>;
+    return <Loader></Loader>;
   }
 
   return (

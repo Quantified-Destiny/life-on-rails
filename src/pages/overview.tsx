@@ -15,6 +15,7 @@ import { LinkedMetric } from "../components/overview/metrics";
 import { State, useOverviewStore } from "../components/overviewState";
 import { api } from "../utils/api";
 import { RxRocket } from "react-icons/rx";
+import { Loader } from "../components/ui/loader";
 
 function Header() {
   return (
@@ -70,9 +71,7 @@ function OverviewPage() {
   const goalsQuery = api.goals.getAllGoals.useQuery();
   if (goalsQuery.isLoading)
     return (
-      <div className="flex h-screen items-center justify-center">
-        <RxRocket className="h-20 w-20 animate-spin"></RxRocket>
-      </div>
+      <Loader></Loader>
     );
   if (goalsQuery.isError) return <p>Query error</p>;
 
