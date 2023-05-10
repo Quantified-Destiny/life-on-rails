@@ -9,7 +9,7 @@ function HabitTableRow({
   frequencyHorizon,
   score,
   completions,
-  metrics
+  metrics,
 }: ExpandedHabit) {
   return (
     <tr>
@@ -22,11 +22,11 @@ function HabitTableRow({
       </td>
       <td className="border-blue-gray-50 px-5 py-3">
         <div className="w-10/12">
-          <p className="text-blue-gray-600  mb-1 block font-sans text-xs text-center font-medium antialiased">
+          <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
             {(score * 100).toFixed(1)}
             {/* */}%
           </p>
-          <div className="flex-start bg-blue-gray-50 bg-gray-200 flex h-1 w-full overflow-hidden rounded-sm font-sans text-xs font-medium">
+          <div className="flex-start bg-blue-gray-50 flex h-1 w-full overflow-hidden rounded-sm bg-gray-200 font-sans text-xs font-medium">
             <div
               className="flex h-full items-baseline justify-center overflow-hidden break-all bg-gradient-to-tr from-red-600 to-red-400 text-white"
               style={{
@@ -36,28 +36,27 @@ function HabitTableRow({
           </div>
         </div>
       </td>
-      <td className="border-blue-gray-50 font-sans text-sm px-1 py-3 text-center">
+      <td className="border-blue-gray-50 px-1 py-3 text-center font-sans text-sm">
         <p className="text-blue-gray-900 block text-xs leading-normal antialiased">
-        {metrics.length}
+          {metrics.length}
         </p>
       </td>
-      <td className="border-blue-gray-50 font-sans text-sm  px-1 py-3">
-        <p className="text-blue-gray-900 block text-xs text-center leading-normal antialiased">
+      <td className="border-blue-gray-50 px-1 py-3  font-sans text-sm">
+        <p className="text-blue-gray-900 block text-center text-xs leading-normal antialiased">
           {frequency}x per {frequencyHorizon.toLowerCase()}
         </p>
       </td>
-      <td className="border-blue-gray-50 font-sans text-sm px-1 py-3 text-center">
+      <td className="border-blue-gray-50 px-1 py-3 text-center font-sans text-sm">
         <p className="text-blue-gray-900 block text-xs leading-normal antialiased">
-        {completions}
+          {completions}
         </p>
       </td>
     </tr>
   );
-};
-
+}
 
 function HabitsTable() {
-  const query = api.habits.getHabits.useQuery();
+  const query = api.habits.getHabits.useQuery({ date: new Date() });
 
   // api.habits.getHabits.useQuery();
 
@@ -69,9 +68,9 @@ function HabitsTable() {
   const habits = query.data;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-screen-lg ">
-      <div className="relative flex flex-col overflow-auto rounded-xl bg-white border border-blue-200 bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
-        <div className="relative m-0 flex items-center justify-between overflow-hidden p-6 text-gray-700 shadow-none border-b-2 bg-blue-200">
+    <div className="container mx-auto max-w-screen-lg px-4 py-8 ">
+      <div className="relative flex flex-col overflow-auto rounded-xl border border-blue-200 bg-white bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
+        <div className="relative m-0 flex items-center justify-between overflow-hidden border-b-2 bg-blue-200 p-6 text-gray-700 shadow-none">
           <div>
             <h6 className="text-blue-gray-900 mb-1 block font-sans text-base font-semibold leading-relaxed tracking-normal antialiased">
               Habits at Risk
@@ -111,9 +110,10 @@ function HabitsTable() {
             </thead>
             <tbody>
               {habits.map((habit) => {
-                if (habit.score < 0.5) return (
-                  <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
-                );
+                if (habit.score < 0.5)
+                  return (
+                    <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
+                  );
               })}
             </tbody>
           </table>
@@ -121,12 +121,14 @@ function HabitsTable() {
       </div>
     </div>
   );
-};
+}
 
 const HabitsPage = () => {
-  return (<>
-    <HabitsTable></HabitsTable>
-  </>);
+  return (
+    <>
+      <HabitsTable></HabitsTable>
+    </>
+  );
 };
 
 export default function Page() {

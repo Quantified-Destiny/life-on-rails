@@ -8,7 +8,8 @@ import { api } from "../utils/api";
 function StatsCardRow() {
   const goalsQuery = api.goals.getAllGoals.useQuery();
   const metricsQuery = api.goals.getAllMetrics.useQuery();
-  if (goalsQuery.isLoading || metricsQuery.isLoading) return <p>Loading dashboard...</p>;
+  if (goalsQuery.isLoading || metricsQuery.isLoading)
+    return <p>Loading dashboard...</p>;
   if (goalsQuery.isError || metricsQuery.isError) return <p>Query error</p>;
   const goalData = goalsQuery.data;
   const metricData = metricsQuery.data;
@@ -73,56 +74,60 @@ function StatsCardRow() {
       greenMetric += 1;
     }
   }
-  
-  return (
-    <div className="container mx-auto px-4 py-2 max-w-screen-lg ">
 
-    
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
-      <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl text-white bg-indigo-800 rounded-t-xl">Goals</div>
-        <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center  border-indigo-800 border-2 rounded-b-xl">
-          <span className="flex-1 m-1 rounded-sm bg-green-500 p-4 text-white font-semibold">
-            {greenGoal}
-          </span>
-          <span className="flex-1 m-1 rounded-sm bg-yellow-500 p-4 text-white font-semibold">
-            {yellowGoal}
-          </span>
-          <span className="flex-1 m-1 rounded-sm bg-red-500 p-4 text-white font-semibold">
-            {redGoal}
-          </span>
+  return (
+    <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+        <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
+          <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
+            Goals
+          </div>
+          <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
+            <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
+              {greenGoal}
+            </span>
+            <span className="m-1 flex-1 rounded-sm bg-yellow-500 p-4 font-semibold text-white">
+              {yellowGoal}
+            </span>
+            <span className="m-1 flex-1 rounded-sm bg-red-500 p-4 font-semibold text-white">
+              {redGoal}
+            </span>
+          </div>
+        </div>
+
+        <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
+          <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
+            Habits
+          </div>
+          <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
+            <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
+              {greenHabit}
+            </span>
+            <span className="m-1 flex-1 rounded-sm bg-yellow-500 p-4 font-semibold text-white">
+              {yellowHabit}
+            </span>
+            <span className="m-1 flex-1 rounded-sm bg-red-500 p-4 font-semibold text-white">
+              {redHabit}
+            </span>
+          </div>
+        </div>
+        <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
+          <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
+            Metrics
+          </div>
+          <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
+            <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
+              {greenMetric}
+            </span>
+            <span className="m-1 flex-1 rounded-sm bg-yellow-500 p-4 font-semibold text-white">
+              {yellowMetric}
+            </span>
+            <span className="m-1 flex-1 rounded-sm bg-red-500 p-4 font-semibold text-white">
+              {redMetric}
+            </span>
+          </div>
         </div>
       </div>
-      
-      <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl text-white bg-indigo-800 rounded-t-xl">Habits</div>
-        <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center  border-indigo-800 border-2 rounded-b-xl">
-          <span className="flex-1 m-1 rounded-sm bg-green-500 p-4 text-white font-semibold">
-            {greenHabit}
-          </span>
-          <span className="flex-1 m-1 rounded-sm bg-yellow-500 p-4 text-white font-semibold">
-            {yellowHabit}
-          </span>
-          <span className="flex-1 m-1 rounded-sm bg-red-500 p-4 text-white font-semibold">
-            {redHabit}
-          </span>
-        </div>
-      </div>
-      <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
-        <div className="p-4 text-center text-2xl text-white bg-indigo-800 rounded-t-xl">Metrics</div>
-        <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center  border-indigo-800 border-2 rounded-b-xl">
-          <span className="flex-1 m-1 rounded-sm bg-green-500 p-4 text-white font-semibold">
-            {greenMetric}
-          </span>
-          <span className="flex-1 m-1 rounded-sm bg-yellow-500 p-4 text-white font-semibold">
-            {yellowMetric}
-          </span>
-          <span className="flex-1 m-1 rounded-sm bg-red-500 p-4 text-white font-semibold">
-            {redMetric}
-          </span>
-        </div>
-      </div>
-    </div>
     </div>
   );
 }
@@ -133,7 +138,7 @@ function HabitTableRow({
   frequencyHorizon,
   score,
   completions,
-  metrics
+  metrics,
 }: ExpandedHabit) {
   return (
     <tr>
@@ -146,11 +151,11 @@ function HabitTableRow({
       </td>
       <td className="border-blue-gray-50 px-5 py-3">
         <div className="w-10/12">
-          <p className="text-blue-gray-600  mb-1 block font-sans text-xs text-center font-medium antialiased">
+          <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
             {(score * 100).toFixed(1)}
             {/* */}%
           </p>
-          <div className="flex-start bg-blue-gray-50 bg-gray-200 flex h-1 w-full overflow-hidden rounded-sm font-sans text-xs font-medium">
+          <div className="flex-start bg-blue-gray-50 flex h-1 w-full overflow-hidden rounded-sm bg-gray-200 font-sans text-xs font-medium">
             <div
               className="flex h-full items-baseline justify-center overflow-hidden break-all bg-gradient-to-tr from-red-600 to-red-400 text-white"
               style={{
@@ -160,45 +165,47 @@ function HabitTableRow({
           </div>
         </div>
       </td>
-      <td className="border-blue-gray-50 font-sans text-sm px-1 py-3 text-center">
+      <td className="border-blue-gray-50 px-1 py-3 text-center font-sans text-sm">
         <p className="text-blue-gray-900 block text-xs leading-normal antialiased">
-        {metrics.length}
+          {metrics.length}
         </p>
       </td>
-      <td className="border-blue-gray-50 font-sans text-sm  px-1 py-3">
-        <p className="text-blue-gray-900 block text-xs text-center leading-normal antialiased">
+      <td className="border-blue-gray-50 px-1 py-3  font-sans text-sm">
+        <p className="text-blue-gray-900 block text-center text-xs leading-normal antialiased">
           {frequency}x per {frequencyHorizon.toLowerCase()}
         </p>
       </td>
-      <td className="border-blue-gray-50 font-sans text-sm px-1 py-3 text-center">
+      <td className="border-blue-gray-50 px-1 py-3 text-center font-sans text-sm">
         <p className="text-blue-gray-900 block text-xs leading-normal antialiased">
-        {completions}
+          {completions}
         </p>
       </td>
     </tr>
   );
-};
+}
 
 function HabitsTable() {
-  const query = api.habits.getHabits.useQuery();
+  const query = api.habits.getHabits.useQuery({ date: new Date() });
 
   // api.habits.getHabits.useQuery();
 
   if (query.isLoading) {
-    return <div className="h-screen flex items-center justify-center">
-    <RxRocket className="text-2xl animate-spin"></RxRocket>
-  </div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <RxRocket className="animate-spin text-2xl"></RxRocket>
+      </div>
+    );
   } else if (query.error) {
     return <div>Error!</div>;
   }
   const habits = query.data;
 
   return (
-    <div className="container mx-auto px-4 py-2 max-w-screen-lg ">
-      <div className="relative flex flex-col overflow-auto rounded-xl bg-white border border-indigo-800 bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
-        <div className="relative m-0 flex items-center justify-between overflow-hidden p-6 text-gray-700 shadow-none border-b-2 bg-indigo-800">
+    <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
+      <div className="relative flex flex-col overflow-auto rounded-xl border border-indigo-800 bg-white bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
+        <div className="relative m-0 flex items-center justify-between overflow-hidden border-b-2 bg-indigo-800 p-6 text-gray-700 shadow-none">
           <div>
-            <h6 className="text-white text-xl mb-1 block font-sans font-semibold leading-relaxed tracking-normal antialiased">
+            <h6 className="mb-1 block font-sans text-xl font-semibold leading-relaxed tracking-normal text-white antialiased">
               Habits at Risk
             </h6>
           </div>
@@ -236,9 +243,10 @@ function HabitsTable() {
             </thead>
             <tbody>
               {habits.map((habit) => {
-                if (habit.score < 0.5) return (
-                  <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
-                );
+                if (habit.score < 0.5)
+                  return (
+                    <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
+                  );
               })}
             </tbody>
           </table>
@@ -246,8 +254,7 @@ function HabitsTable() {
       </div>
     </div>
   );
-};
-
+}
 
 export function Home() {
   return (
@@ -255,7 +262,7 @@ export function Home() {
       <div className="m-auto h-full max-w-3xl pt-2">
         <StatsCardRow></StatsCardRow>
         <HabitsTable></HabitsTable>
-      
+
         {/* <div className="mb-6 mt-5 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 xl:grid-cols-3">
           {statisticsChartsData.map((props) => (
             <StatisticsChart
