@@ -12,6 +12,7 @@ export const profileRouter = createTRPCRouter({
           name: true,
           email: true,
           image: true,
+          scoringWeeks: true,
           accounts: {
             select: {
               provider: true
@@ -25,9 +26,22 @@ export const profileRouter = createTRPCRouter({
         name: data.name,
         email: data.email,
         image: data.image,
+        scoringWeeks: data.scoringWeeks,
         providers: data.accounts.map(it => it.provider),
         createdAt: data.createdAt
       }
 
     }),
+    
+  updateScoringWeeks: protectedProcedure
+  .input(z.object({ scoringWeeks: z.number() }))
+  .mutation(async ({ input, ctx }) => {
+    await ctx.prisma.user.update({
+      where: {
+        id: ctx.session.user.id,
+      },
+      data: { scoringWeeks: input.scoringWeeks },
+    });
+  }),
+
 });

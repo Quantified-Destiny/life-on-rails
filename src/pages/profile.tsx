@@ -5,6 +5,12 @@ import { api } from "../utils/api";
 import { RxRocket } from 'react-icons/rx';
 
 const ProfilePage = () => {
+  const context = api.useContext();
+  const updateScoringWeeks = api.profile.updateScoringWeeks.useMutation({
+    onSuccess() {
+      void context.profile.invalidate();
+    },
+  });
   const query = api.profile.getProfile.useQuery();
 
   if (query.isLoading) return <div className="h-screen flex items-center justify-center">
@@ -14,7 +20,11 @@ const ProfilePage = () => {
 
   const profile = query.data;
   const joinDate = format(profile.createdAt, 'MM/dd/yyyy hh:mm a');
-  joinDate.toString();
+
+  
+  
+
+  // joinDate.toString();
 
   return (<>
     <div className="flex justify-center">
@@ -70,8 +80,16 @@ const ProfilePage = () => {
                 </div>
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Scoring Time Horizon in Weeks</dt>
-                  <select id="scoring" className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/2 px-2 py-0.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                    <option value="2" selected>2</option>
+                  <select id="scoring" className="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-1/2 px-2 py-0.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                  value={profile.scoringWeeks}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    console.log(value);
+                    updateScoringWeeks.mutate({ scoringWeeks: parseInt(value)});
+                    // setValue({ value })
+                  }}>
+                    {/* onChange={(value: string) => updateScoringWeeks.mutate({ scoringWeeks: parseInt(value) })}> */}
+                    <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
@@ -80,6 +98,8 @@ const ProfilePage = () => {
                     <option value="8">8</option>
                     <option value="9">9</option>
                     <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
                   </select>
                 </div>
               </dl>
