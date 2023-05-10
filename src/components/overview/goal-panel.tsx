@@ -444,10 +444,10 @@ function GoalPanel({ goalId }: { goalId: string }) {
     return <p>LOADING</p>;
   }
   const habitGoalWeightMap = new Map(
-    goalWeightsQuery.data.habits.map((habit) => [habit.id, habit.weight])
+    goalWeightsQuery.data.habits.map((habit) => [habit.habitId, habit.weight])
   );
   const metricGoalWeightMap = new Map(
-    goalWeightsQuery.data.metrics.map((metric) => [metric.id, metric.weight])
+    goalWeightsQuery.data.metrics.map((metric) => [metric.metricId, metric.weight])
   );
 
   return (
