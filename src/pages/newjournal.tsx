@@ -5,7 +5,7 @@ import TimePicker from "../components/time-picker";
 import { RxGear, RxRocket } from "react-icons/rx";
 import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 
-import { Metric } from "@prisma/client";
+import { FrequencyHorizon, Metric } from "@prisma/client";
 import classNames from "classnames";
 
 import { api } from "../utils/api";
@@ -163,15 +163,20 @@ function Actions({ id }: { id: string }) {
 function Schedule({
   currentCompletions,
   target,
+  horizon,
 }: {
   currentCompletions: number;
   target: number;
+  horizon: FrequencyHorizon;
 }) {
   return (
-    <div className="flex items-center">
+    <div className="flex flex-col items-center">
       <p className="ml-2 text-sm leading-none text-gray-600/40">
         {/* based off the frequency, if multiple times a day */}
         {currentCompletions}/{target}
+      </p>
+      <p className="ml-2 text-sm leading-none text-gray-400/40">
+        {horizon == FrequencyHorizon.DAY ? "today" : "this week"}
       </p>
     </div>
   );
@@ -182,6 +187,7 @@ interface Completion {
   schedule?: {
     current: number;
     frequency: number;
+    frequencyHorizon: FrequencyHorizon;
   };
   action?: () => void;
 }
@@ -195,6 +201,7 @@ interface RowProps {
   score: number;
   tags: string[];
   type: "Habit" | "Metric";
+  actions?: React.ReactNode;
 }
 
 const Row = ({
@@ -205,6 +212,7 @@ const Row = ({
   completion,
   metrics,
   tags,
+  actions,
 }: RowProps): JSX.Element => {
   return (
     <tr
@@ -213,23 +221,18 @@ const Row = ({
       key={key}
     >
       <TypeIcon type={type}></TypeIcon>
-      <td className="">
-        <div className="flex flex-row items-center justify-center">
-          {completion && (
-            <>
-              <Status completion={completion}></Status>
-              {completion.schedule && (
-                <Schedule
-                  currentCompletions={completion.schedule?.current}
-                  target={completion.schedule?.frequency}
-                ></Schedule>
-              )}
-            </>
-          )}
-        </div>
+      <td>{completion && <Status completion={completion}></Status>}</td>
+      <td>
+        {completion && completion.schedule && (
+          <Schedule
+            currentCompletions={completion.schedule.current}
+            target={completion.schedule.frequency}
+            horizon={completion.schedule.frequencyHorizon}
+          ></Schedule>
+        )}
       </td>
       <td className="pl-2">
-        <div className="flex items-center text-sm">{score.toFixed(1)}</div>
+        <div className="w-full text-center text-sm">{score.toFixed(1)}</div>
       </td>
       <td className="">
         <div className="flex items-center pl-2">
@@ -253,7 +256,7 @@ const Row = ({
       <td className="pl-2">
         <TagsTooltip tags={tags}></TagsTooltip>
       </td>
-      <td>{type === "Habit" && <Actions id={key}></Actions>}</td>
+      <td>{actions}</td>
     </tr>
   );
 };
@@ -265,8 +268,28 @@ interface SubjectiveProps {
 }
 
 const Metric = ({ id, prompt, score: serverScore }: SubjectiveProps) => {
+  return (
+    <div className="mb-1 py-1">
+      <span className="flex flex-row items-center justify-center gap-2">
+        <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
+        <p>{prompt}</p>
+      </span>
+      <MetricButtonRow id={id} score={serverScore}></MetricButtonRow>
+    </div>
+  );
+};
+
+function MetricButtonRow({
+  id,
+  score: serverScore,
+}: {
+  id: string;
+  score: number | undefined;
+}) {
   const setScoreMutation = api.metrics.setScore.useMutation();
-  const [score, setScoreState] = useState<undefined | number>(serverScore);
+  const [score, setScoreState] = useState<undefined | number>(
+    (serverScore ?? 0) * 5
+  );
 
   const setScore = (score: number) => {
     setScoreState(score);
@@ -278,46 +301,40 @@ const Metric = ({ id, prompt, score: serverScore }: SubjectiveProps) => {
   };
 
   return (
-    <div className="mb-1 py-1">
-      <span className="flex flex-row items-center justify-center gap-2">
-        <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
-        <p>{prompt}</p>
-      </span>
-      <div className="flex flex-row flex-nowrap gap-2 p-2">
-        <Button
-          onClick={() => setScore(1)}
-          variant={score == 1 ? "default" : "outline"}
-        >
-          1
-        </Button>
-        <Button
-          onClick={() => setScore(2)}
-          variant={score == 2 ? "default" : "outline"}
-        >
-          2
-        </Button>
-        <Button
-          onClick={() => setScore(3)}
-          variant={score == 3 ? "default" : "outline"}
-        >
-          3
-        </Button>
-        <Button
-          onClick={() => setScore(4)}
-          variant={score == 4 ? "default" : "outline"}
-        >
-          4
-        </Button>
-        <Button
-          onClick={() => setScore(5)}
-          variant={score == 5 ? "default" : "outline"}
-        >
-          5
-        </Button>
-      </div>
+    <div className="flex flex-row flex-nowrap gap-2 p-2">
+      <Button
+        onClick={() => setScore(1)}
+        variant={score == 1 ? "default" : "outline"}
+      >
+        1
+      </Button>
+      <Button
+        onClick={() => setScore(2)}
+        variant={score == 2 ? "default" : "outline"}
+      >
+        2
+      </Button>
+      <Button
+        onClick={() => setScore(3)}
+        variant={score == 3 ? "default" : "outline"}
+      >
+        3
+      </Button>
+      <Button
+        onClick={() => setScore(4)}
+        variant={score == 4 ? "default" : "outline"}
+      >
+        4
+      </Button>
+      <Button
+        onClick={() => setScore(5)}
+        variant={score == 5 ? "default" : "outline"}
+      >
+        5
+      </Button>
     </div>
   );
-};
+}
 
 const InlineEdit = ({
   placeholder,
@@ -435,7 +452,7 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
   });
 
   const [panelOpen, setPanelOpen] = useState<boolean>(false);
-  const state =
+  const status =
     habit.completions >= habit.frequency
       ? CompletionStatus.COMPLETED
       : CompletionStatus.INCOMPLETE;
@@ -450,48 +467,56 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
         tags={habit.tags}
         date={date}
         score={habit.score}
+        actions={<Actions id={habit.id}></Actions>}
         completion={{
-          status: state,
+          status: status,
+          schedule: {
+            current: habit.completions,
+            frequency: habit.frequency,
+            frequencyHorizon: habit.frequencyHorizon,
+          },
           action: () => {
             createCompletion.mutate({ date: date, habitId: habit.id });
             setPanelOpen(true);
           },
         }}
       ></Row>
-      {panelOpen && (
-        <tr>
-          <td colSpan={7} className="rounded border border-gray-100">
-            <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
-              <form className="">
-                <div className="flex items-center">
-                  {/* {habit.metrics.map((metric) => (
-                    <Metric key={metric.id} {...metric} score={0.5}></Metric>
-                  ))} */}
-                </div>
-                <div className="">
-                  <textarea
-                    placeholder="Memo"
-                    className="h-14 w-full resize-none rounded border border-gray-200 py-3 pl-3 focus:h-20 focus:overflow-auto focus:outline-none"
-                    defaultValue={""}
-                  />
-                </div>
-                <div className="items-right mt-2 flex justify-end gap-2">
-                  <Button variant="link">Cancel</Button>
-                  <Button variant="outline">Done</Button>
-                </div>
-              </form>
-            </div>
-          </td>
-        </tr>
-      )}
+      {panelOpen && <MetricPanel metrics={habit.metrics}></MetricPanel>}
     </>
   );
 }
 
-function MetricRows({ metric, date }: { metric: ExpandedMetric; date: Date }) {
-  const [state, setState] = useState<CompletionStatus>(
-    CompletionStatus.INCOMPLETE
+function MetricPanel({ metrics }: { metrics: ExpandedMetric[] }) {
+  const submitAllowed = metrics.every((it) => it.score !== undefined);
+  return (
+    <tr>
+      <td colSpan={7} className="rounded border border-gray-100">
+        <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
+          <div className="flex items-center">
+            {metrics.map((metric) => (
+              <Metric
+                key={metric.id}
+                id={metric.id}
+                prompt={metric.prompt}
+                score={0.5}
+              ></Metric>
+            ))}
+          </div>
+          <div className="">
+            <Memo></Memo>
+          </div>
+          <div className="items-right mt-2 flex justify-end gap-2">
+            <Button variant="link">Cancel</Button>
+            <Button variant="outline" disabled={!submitAllowed}>
+              Done
+            </Button>
+          </div>
+        </div>
+      </td>
+    </tr>
   );
+}
+function MetricRows({ metric, date }: { metric: ExpandedMetric; date: Date }) {
   return (
     <>
       <Row
@@ -501,36 +526,52 @@ function MetricRows({ metric, date }: { metric: ExpandedMetric; date: Date }) {
         tags={metric.tags.map((tag) => tag.name)}
         date={date}
         score={metric.score}
-        completion={{
-          status: state,
-          action: () => setState(CompletionStatus.PARTIAL),
-        }}
       ></Row>
-      {state === CompletionStatus.PARTIAL && (
+      {
         <tr>
           <td colSpan={7} className="rounded border border-gray-100">
             <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
-              <form className="">
-                <div className="flex items-center">
-                  <Metric key={metric.id} {...metric} score={0.5}></Metric>
-                </div>
-                <div className="">
-                  <textarea
-                    placeholder="Memo"
-                    className="h-14 w-full resize-none rounded border border-gray-200 py-3 pl-3 focus:h-20 focus:overflow-auto focus:outline-none"
-                    defaultValue={""}
-                  />
-                </div>
-                <div className="items-right mt-2 flex justify-end gap-2">
-                  <Button variant="link">Cancel</Button>
-                  <Button variant="outline">Done</Button>
-                </div>
-              </form>
+              <div className="flex items-center">
+                <MetricButtonRow
+                  id={metric.id}
+                  score={metric.value}
+                ></MetricButtonRow>
+              </div>
+              <div className="">
+                <Memo></Memo>
+              </div>
             </div>
           </td>
         </tr>
-      )}
+      }
     </>
+  );
+}
+
+function Memo() {
+  const [active, setActive] = useState<boolean>(false);
+
+  return !active ? (
+    <span
+      className="mt-5 flex cursor-pointer flex-row items-center gap-1 text-gray-400"
+      onClick={() => setActive(true)}
+    >
+      <PlusIcon className="h-4 w-4"></PlusIcon> Add memo
+    </span>
+  ) : (
+    <textarea
+      placeholder="Memo"
+      className="h-14 w-full resize-none rounded border border-gray-200 py-3 pl-3 focus:h-20 focus:overflow-auto focus:outline-none"
+      defaultValue={""}
+      onKeyDown={(key) => {
+        if (key.key === "Escape") {
+          setActive(false);
+        }
+        if (key.key === "Enter") {
+          setActive(false);
+        }
+      }}
+    />
   );
 }
 
@@ -549,7 +590,8 @@ function DataTable({
         <thead>
           <tr className="font-semisbold justify-between text-center text-xs">
             <td></td>
-            <td>Completions</td>
+            <td className="w-2"></td>
+            <td className="w-2"></td>
             <td>Score</td>
             <td>Name</td>
             <td></td>
