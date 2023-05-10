@@ -233,7 +233,7 @@ function CompletionsGrid({
       </table>
       <div>
         <div className="pt-10">
-          <ol className="relative pt-1 dark:border-gray-700">
+          <ol className="pt-1 dark:border-gray-700">
             {completionsQuery.isLoading && <Loader></Loader>}
             {completionsQuery.data?.map((it) => (
               <li className="mb-2" key={it.id}>

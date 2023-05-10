@@ -78,13 +78,14 @@ export const habitsRouter = createTRPCRouter({
       return completions;
     }),
 
-    deleteCompletion: protectedProcedure.input(z.object({ completionId: z.string() }))
+  deleteCompletion: protectedProcedure
+    .input(z.object({ completionId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       await ctx.prisma.habitCompletion.delete({
         where: {
           id: input.completionId,
-        }
-      })
+        },
+      });
     }),
 
   getMetrics: protectedProcedure
@@ -216,7 +217,6 @@ export const habitsRouter = createTRPCRouter({
         userId: ctx.session.user.id,
         date: input.date,
       });
-      habits.sort((a, b) => a.score - b.score); //to sort by urgency on habits page
       return habits;
     }),
 

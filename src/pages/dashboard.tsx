@@ -185,8 +185,10 @@ function HabitTableRow({
   );
 }
 
+const date = new Date();
+
 function HabitsTable() {
-  const query = api.habits.getHabits.useQuery({ date: new Date() });
+  const query = api.habits.getHabits.useQuery({ date: date });
 
   // api.habits.getHabits.useQuery();
 
@@ -239,12 +241,14 @@ function HabitsTable() {
               </tr>
             </thead>
             <tbody>
-              {habits.map((habit) => {
-                if (habit.score < 0.5)
-                  return (
-                    <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
-                  );
-              })}
+              {habits
+                .sort((a, b) => a.score - b.score)
+                .map((habit) => {
+                  if (habit.score < 0.5)
+                    return (
+                      <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
+                    );
+                })}
             </tbody>
           </table>
         </div>
