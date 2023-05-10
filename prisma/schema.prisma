@@ -120,7 +120,6 @@ model HabitCompletion {
   id            String         @id @default(cuid())
   date          DateTime       @default(now())
   habitId       String
-  isCompleted   Boolean        @default(true)
   Habit         Habit          @relation(fields: [habitId], references: [id], onDelete: Cascade)
   linkedAnswers MetricAnswer[]
   memo          String?
