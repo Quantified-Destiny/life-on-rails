@@ -170,28 +170,19 @@ export const goalsRouter = createTRPCRouter({
       return goal;
     }),
 
-  getHabitGoalWeight: protectedProcedure
+  getWeights: protectedProcedure
     .input(z.object({ goalId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const goals: { habitId: string; weight: number }[] =
-        await ctx.prisma.habitMeasuresGoal.findMany({
-          where: {
-            goalId: input.goalId,
-          },
-          select: {
-            habitId: true,
-            weight: true,
-          },
-        });
-
-      const HabitGoalWeightMap = new Map();
-      goals.map((g) => {
-        HabitGoalWeightMap.set(g.habitId, g.weight);
+      const goal = await ctx.prisma.goal.findUnique({
+        where: {
+          id: input.goalId,
+        },
+        select: {
+          habits: true,
+          metrics: true,
+        },
       });
-
-      return {
-        HabitGoalWeightMap: HabitGoalWeightMap,
-      };
+      return goal;
     }),
 
   getMetricGoalWeight: protectedProcedure

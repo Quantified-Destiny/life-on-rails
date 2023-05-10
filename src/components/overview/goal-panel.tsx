@@ -1,8 +1,10 @@
 import type { Habit } from "@prisma/client";
 import { subYears } from "date-fns";
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { TbSquareRoundedLetterH } from "react-icons/tb";
 import type { ExpandedHabit, ExpandedMetric } from "../../server/queries";
 import { api } from "../../utils/api";
 import { CreateLinkedMetricInline, EditableField } from "../inlineEdit";
@@ -28,9 +30,6 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SpaceIcon } from "lucide-react";
-import { TbSquareRoundedLetterH } from "react-icons/tb";
-import { goalsRouter } from "../../server/api/routers/goals";
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
@@ -98,7 +97,7 @@ function MetricsSection({ goalId }: { goalId: string }) {
                       metricId: metric.id,
                     })
                   }
-                  variant="destructive"
+                  variant="outline"
                 >
                   Delete
                 </Button>
@@ -186,17 +185,11 @@ function HabitsSection({
   habits: Habit[];
 }) {
   const context = api.useContext();
-  const deleteMetric = api.metrics.deleteMetric.useMutation({
+  const deleteHabit = api.habits.deleteHabit.useMutation({
     onSuccess() {
       void context.invalidate();
     },
   });
-
-  const deleteHabit = api.habits.deleteHabit.useMutation({
-    onSuccess() {
-      void context.invalidate();
-    }
-  })
 
   return (
     <>
@@ -293,12 +286,12 @@ function ScoringSection({
   const context = api.useContext();
   const updateHabitWeight = api.goals.updateHabitWeight.useMutation({
     onSuccess() {
-      void context.invalidate();
+      void context.goals.getWeights.invalidate();
     },
   });
   const updateMetricWeight = api.goals.updateMetricWeight.useMutation({
     onSuccess() {
-      void context.invalidate();
+      void context.goals.getWeights.invalidate();
     },
   });
   const totalWeight =
@@ -341,22 +334,29 @@ function ScoringSection({
               </TooltipTrigger>
               <p> Weight: {habit.weight}</p>
               <span>
-                <Button variant="ghost" disabled={habit.weight <= 1}
+                <Button
+                  variant="ghost"
+                  disabled={habit.weight <= 1}
                   onClick={() =>
                     updateHabitWeight.mutate({
                       goalId: goalId,
                       habitId: habit.id,
-                      weight: habit.weight - 1
-                    })}>
+                      weight: habit.weight - 1,
+                    })
+                  }
+                >
                   <ArrowDownIcon></ArrowDownIcon>
                 </Button>
-                <Button variant="ghost" onClick={() =>
-                  updateHabitWeight.mutate({
-                    goalId: goalId,
-                    habitId: habit.id,
-                    weight: habit.weight + 1
-                  })
-                }>
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    updateHabitWeight.mutate({
+                      goalId: goalId,
+                      habitId: habit.id,
+                      weight: habit.weight + 1,
+                    })
+                  }
+                >
                   <ArrowUpIcon></ArrowUpIcon>
                 </Button>
               </span>
@@ -403,28 +403,26 @@ function GoalPanel({ goalId }: { goalId: string }) {
     },
   });
   const goalQuery = api.goals.getGoal.useQuery({ id: goalId });
-  const habitGoalWeightQuery = api.goals.getHabitGoalWeight.useQuery({ goalId: goalId });
-  const metricGoalWeightQuery = api.goals.getMetricGoalWeight.useQuery({ goalId: goalId });
+  const goalWeightsQuery = api.goals.getWeights.useQuery({ goalId: goalId });
 
   const data = goalQuery.data;
-  const habitGoalWeightMap = habitGoalWeightQuery.data;
-  const metricGoalWeightMap = metricGoalWeightQuery.data;
-  if (
-    goalQuery.isError ||
-    habitGoalWeightQuery.isError ||
-    metricGoalWeightQuery.isError
-  ) {
+  if (goalQuery.isError || goalWeightsQuery.isError) {
     return <p>Error</p>;
   }
   if (
     goalQuery.isLoading ||
     !data ||
-    habitGoalWeightQuery.isLoading ||
-    metricGoalWeightQuery.isLoading
+    !goalWeightsQuery.data ||
+    goalWeightsQuery.isLoading
   ) {
     return <p>LOADING</p>;
   }
-
+  const habitGoalWeightMap = new Map(
+    goalWeightsQuery.data.habits.map((habit) => [habit.id, habit.weight])
+  );
+  const metricGoalWeightMap = new Map(
+    goalWeightsQuery.data.metrics.map((metric) => [metric.id, metric.weight])
+  );
 
   return (
     <div className="relative h-full">
@@ -462,13 +460,11 @@ function GoalPanel({ goalId }: { goalId: string }) {
                 goalId={goalId}
                 habits={goalQuery.data.habits.map((it) => ({
                   ...it,
-                  weight:
-                    habitGoalWeightMap?.HabitGoalWeightMap.get(it.id) ?? 0,
+                  weight: habitGoalWeightMap?.get(it.id) ?? 0,
                 }))}
                 metrics={goalQuery.data.metrics.map((it) => ({
                   ...it,
-                  weight:
-                    metricGoalWeightMap?.MetricGoalWeightMap.get(it.id) ?? 0,
+                  weight: metricGoalWeightMap?.get(it.id) ?? 0,
                 }))}
               ></ScoringSection>
             </AccordionContent>
