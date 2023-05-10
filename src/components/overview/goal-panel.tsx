@@ -28,9 +28,8 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
-import { ArrowDownIcon, ArrowUpIcon, SpaceIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SpaceIcon } from "lucide-react";
 import { TbSquareRoundedLetterH } from "react-icons/tb";
-import { InlineEdit } from "../../pages/journal";
 import { goalsRouter } from "../../server/api/routers/goals";
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
@@ -113,6 +112,52 @@ function MetricsSection({ goalId }: { goalId: string }) {
   );
 }
 
+export const InlineEdit = ({
+  placeholder,
+  initialText,
+  commit,
+}: {
+  placeholder: string;
+  initialText: string;
+  commit: (text: string) => void;
+}) => {
+  const [isActive, setActive] = useState<boolean>(false);
+  const [text, setText] = useState<string>(initialText);
+  if (!isActive) {
+    return (
+      <div className="bg-slate-100">
+        <span onClick={() => setActive(true)}>
+          <PlusIcon className="h-4 w-4"></PlusIcon>
+          {placeholder}
+        </span>
+      </div>
+    );
+  } else
+    return (
+      <div className="bg-slate-100">
+        <input
+          autoFocus
+          type="text"
+          value={text}
+          onBlur={() => setActive(false)}
+          onChange={(event) => {
+            setText(event.target.value);
+          }}
+          onKeyDown={(event) => {
+            if (event.key == "Enter") {
+              console.log(text);
+              commit(text);
+              setActive(false);
+            } else if (event.key == "Escape") {
+              setText("");
+              setActive(false);
+            }
+          }}
+        ></input>
+      </div>
+    );
+};
+
 function InlineCreateHabit({ goalId }: { goalId: string }) {
   const context = api.useContext();
   const addHabit = api.create.createLinkedHabit.useMutation({
@@ -177,7 +222,7 @@ function HabitsSection({
                       habitId: habit.id,
                     })
                   }
-                  variant="destructive"
+                  variant="outline"
                 >
                   Delete
                 </Button>
@@ -226,6 +271,7 @@ function HistorySection({ habitId }: { habitId: string }) {
     <div className="my-8 flex flex-col items-center justify-center">
       <HeatMap
         value={value}
+        space={100}
         startDate={new Date(subYears(new Date(), 1))}
         width={600}
         legendCellSize={0}
@@ -464,6 +510,7 @@ export function GoalSheet({
   return (
     <Sheet>
       <SheetTrigger>{children}</SheetTrigger>
+      <SheetContent position="right" className="overflow-scroll">
       <SheetContent position="right" size="lg" className="overflow-scroll max-md:w-full">
         <GoalPanel goalId={goalId}></GoalPanel>
       </SheetContent>
