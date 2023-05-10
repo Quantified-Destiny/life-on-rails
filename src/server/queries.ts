@@ -12,7 +12,7 @@ import type {
   Tag,
 } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
-import { isSameDay, subDays, subWeeks } from "date-fns";
+import { isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
 import type { prisma as prismaClient } from "./db";
 
@@ -37,11 +37,13 @@ export async function getHabitsWithMetricsMap({
   metricsMap,
   userId,
   goalIds,
+  date = new Date(),
 }: {
   prisma: typeof prismaClient;
   metricsMap: Map<string, ExpandedMetric>;
   userId: string;
   goalIds?: string[];
+  date?: Date;
 }): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
   type HabitType = Habit & {
     metrics: LinkedMetric[];
@@ -62,7 +64,7 @@ export async function getHabitsWithMetricsMap({
       metrics: true,
       HabitTag: { include: { tag: true } },
       goals: true,
-      completions: { where: { date: { gt: subDays(new Date(), 7) } } },
+      completions: { where: { date: { gt: subDays(date, 7) } } },
     },
   });
   const habitsMap = new Map<string, HabitType>(habits.map((h) => [h.id, h]));
@@ -172,6 +174,9 @@ export async function getHabits({
         include: {
           metric: {
             include: {
+              metricAnswers: {
+                where: { createdAt: { gt: startOfDay(new Date()) } },
+              },
               goals: { include: { goal: true } },
               MetricTag: { include: { tag: true } },
             },
@@ -202,10 +207,11 @@ export async function getHabits({
 
   const expandedHabits = habits.map((habit) => {
     const expandedMetrics = habit.metrics.map((m) => {
+      const value = m.metric.metricAnswers[0]?.value ?? 0;
       const score = avg(m.metric.metricAnswers.map((it) => it.value));
       const tags = m.metric.MetricTag.map((it) => it.tag);
       const goals = m.metric.goals.map((it) => it.goal);
-      return { ...m.metric, score, tags, linkedHabits: [], goals };
+      return { ...m.metric, score, tags, linkedHabits: [], goals, value };
     });
 
     const normalizedFrequency =
@@ -249,6 +255,7 @@ export interface ExpandedMetric extends Metric {
   tags: Tag[];
   score: number;
   goals: Goal[];
+  value: number;
 }
 
 export async function getMetrics({
@@ -256,11 +263,13 @@ export async function getMetrics({
   userId,
   goalIds,
   habitIds,
+  date = new Date(),
 }: {
   prisma: typeof prismaClient;
   userId: string;
   goalIds?: string[];
   habitIds?: string[];
+  date?: Date;
 }): Promise<[ExpandedMetric[], Map<string, ExpandedMetric>]> {
   const whereConditions = {
     goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
@@ -274,6 +283,7 @@ export async function getMetrics({
     completionMetric: LinkedMetric[];
     MetricTag: (MetricTag & { tag: Tag })[];
     goals: (MetricMeasuresGoal & { goal: Goal })[];
+    metricAnswers: MetricAnswer[];
   })[] = await prisma.metric.findMany({
     where: {
       ownerId: userId,
@@ -281,6 +291,7 @@ export async function getMetrics({
     },
     include: {
       completionMetric: true,
+      metricAnswers: { where: { createdAt: { gt: startOfDay(date) } } },
       MetricTag: {
         include: { tag: true },
       },
@@ -305,7 +316,7 @@ export async function getMetrics({
     },
     where: {
       metricId: { in: metricIds },
-      createdAt: { gt: subDays(new Date(), 7 * user.scoringWeeks) },
+      createdAt: { gt: subDays(date, 7 * user.scoringWeeks) },
     },
   });
 
@@ -322,6 +333,7 @@ export async function getMetrics({
     tags: m.MetricTag.map((mt) => mt.tag),
     goals: m.goals.map((g) => g.goal),
     score: metricScores.get(m.id) ?? 0,
+    value: m.metricAnswers[0]?.value ?? 0,
   }));
 
   const metricsMap = new Map<string, ExpandedMetric>();
