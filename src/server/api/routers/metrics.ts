@@ -4,8 +4,20 @@ import { z } from "zod";
 import type { Metric } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { startOfDay, endOfDay } from "date-fns";
+import { getMetrics } from "../../queries";
 
 export const metricsRouter = createTRPCRouter({
+  getMetrics: protectedProcedure
+  .input(z.object({ date: z.date() }))
+  .query(async ({ input, ctx }) => {
+    const [metrics, _map] = await getMetrics({
+      prisma: ctx.prisma,
+      userId: ctx.session.user.id,
+      date: input.date
+    });
+    return metrics;
+  }),
+
   createMetric: protectedProcedure
     .input(
       z.object({

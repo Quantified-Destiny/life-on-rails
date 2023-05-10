@@ -180,16 +180,20 @@ export const habitsRouter = createTRPCRouter({
       });
     }),
 
-  getHabits: protectedProcedure.query(async ({ ctx }) => {
+  getHabits: protectedProcedure
+  .input(z.object({date: z.date()}))
+  .query(async ({ input, ctx }) => {
     const [_, metricsMap] = await getMetrics({
       prisma: ctx.prisma,
       userId: ctx.session.user.id,
+      date: input.date
     });
 
     const [habits, _habitsMap] = await getHabitsWithMetricsMap({
       prisma: ctx.prisma,
       metricsMap,
       userId: ctx.session.user.id,
+      date: input.date
     });
     habits.sort((a, b)=>a.score-b.score); //to sort by urgency on habits page
     return habits;
