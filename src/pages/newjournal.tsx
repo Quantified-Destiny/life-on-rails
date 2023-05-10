@@ -5,10 +5,8 @@ import TimePicker from "../components/time-picker";
 import { RxGear, RxRocket } from "react-icons/rx";
 import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 
-import type { HabitCompletion, Tag } from "@prisma/client";
 import { Metric } from "@prisma/client";
 import classNames from "classnames";
-import { RiCalendarCheckLine } from "react-icons/ri";
 
 import { api } from "../utils/api";
 
@@ -27,31 +25,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../components/ui/tooltip";
-import MetricModal from "./metric_modal";
+import type { ExpandedHabit, ExpandedMetric } from "../server/queries";
 
-interface RowProps {
-  id: string;
-  description: string;
-  date: Date;
-  state: RowState;
-  metrics?: Metric[];
-  tags: Tag[];
-  complete: () => void;
-  type: "Habit" | "Metric";
-}
-
-function Status(props: { status: RowState; complete: () => void }) {
-  switch (props.status) {
-    case RowState.COMPLETED:
+function Status({
+  completion: { status, action },
+}: {
+  completion: Completion;
+}) {
+  switch (status) {
+    case CompletionStatus.COMPLETED:
       return <CheckCircle></CheckCircle>;
-    case RowState.INCOMPLETE:
+    case CompletionStatus.INCOMPLETE:
       return (
-        <CircleIcon
-          onClick={props.complete}
-          className="cursor-pointer"
-        ></CircleIcon>
+        <CircleIcon onClick={action} className="cursor-pointer"></CircleIcon>
       );
-    case RowState.PARTIAL:
+    case CompletionStatus.PARTIAL:
       return <CircleDot></CircleDot>;
   }
 }
@@ -59,7 +47,7 @@ function Status(props: { status: RowState; complete: () => void }) {
 function TypeIcon({ type }: { type: "Habit" | "Metric" }) {
   return (
     <td className="">
-      <div className="flex items-center">
+      <div className="flex flex-row items-center justify-center">
         {type == "Habit" ? (
           <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
         ) : (
@@ -70,7 +58,7 @@ function TypeIcon({ type }: { type: "Habit" | "Metric" }) {
   );
 }
 
-function MetricsIcon({ metrics }: { metrics?: Metric[] }) {
+function MetricsTooltip({ metrics }: { metrics?: Metric[] }) {
   if (metrics && metrics.length > 0)
     return (
       <>
@@ -108,7 +96,7 @@ function MetricsIcon({ metrics }: { metrics?: Metric[] }) {
   else return <></>;
 }
 
-function TagsTooltip({ tags }: { tags: Tag[] }) {
+function TagsTooltip({ tags }: { tags: string[] }) {
   return (
     <>
       <TooltipProvider>
@@ -120,7 +108,7 @@ function TagsTooltip({ tags }: { tags: Tag[] }) {
                 <div
                   className="item"
                   data-tooltip-id="tag-tooltip"
-                  data-tooltip-content={tags.map((it) => it.name).join(", ")}
+                  data-tooltip-content={tags.join(", ")}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -150,9 +138,7 @@ function TagsTooltip({ tags }: { tags: Tag[] }) {
               )}
             </div>
           </TooltipTrigger>
-          <TooltipContent>
-            {tags.map((it) => it.name).join(", ")}
-          </TooltipContent>
+          <TooltipContent>{tags.join(", ")}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </>
@@ -191,61 +177,83 @@ function Schedule({
   );
 }
 
+interface Completion {
+  status: CompletionStatus;
+  schedule?: {
+    current: number;
+    frequency: number;
+  };
+  action?: () => void;
+}
+
+interface RowProps {
+  key: string;
+  description: string;
+  date: Date;
+  completion?: Completion;
+  metrics?: Metric[];
+  score: number;
+  tags: string[];
+  type: "Habit" | "Metric";
+}
+
 const Row = ({
   type,
-  id,
+  key,
   description,
-  state,
+  score,
+  completion,
   metrics,
   tags,
-  complete,
 }: RowProps): JSX.Element => {
   return (
     <tr
       tabIndex={0}
       className="h-12 rounded border border-gray-100 focus:outline-none"
-      key={id}
+      key={key}
     >
       <TypeIcon type={type}></TypeIcon>
       <td className="">
         <div className="flex flex-row items-center justify-center">
-          <Status status={state} complete={complete}></Status>
-          <Schedule currentCompletions={1} target={3}></Schedule>
+          {completion && (
+            <>
+              <Status completion={completion}></Status>
+              {completion.schedule && (
+                <Schedule
+                  currentCompletions={completion.schedule?.current}
+                  target={completion.schedule?.frequency}
+                ></Schedule>
+              )}
+            </>
+          )}
         </div>
       </td>
       <td className="pl-2">
-        <div className="flex items-center text-sm">0.8</div>
+        <div className="flex items-center text-sm">{score.toFixed(1)}</div>
       </td>
       <td className="">
         <div className="flex items-center pl-2">
-          {/* <span className={classNames({ "line-through": completed })}>
-                  {description}
-                </span> */}
           <p
             className={classNames(
               "mr-2 text-base font-medium leading-none text-gray-700",
-              { "line-through": state === RowState.COMPLETED }
+              {
+                "line-through":
+                  completion?.status === CompletionStatus.COMPLETED,
+              }
             )}
           >
             {description}
           </p>
-          {/* only show if there's linked metrics */}
-          {/* {JSON.stringify(metrics)} */}
-          {type === "Habit" && <MetricsIcon metrics={metrics}></MetricsIcon>}
+          {type === "Habit" && (
+            <MetricsTooltip metrics={metrics}></MetricsTooltip>
+          )}
         </div>
       </td>
 
       <td className="pl-2">
         <TagsTooltip tags={tags}></TagsTooltip>
       </td>
-      <td className="pl-2">
-        <div className="flex items-center">
-          <RiCalendarCheckLine></RiCalendarCheckLine>
-          {/* last completed else -   */}
-          <p className="ml-2 text-sm leading-none text-gray-600">05/01</p>
-        </div>
-      </td>
-      <td>{type === "Habit" && <Actions id={id}></Actions>}</td>
+      <td>{type === "Habit" && <Actions id={key}></Actions>}</td>
     </tr>
   );
 };
@@ -392,21 +400,10 @@ function InlineCreateHabit() {
 }
 
 interface JournalProps {
-  habits: {
-    id: string;
-    description: string;
-    completions: HabitCompletion[];
-    metrics: Metric[];
-    tags: Tag[];
-  }[];
+  habits: ExpandedHabit[];
   date: Date;
   setDate: (date: Date) => void;
-  metrics: {
-    id: string;
-    prompt: string;
-    score: number | undefined;
-    tags: Tag[];
-  }[];
+  metrics: ExpandedMetric[];
 }
 
 // https://tailwindcomponents.com/component/free-tailwind-css-advance-table-component
@@ -423,53 +420,53 @@ interface JournalProps {
 //     list.classList.toggle("hidden");
 // }
 
-type HabitType = {
-  id: string;
-  description: string;
-  metrics: Metric[];
-  completions: HabitCompletion[];
-  tags: Tag[];
-};
-
-type MetricType = {
-  id: string;
-  prompt: string;
-  score: number | undefined;
-  tags: Tag[];
-};
-
-enum RowState {
+enum CompletionStatus {
   INCOMPLETE,
   PARTIAL,
   COMPLETED,
 }
 
-function HabitRows({ habit, date }: { habit: HabitType; date: Date }) {
-  const [state, setState] = useState<RowState>(RowState.INCOMPLETE);
+function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
+  const context = api.useContext();
+  const createCompletion = api.journal.complete.useMutation({
+    onSuccess() {
+      void context.habits.getHabits.invalidate();
+    },
+  });
 
+  const [panelOpen, setPanelOpen] = useState<boolean>(false);
+  const state =
+    habit.completions >= habit.frequency
+      ? CompletionStatus.COMPLETED
+      : CompletionStatus.INCOMPLETE;
+
+  habit.metrics;
   return (
     <>
       <Row
         type="Habit"
-        {...habit}
-        date={date}
+        description={habit.description}
         key={habit.id}
-        state={state}
-        complete={
-          habit.metrics.length > 0
-            ? () => setState(RowState.PARTIAL)
-            : () => setState(RowState.COMPLETED)
-        }
+        tags={habit.tags}
+        date={date}
+        score={habit.score}
+        completion={{
+          status: state,
+          action: () => {
+            createCompletion.mutate({ date: date, habitId: habit.id });
+            setPanelOpen(true);
+          },
+        }}
       ></Row>
-      {state !== RowState.INCOMPLETE && (
+      {panelOpen && (
         <tr>
           <td colSpan={7} className="rounded border border-gray-100">
             <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
               <form className="">
                 <div className="flex items-center">
-                  {habit.metrics.map((metric) => (
+                  {/* {habit.metrics.map((metric) => (
                     <Metric key={metric.id} {...metric} score={0.5}></Metric>
-                  ))}
+                  ))} */}
                 </div>
                 <div className="">
                   <textarea
@@ -491,21 +488,25 @@ function HabitRows({ habit, date }: { habit: HabitType; date: Date }) {
   );
 }
 
-function MetricRows({ metric, date }: { metric: MetricType; date: Date }) {
-  const [state, setState] = useState<RowState>(RowState.INCOMPLETE);
+function MetricRows({ metric, date }: { metric: ExpandedMetric; date: Date }) {
+  const [state, setState] = useState<CompletionStatus>(
+    CompletionStatus.INCOMPLETE
+  );
   return (
     <>
       <Row
         type="Metric"
         description={metric.prompt}
-        id={metric.id}
-        tags={metric.tags}
-        date={date}
         key={metric.id}
-        state={state}
-        complete={() => setState(RowState.PARTIAL)}
+        tags={metric.tags.map((tag) => tag.name)}
+        date={date}
+        score={metric.score}
+        completion={{
+          status: state,
+          action: () => setState(CompletionStatus.PARTIAL),
+        }}
       ></Row>
-      {state === RowState.PARTIAL && (
+      {state === CompletionStatus.PARTIAL && (
         <tr>
           <td colSpan={7} className="rounded border border-gray-100">
             <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
@@ -538,27 +539,12 @@ function DataTable({
   date,
   metrics,
 }: {
-  habits: HabitType[];
+  habits: ExpandedHabit[];
   date: Date;
-  metrics: MetricType[];
+  metrics: ExpandedMetric[];
 }) {
-  const context = api.useContext();
-  const complete = api.journal.complete.useMutation({
-    onSuccess() {
-      void context.journal.getHabits.invalidate();
-    },
-  });
-  const [modalMetrics, setMetrics] = useState<Metric[] | undefined>();
-  const [open, setOpen] = useState<boolean>(false);
-
   return (
     <>
-      <MetricModal
-        open={open}
-        onOpenChange={setOpen}
-        metrics={modalMetrics}
-      ></MetricModal>
-
       <table className="w-full whitespace-nowrap">
         <thead>
           <tr className="font-semisbold justify-between text-center text-xs">
@@ -567,7 +553,6 @@ function DataTable({
             <td>Score</td>
             <td>Name</td>
             <td></td>
-            <td>Last</td>
             <td></td>
           </tr>
         </thead>
@@ -658,17 +643,20 @@ const today = new Date();
 const JournalPage = () => {
   const [date, setDate] = useState(today);
 
-  const habits = api.journal.getHabits.useQuery({ date });
-  const metrics = api.journal.getMetrics.useQuery({ date });
-  if (habits.isLoading || metrics.isLoading) return <div className="h-screen flex items-center justify-center">
-  <RxRocket className="text-2xl animate-spin"></RxRocket>
-</div>;
+  const habits = api.habits.getHabits.useQuery({ date });
+  const metrics = api.metrics.getMetrics.useQuery({ date });
+  if (habits.isLoading || metrics.isLoading)
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <RxRocket className="animate-spin text-2xl"></RxRocket>
+      </div>
+    );
   if (habits.isError || metrics.isError) return <p>Query error</p>;
   const habitsData = habits.data;
-  const metricsData = metrics.data.metrics; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
+  const metricsData = metrics.data; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
   return (
     <Journal
-      habits={habitsData.habits}
+      habits={habitsData}
       date={date}
       setDate={setDate}
       metrics={metricsData}
