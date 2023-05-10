@@ -147,6 +147,12 @@ function HabitsSection({
     },
   });
 
+  const deleteHabit = api.habits.deleteHabit.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    }
+  })
+
   return (
     <>
       <div className="mb-4 grid w-full grid-cols-2 items-baseline justify-between gap-2">
@@ -167,8 +173,8 @@ function HabitsSection({
               <div className="flex-shrink space-x-2 text-right">
                 <Button
                   onClick={() =>
-                    deleteMetric.mutate({
-                      metricId: habit.id,
+                    deleteHabit.mutate({
+                      habitId: habit.id,
                     })
                   }
                   variant="destructive"
