@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { CreateMenu } from "../components/createMenu";
 import { EllipsisIcon } from "../components/icons";
-import Layout from "../components/layout";
 import {
   CreateGoalModal,
   CreateHabitModal,
@@ -13,9 +12,8 @@ import { GoalCard } from "../components/overview/goals";
 import { HabitCard } from "../components/overview/habits";
 import { LinkedMetric } from "../components/overview/metrics";
 import { State, useOverviewStore } from "../components/overviewState";
-import { api } from "../utils/api";
-import { RxRocket } from "react-icons/rx";
 import { Loader } from "../components/ui/loader";
+import { api } from "../utils/api";
 
 function Header() {
   return (
@@ -69,10 +67,7 @@ function Header() {
 function OverviewPage() {
   const store = useOverviewStore();
   const goalsQuery = api.goals.getAllGoals.useQuery();
-  if (goalsQuery.isLoading)
-    return (
-      <Loader></Loader>
-    );
+  if (goalsQuery.isLoading) return <Loader></Loader>;
   if (goalsQuery.isError) return <p>Query error</p>;
 
   const data = goalsQuery.data;
@@ -121,9 +116,4 @@ function OverviewPage() {
     </div>
   );
 }
-
-function Page() {
-  return <Layout main={OverviewPage}></Layout>;
-}
-
-export default Page;
+export default OverviewPage;

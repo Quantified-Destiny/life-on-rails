@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "../components/layout";
 
 import GoalFormModal from "../components/GoalFormModal";
 import HabitFormModal from "../components/habitformmodal";
@@ -39,7 +38,7 @@ const CreatePage = () => {
         <div className="flex flex-col space-y-4">
           <button
             type="button"
-            className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 font-semibold text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 hover:bg-gray-700"
             onClick={handleGoalModalToggle}
           >
             <span className="mr-2">
@@ -49,7 +48,7 @@ const CreatePage = () => {
           </button>
           <button
             type="button"
-            className="inline-flex items-center rounded-md border border-transparent bg-yellow-600 px-4 py-2 font-semibold text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+            className="inline-flex items-center rounded-md border border-transparent bg-yellow-600 px-4 py-2 font-semibold text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 hover:bg-yellow-700"
             onClick={handleHabitModalToggle}
           >
             <span className="mr-2">
@@ -59,7 +58,7 @@ const CreatePage = () => {
           </button>
           <button
             type="button"
-            className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-semibold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:bg-indigo-700"
             onClick={handleSubjectiveModalToggle}
           >
             <span className="mr-2">
@@ -73,6 +72,4 @@ const CreatePage = () => {
   );
 };
 
-export default function Page() {
-  return <Layout main={CreatePage}></Layout>;
-}
+export default CreatePage;

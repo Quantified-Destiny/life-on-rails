@@ -1,5 +1,3 @@
-import Layout from "../components/layout";
-
 import type { ExpandedHabit } from "../server/queries";
 import { api } from "../utils/api";
 
@@ -131,6 +129,4 @@ const HabitsPage = () => {
   );
 };
 
-export default function Page() {
-  return <Layout main={HabitsPage}></Layout>;
-}
+export default HabitsPage;

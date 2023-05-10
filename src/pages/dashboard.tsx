@@ -283,6 +283,4 @@ export function Home() {
   );
 }
 
-const DashboardPage = () => <Layout main={Home}></Layout>;
-
-export default DashboardPage;
+export default Home;

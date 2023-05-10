@@ -2,7 +2,7 @@ import { useState } from "react";
 import Layout from "../components/layout";
 import TimePicker from "../components/time-picker";
 
-import { RxGear, RxRocket } from "react-icons/rx";
+import { RxGear } from "react-icons/rx";
 import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 
 import { FrequencyHorizon, Metric } from "@prisma/client";
@@ -19,6 +19,7 @@ import { RxExternalLink } from "react-icons/rx";
 import { CreateMenu } from "../components/createMenu";
 import { HabitSheet } from "../components/overview/habit-panel";
 import { Button } from "../components/ui/button";
+import { Loader } from "../components/ui/loader";
 import {
   Tooltip,
   TooltipContent,
@@ -540,8 +541,6 @@ function DataTable({
 }
 
 function Journal({ date, setDate, habits, metrics }: JournalProps) {
-  const context = api.useContext();
-  const [Tgl, setTgl] = useState<boolean>(true);
   return (
     <>
       <div className="container flex max-w-5xl justify-center">
@@ -611,12 +610,7 @@ const JournalPage = () => {
 
   const habits = api.habits.getHabits.useQuery({ date });
   const metrics = api.metrics.getMetrics.useQuery({ date });
-  if (habits.isLoading || metrics.isLoading)
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <RxRocket className="animate-spin text-2xl"></RxRocket>
-      </div>
-    );
+  if (habits.isLoading || metrics.isLoading) return <Loader></Loader>;
   if (habits.isError || metrics.isError) return <p>Query error</p>;
   const habitsData = habits.data;
   const metricsData = metrics.data; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
@@ -625,11 +619,9 @@ const JournalPage = () => {
       habits={habitsData}
       date={date}
       setDate={setDate}
-      metrics={metricsData}
+      metrics={metricsData.filter((it) => it.linkedHabits.length == 0)}
     ></Journal>
   );
 };
 
-export default function Page() {
-  return <Layout main={JournalPage}></Layout>;
-}
+export default JournalPage;

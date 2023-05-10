@@ -1,12 +1,11 @@
 import { useState } from "react";
 import Calendar from "react-calendar";
 // import 'react-calendar/dist/Calendar.css';
-import Layout from "../../components/layout";
 import dynamic from "next/dynamic";
 
 import { AiOutlineFire, AiTwotoneFire } from "react-icons/ai";
 import { GiBackwardTime } from "react-icons/gi";
-import { MdArrowUpward, MdScoreboard } from "react-icons/md";
+import { MdScoreboard } from "react-icons/md";
 // import HeatMap from '@uiw/react-heat-map';
 
 // import "@uiw/react-heat-map/dist.css";
@@ -32,6 +31,8 @@ import {
   startOfDay,
 } from "date-fns";
 import { useRouter } from "next/router";
+import type { Value } from "react-calendar/dist/cjs/shared/types";
+import { RxRocket } from "react-icons/rx";
 import { DropdownMenu } from "../../components/createMenu";
 import {
   DropDown,
@@ -40,12 +41,8 @@ import {
 } from "../../components/inlineEdit";
 import { textcolor } from "../../components/overview/lib";
 import { LinkedMetric } from "../../components/overview/metrics";
-import { api } from "../../utils/api";
-import { RxRocket } from "react-icons/rx";
-import { PlusCircle } from "lucide-react";
-import { BsPlus } from "react-icons/bs";
 import { CreateTag } from "../../components/overview/tags";
-import type { Value } from "react-calendar/dist/cjs/shared/types";
+import { api } from "../../utils/api";
 
 function isSameDay(a: Date, b: Date) {
   return differenceInCalendarDays(a, b) === 0;
@@ -166,8 +163,8 @@ function _HabitsPage({ id }: { id: string }) {
 
   if (!completionsData.data || !goalQuery.data || !habitData.data) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <RxRocket className="text-2xl animate-spin"></RxRocket>
+      <div className="flex h-screen items-center justify-center">
+        <RxRocket className="animate-spin text-2xl"></RxRocket>
       </div>
     );
   }
@@ -457,6 +454,4 @@ function _HabitsPage({ id }: { id: string }) {
   );
 }
 
-export default function Page() {
-  return <Layout main={HabitsPage}></Layout>;
-}
+export default HabitsPage;
