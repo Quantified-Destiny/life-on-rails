@@ -1,5 +1,5 @@
 import type { FrequencyHorizon } from "@prisma/client";
-import type { ChangeEvent, KeyboardEvent } from "react";
+import type { BaseSyntheticEvent, ChangeEvent, KeyboardEvent } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
@@ -217,12 +217,14 @@ export function CreateLinkedMetricInline({
   const { register, handleSubmit } = useForm<CreateLinkedMetric>();
 
   const onSubmit = (formData: CreateLinkedMetric) => {
-    return createMetric(formData.prompt);
+    console.log(formData);
+    createMetric(formData.prompt);
+    closeEdit();
   };
 
   return (
     <div className="mt-2 w-full rounded-lg p-4">
-      <form className="space-y-6" onSubmit={void handleSubmit(onSubmit)}>
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-row flex-nowrap gap-2">
           <div className="flex-grow">
             <input
@@ -235,12 +237,10 @@ export function CreateLinkedMetricInline({
             />
           </div>
           <div className="space-x-2 text-right">
-            <Button onClick={closeEdit} variant="outline">
+            <Button onClick={closeEdit} variant="outline" type="button">
               Cancel
             </Button>
-            <Button onClick={closeEdit} type="submit">
-              Create
-            </Button>
+            <Button type="submit">Create</Button>
           </div>
         </div>
       </form>
