@@ -31,6 +31,7 @@ import { GoalTagList } from "./tags";
 import { ArrowDownIcon, ArrowUpIcon, SpaceIcon } from "lucide-react";
 import { TbSquareRoundedLetterH } from "react-icons/tb";
 import { InlineEdit } from "../../pages/journal";
+import { goalsRouter } from "../../server/api/routers/goals";
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
@@ -228,12 +229,20 @@ function HistorySection({ habitId }: { habitId: string }) {
 }
 
 function ScoringSection({
+  goalId
   habits,
   metrics,
 }: {
+  goalId: string;
   habits: (ExpandedHabit & { weight: number })[];
   metrics: (ExpandedMetric & { weight: number })[];
 }) {
+  const context = api.useContext();
+  const updateHabitWeight = api.goals.habitMeasureGoal.updateHabitWeight.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
   const totalWeight =
     habits.reduce((acc, cur) => acc + cur.weight, 0) +
     metrics.reduce((acc, cur) => acc + cur.weight, 0);
@@ -274,10 +283,23 @@ function ScoringSection({
               </TooltipTrigger>
               <p> Weight: {habit.weight}</p>
               <span>
-                <Button variant="ghost" disabled={habit.weight <= 1}>
+                <Button variant="ghost" disabled={habit.weight <= 1}
+                onClick={() =>
+                  updateHabitWeight.mutate({
+                    goalId: goalId,
+                    metricId: habit.id,
+                    weight: habit.weight-1
+                  })}>
                   <ArrowDownIcon></ArrowDownIcon>
                 </Button>
-                <Button variant="ghost">
+                <Button variant="ghost" onClick={
+                  () =>
+                  updateHabitWeight.mutate({
+                      goalId: goalId,
+                      metricId: habit.id,
+                      weight: habit.weight+1
+                    })
+                }>
                   <ArrowUpIcon></ArrowUpIcon>
                 </Button>
               </span>
@@ -373,11 +395,11 @@ function GoalPanel({ goalId }: { goalId: string }) {
               <ScoringSection
                 habits={goalQuery.data.habits.map((it) => ({
                   ...it,
-                  weight: (habitGoalWeightMap?.get(it.id) ?? 0),
+                  weight: (habitGoalWeightMap?.HabitGoalWeightMap.get(it.id) ?? 0),
                 }))}
                 metrics={goalQuery.data.metrics.map((it) => ({
                   ...it,
-                  weight: (metricGoalWeightMap?.get(it.id) ?? 0),
+                  weight: (metricGoalWeightMap?.MetricGoalWeightMap.get(it.id) ?? 0),
                 }))}
               ></ScoringSection>
             </AccordionContent>
