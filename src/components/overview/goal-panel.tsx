@@ -229,7 +229,7 @@ function HistorySection({ habitId }: { habitId: string }) {
 }
 
 function ScoringSection({
-  goalId
+  goalId,
   habits,
   metrics,
 }: {
