@@ -16,7 +16,6 @@ import { State, useOverviewStore } from "../components/overviewState";
 import { api } from "../utils/api";
 import { RxRocket } from "react-icons/rx";
 
-
 function Header() {
   return (
     <>
@@ -69,54 +68,57 @@ function Header() {
 function OverviewPage() {
   const store = useOverviewStore();
   const goalsQuery = api.goals.getAllGoals.useQuery();
-  if (goalsQuery.isLoading) return (<div className="h-screen flex items-center justify-center">
-  <RxRocket className="text-2xl animate-spin"></RxRocket>
-</div>);
+  if (goalsQuery.isLoading)
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <RxRocket className="h-20 w-20 animate-spin"></RxRocket>
+      </div>
+    );
   if (goalsQuery.isError) return <p>Query error</p>;
 
   const data = goalsQuery.data;
   return (
     <div className="container max-w-4xl">
-    <div className="mb-10 scrollbar-none">
-      {store.modal?.state === State.CreateGoal && (
-        <CreateGoalModal></CreateGoalModal>
-      )}
-      {store.modal?.state === State.CreateHabit && (
-        <CreateHabitModal></CreateHabitModal>
-      )}
-      {store.modal?.state === State.CreateMetric && (
-        <CreateMetricModal></CreateMetricModal>
-      )}
-      <Header></Header>
-      <div className="mx-auto mt-3 grid grid-cols-2 items-center gap-2 p-6 ">
-        {data.goals.map((goal) => (
-          <GoalCard
-            {...goal.goal}
-            habits={goal.habits}
-            metrics={goal.metrics}
-            key={goal.goal.id}
-          ></GoalCard>
-        ))}
-        {/* Habit Card with Progress Bar */}
-        <h1 className="col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600 under">
-          Unlinked Items
-          <hr />
-        </h1>
-        {data.habits.map((habit) => (
-          <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
-        ))}
-        {data.metrics.map((metric) => {
-          return (
-            <LinkedMetric
-              {...metric}
-              weight={0.5}
-              key={metric.id}
-              offset={0}
-            ></LinkedMetric>
-          );
-        })}
+      <div className="mb-10 scrollbar-none">
+        {store.modal?.state === State.CreateGoal && (
+          <CreateGoalModal></CreateGoalModal>
+        )}
+        {store.modal?.state === State.CreateHabit && (
+          <CreateHabitModal></CreateHabitModal>
+        )}
+        {store.modal?.state === State.CreateMetric && (
+          <CreateMetricModal></CreateMetricModal>
+        )}
+        <Header></Header>
+        <div className="mx-auto mt-3 grid grid-cols-2 items-center gap-2 p-6 ">
+          {data.goals.map((goal) => (
+            <GoalCard
+              {...goal.goal}
+              habits={goal.habits}
+              metrics={goal.metrics}
+              key={goal.goal.id}
+            ></GoalCard>
+          ))}
+          {/* Habit Card with Progress Bar */}
+          <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
+            Unlinked Items
+            <hr />
+          </h1>
+          {data.habits.map((habit) => (
+            <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
+          ))}
+          {data.metrics.map((metric) => {
+            return (
+              <LinkedMetric
+                {...metric}
+                weight={0.5}
+                key={metric.id}
+                offset={0}
+              ></LinkedMetric>
+            );
+          })}
+        </div>
       </div>
-    </div>
     </div>
   );
 }
