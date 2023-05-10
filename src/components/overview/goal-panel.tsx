@@ -1,13 +1,17 @@
 import type { Habit } from "@prisma/client";
 import { subYears } from "date-fns";
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { TbSquareRoundedLetterH } from "react-icons/tb";
 import type { ExpandedHabit, ExpandedMetric } from "../../server/queries";
 import { api } from "../../utils/api";
-import { CreateLinkedMetricInline, EditableField, CreateLinkedHabitInline } from "../inlineEdit";
+import {
+  CreateLinkedHabitInline,
+  CreateLinkedMetricInline,
+  EditableField,
+} from "../inlineEdit";
 import {
   Accordion,
   AccordionContent,
@@ -186,12 +190,13 @@ function CreateHabitLinkedToGoal({ goalId }: { goalId: string }) {
     },
   });
 
-
   const [active, setActive] = useState(false);
 
   return active ? (
     <CreateLinkedHabitInline
-      createHabit={(description) => createLinkedHabit.mutate({ description, goalId })}
+      createHabit={(description) =>
+        createLinkedHabit.mutate({ description: description, goalId })
+      }
       closeEdit={() => setActive(false)}
     ></CreateLinkedHabitInline>
   ) : (
@@ -251,7 +256,7 @@ function HabitsSection({
           );
         })}
       </div>
-      <CreateHabitLinkedToGoal goalId={goalId}></CreateHabitLinkedToGoal> 
+      <CreateHabitLinkedToGoal goalId={goalId}></CreateHabitLinkedToGoal>
     </>
   );
 }
@@ -443,11 +448,11 @@ function GoalPanel({ goalId }: { goalId: string }) {
   ) {
     return <p>LOADING</p>;
   }
-  const habitGoalWeightMap = new Map(
-    goalWeightsQuery.data.habits.map((habit) => [habit.habitId, habit.weight])
+  const habitWeights = new Map(
+    goalWeightsQuery.data.habits.map((habit) => [habit.id, habit.weight])
   );
-  const metricGoalWeightMap = new Map(
-    goalWeightsQuery.data.metrics.map((metric) => [metric.metricId, metric.weight])
+  const metricWeights = new Map(
+    goalWeightsQuery.data.metrics.map((metric) => [metric.id, metric.weight])
   );
 
   return (
@@ -486,11 +491,11 @@ function GoalPanel({ goalId }: { goalId: string }) {
                 goalId={goalId}
                 habits={goalQuery.data.habits.map((it) => ({
                   ...it,
-                  weight: habitGoalWeightMap?.get(it.id) ?? 0,
+                  weight: habitWeights?.get(it.id) ?? 1,
                 }))}
                 metrics={goalQuery.data.metrics.map((it) => ({
                   ...it,
-                  weight: metricGoalWeightMap?.get(it.id) ?? 0,
+                  weight: metricWeights?.get(it.id) ?? 1,
                 }))}
               ></ScoringSection>
             </AccordionContent>
