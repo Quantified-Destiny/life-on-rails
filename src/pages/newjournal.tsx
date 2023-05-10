@@ -336,86 +336,6 @@ function MetricButtonRow({
   );
 }
 
-const InlineEdit = ({
-  placeholder,
-  initialText,
-  commit,
-}: {
-  placeholder: string;
-  initialText: string;
-  commit: (text: string) => void;
-}) => {
-  const [isActive, setActive] = useState<boolean>(false);
-  const [text, setText] = useState<string>(initialText);
-  if (!isActive) {
-    return (
-      <div className="bg-slate-100">
-        <span onClick={() => setActive(true)}>
-          <PlusIcon className="h-4 w-4"></PlusIcon>
-          {placeholder}
-        </span>
-      </div>
-    );
-  } else
-    return (
-      <div className="bg-slate-100">
-        <input
-          autoFocus
-          type="text"
-          value={text}
-          onBlur={() => setActive(false)}
-          onChange={(event) => {
-            setText(event.target.value);
-          }}
-          onKeyDown={(event) => {
-            if (event.key == "Enter") {
-              console.log(text);
-              commit(text);
-              setActive(false);
-            } else if (event.key == "Escape") {
-              setText("");
-              setActive(false);
-            }
-          }}
-        ></input>
-      </div>
-    );
-};
-
-const InlineCreateSubjective = () => {
-  const context = api.useContext();
-  const addSubjective = api.journal.addSubjective.useMutation({
-    onSuccess() {
-      void context.journal.getMetrics.invalidate();
-    },
-  });
-
-  return (
-    <InlineEdit
-      placeholder="New subjective"
-      initialText=""
-      commit={(text: string) => addSubjective.mutate({ prompt: text })}
-    />
-  );
-};
-
-function InlineCreateHabit() {
-  const context = api.useContext();
-  const addHabit = api.journal.addHabit.useMutation({
-    onSuccess() {
-      void context.journal.getHabits.invalidate();
-    },
-  });
-
-  return (
-    <InlineEdit
-      placeholder="New habit"
-      initialText=""
-      commit={(text: string) => addHabit.mutate({ description: text })}
-    />
-  );
-}
-
 interface JournalProps {
   habits: ExpandedHabit[];
   date: Date;
@@ -487,7 +407,6 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
 }
 
 function MetricPanel({ metrics }: { metrics: ExpandedMetric[] }) {
-  const submitAllowed = metrics.every((it) => it.score !== undefined);
   return (
     <tr>
       <td colSpan={7} className="rounded border border-gray-100">
@@ -505,12 +424,17 @@ function MetricPanel({ metrics }: { metrics: ExpandedMetric[] }) {
           <div className="">
             <Memo></Memo>
           </div>
-          <div className="items-right mt-2 flex justify-end gap-2">
-            <Button variant="link">Cancel</Button>
-            <Button variant="outline" disabled={!submitAllowed}>
-              Done
-            </Button>
-          </div>
+          {metrics.length > 0 && (
+            <div className="items-right mt-2 flex justify-end gap-2">
+              <Button variant="link">Cancel</Button>
+              <Button
+                variant="outline"
+                disabled={metrics.some((it) => it.score === undefined)}
+              >
+                Done
+              </Button>
+            </div>
+          )}
         </div>
       </td>
     </tr>
