@@ -171,18 +171,21 @@ export function HabitHeaderLineGrid({
 
   return (
     <>
-      <div className={classNames("flex flex-row items-baseline gap-2")}>
+      <div className={classNames("flex flex-row items-center gap-2")}>
         {linked && (
           <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
         )}
-        <TbSquareRoundedLetterH></TbSquareRoundedLetterH>
+        <TbSquareRoundedLetterH className="text-2xl text-blue-500"></TbSquareRoundedLetterH>
         <EditableField
           initialText={description}
           commit={(text) => mutation.mutate({ habitId: id, description: text })}
           className="font-semibold"
         ></EditableField>
       </div>
-      <span className="text-sm lowercase text-gray-500">
+      
+      
+      {/* <span className="text-sm lowercase text-gray-500">
+        
         <span className="space-x-1 text-sm">
           <span className="text-md ">Completed</span>
           <span className="text-md ">{completions}</span>
@@ -206,7 +209,7 @@ export function HabitHeaderLineGrid({
             className="font-semibold"
           ></DropDown>
         </span>
-      </span>
+      </span> */}
       <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
         <span
           className={classNames(

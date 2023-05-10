@@ -73,6 +73,7 @@ function OverviewPage() {
 
   const data = goalsQuery.data;
   return (
+    <div className="container max-w-4xl">
     <div className="mb-10 scrollbar-none">
       {store.modal?.state === State.CreateGoal && (
         <CreateGoalModal></CreateGoalModal>
@@ -84,7 +85,7 @@ function OverviewPage() {
         <CreateMetricModal></CreateMetricModal>
       )}
       <Header></Header>
-      <div className="mx-auto mt-5 grid grid-cols-3 items-center gap-5 p-6 shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+      <div className="mx-auto mt-3 grid grid-cols-2 items-center gap-2 p-6 ">
         {data.goals.map((goal) => (
           <GoalCard
             {...goal.goal}
@@ -94,8 +95,9 @@ function OverviewPage() {
           ></GoalCard>
         ))}
         {/* Habit Card with Progress Bar */}
-        <h1 className="col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
+        <h1 className="col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600 under">
           Unlinked Items
+          <hr />
         </h1>
         {data.habits.map((habit) => (
           <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
@@ -111,6 +113,7 @@ function OverviewPage() {
           );
         })}
       </div>
+    </div>
     </div>
   );
 }

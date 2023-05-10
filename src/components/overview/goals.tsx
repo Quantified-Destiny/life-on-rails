@@ -35,11 +35,12 @@ export function GoalCard({
   });
   return (
     <div className="contents" onClick={console.log}>
-      <div className="col-span-2 flex flex-row items-center">
-        <TbSquareRoundedLetterG></TbSquareRoundedLetterG>
+      <div className="col-span-1 w-auto flex flex-row items-center gap-2">
+        <TbSquareRoundedLetterG className="text-2xl text-yellow-500"></TbSquareRoundedLetterG>
         <EditableField
           initialText={name}
           commit={(name) => editGoal.mutate({ goalId: id, name })}
+          className="text-yellow-800"
         ></EditableField>
       </div>
       <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
