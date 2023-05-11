@@ -60,7 +60,7 @@ export function GoalCard({
         ></HabitCard>
       ))}
       {metrics.map((m) => (
-        <LinkedMetric {...m} weight={0.4} key={m.id} offset={0}></LinkedMetric>
+        <LinkedMetric {...m} weight={0.4} key={m.id} offset={1}></LinkedMetric>
       ))}
     </div>
   );
