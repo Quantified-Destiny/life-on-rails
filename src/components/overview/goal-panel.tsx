@@ -34,6 +34,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
+import { TbSquareRoundedLetterM } from "react-icons/tb";
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
@@ -399,6 +400,62 @@ function ScoringSection({
         ))}
         {metrics.map((metric, i) => (
           <Tooltip key={metric.id} delayDuration={0}>
+            <div
+              key={metric.id}
+              className="inline-flex h-full flex-col items-center gap-3 text-center"
+              style={{
+                width: `${(metric.weight / totalWeight) * 100}%`,
+              }}
+            >
+              <span className="flex flex-row items-baseline justify-center gap-2">
+                <TbSquareRoundedLetterM></TbSquareRoundedLetterM>
+                {metric.prompt}
+              </span>
+              <TooltipTrigger asChild>
+                <div
+                  className="h-5 w-full animate-[scale] animate-in animate-out hover:scale-110 hover:scale-y-150"
+                  style={{
+                    backgroundColor: `hsl(0deg 0% ${40 + ((i * 15) % 60)}%)`,
+                  }}
+                ></div>
+              </TooltipTrigger>
+              <p> Weight: {metric.weight}</p>
+              <span>
+                <Button
+                  variant="ghost"
+                  disabled={metric.weight <= 1}
+                  onClick={() =>
+                    updateMetricWeight.mutate({
+                      goalId: goalId,
+                      metricId: metric.id,
+                      weight: metric.weight - 1,
+                    })
+                  }
+                >
+                  <ArrowDownIcon></ArrowDownIcon>
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    updateMetricWeight.mutate({
+                      goalId: goalId,
+                      metricId: metric.id,
+                      weight: metric.weight + 1,
+                    })
+                  }
+                >
+                  <ArrowUpIcon></ArrowUpIcon>
+                </Button>
+              </span>
+            </div>
+            <TooltipContent>
+              {((metric.weight / totalWeight) * 100).toFixed(2)}%
+            </TooltipContent>
+          </Tooltip>
+
+        ))}
+        {/* {metrics.map((metric, i) => (
+          <Tooltip key={metric.id} delayDuration={0}>
             <TooltipTrigger asChild>
               <div
                 key={metric.id}
@@ -414,7 +471,7 @@ function ScoringSection({
               {((metric.weight / totalWeight) * 100).toFixed(2)}%
             </TooltipContent>
           </Tooltip>
-        ))}
+        ))} */}
       </div>
     </TooltipProvider>
   );
