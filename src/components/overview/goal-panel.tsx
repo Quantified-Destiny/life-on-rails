@@ -420,7 +420,7 @@ function ScoringSection({
   );
 }
 
-function GoalPanel({ goalId, score }: { goalId: string, score: number }) {
+function GoalPanel({ goalId, score }: { goalId: string; score: number }) {
   const context = api.useContext();
 
   const deleteGoal = api.goals.deleteGoal.useMutation({
@@ -449,10 +449,13 @@ function GoalPanel({ goalId, score }: { goalId: string, score: number }) {
     return <p>LOADING</p>;
   }
   const habitWeights = new Map(
-    goalWeightsQuery.data.habits.map((habit) => [habit.id, habit.weight])
+    goalWeightsQuery.data.habits.map((habit) => [habit.habitId, habit.weight])
   );
   const metricWeights = new Map(
-    goalWeightsQuery.data.metrics.map((metric) => [metric.id, metric.weight])
+    goalWeightsQuery.data.metrics.map((metric) => [
+      metric.metricId,
+      metric.weight,
+    ])
   );
 
   return (
@@ -491,11 +494,11 @@ function GoalPanel({ goalId, score }: { goalId: string, score: number }) {
                 goalId={goalId}
                 habits={goalQuery.data.habits.map((it) => ({
                   ...it,
-                  weight: habitWeights?.get(it.id) ?? 1,
+                  weight: habitWeights?.get(it.id) ?? -1,
                 }))}
                 metrics={goalQuery.data.metrics.map((it) => ({
                   ...it,
-                  weight: metricWeights?.get(it.id) ?? 1,
+                  weight: metricWeights?.get(it.id) ?? -1,
                 }))}
               ></ScoringSection>
             </AccordionContent>
@@ -541,7 +544,7 @@ function GoalPanel({ goalId, score }: { goalId: string, score: number }) {
 export function GoalSheet({
   goalId,
   children,
-  score
+  score,
 }: {
   goalId: string;
   children: ReactNode;
