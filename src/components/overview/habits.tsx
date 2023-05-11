@@ -57,78 +57,81 @@ export function HabitHeaderLine({
   const context = api.useContext();
   const mutation = api.habits.editHabit.useMutation({
     onSuccess: () => {
+      void context.habits.getHabit.invalidate();
       void context.goals.getAllGoals.invalidate();
     },
   });
   const editFrequency = api.habits.editFrequency.useMutation({
     onSuccess: () => {
+      void context.habits.getHabit.invalidate();
       void context.goals.getAllGoals.invalidate();
     },
   });
   const editFrequencyHorizon = api.habits.editFrequencyHorizon.useMutation({
     onSuccess: () => {
       void context.goals.getAllGoals.invalidate();
+      void context.habits.getHabit.invalidate();
     },
   });
   //const openHabitPanel = useOverviewStore((store) => store.openHabitPanel);
 
   return (
     <>
-    <div className="flexflex-col">
-      <div className="flex flex-row items-center justify-between">
-        <div className="flex flex-row items-baseline gap-2">
-          <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
-            Habit
-          </span>
-          <EditableField
-            initialText={description}
-            commit={(text) =>
-              mutation.mutate({ habitId: id, description: text })
-            }
-            className="font-semibold"
-          ></EditableField>
-        </div>
-        <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
-          <span
-            className={classNames(
-              "rounded-lg bg-gray-100 p-2 text-xl",
-              textcolor(score)
-            )}
-          >
-            {score.toFixed(2)}
-          </span>
-          <HabitSheet habitId={id}>
-            {/* <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon> */}
-          </HabitSheet>
-        </div>
-      </div>
-      <div className="flex flex-row">
-      <span className="text-sm lowercase text-gray-500">
-          <span className="space-x-1 text-sm">
-            <span className="text-md ">Completed</span>
-            <span className="text-md ">{completions}</span>
-            <span className="">/</span>
-            <EditableNumberField
-              initial={frequency}
-              commit={(number) =>
-                editFrequency.mutate({ habitId: id, frequency: number })
+      <div className="flexflex-col">
+        <div className="flex flex-row items-center justify-between">
+          <div className="flex flex-row items-baseline gap-2">
+            <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
+              Habit
+            </span>
+            <EditableField
+              initialText={description}
+              commit={(text) =>
+                mutation.mutate({ habitId: id, description: text })
               }
               className="font-semibold"
-            ></EditableNumberField>
-            <span className="text-md ">times this</span>
-            <DropDown
-              frequencyHorizon={frequencyHorizon}
-              commit={(freq) =>
-                editFrequencyHorizon.mutate({
-                  habitId: id,
-                  frequencyHorizon: freq,
-                })
-              }
-              className="font-semibold"
-            ></DropDown>
+            ></EditableField>
+          </div>
+          <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
+            <span
+              className={classNames(
+                "rounded-lg bg-gray-100 p-2 text-xl",
+                textcolor(score)
+              )}
+            >
+              {score.toFixed(2)}
+            </span>
+            <HabitSheet habitId={id}>
+              {/* <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon> */}
+            </HabitSheet>
+          </div>
+        </div>
+        <div className="flex flex-row">
+          <span className="text-sm lowercase text-gray-500">
+            <span className="space-x-1 text-sm">
+              <span className="text-md ">Completed</span>
+              <span className="text-md ">{completions}</span>
+              <span className="">/</span>
+              <EditableNumberField
+                initial={frequency}
+                commit={(number) =>
+                  editFrequency.mutate({ habitId: id, frequency: number })
+                }
+                className="font-semibold"
+              ></EditableNumberField>
+              <span className="text-md ">times this</span>
+              <DropDown
+                frequencyHorizon={frequencyHorizon}
+                commit={(freq) =>
+                  editFrequencyHorizon.mutate({
+                    habitId: id,
+                    frequencyHorizon: freq,
+                  })
+                }
+                className="font-semibold"
+              ></DropDown>
+            </span>
           </span>
-        </span>
-      </div>
+        </div>
       </div>
     </>
   );
@@ -182,8 +185,7 @@ export function HabitHeaderLineGrid({
           className="font-semibold"
         ></EditableField>
       </div>
-      
-      
+
       {/* <span className="text-sm lowercase text-gray-500">
         
         <span className="space-x-1 text-sm">
