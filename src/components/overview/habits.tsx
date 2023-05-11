@@ -22,6 +22,10 @@ import { TagList } from "./tags";
 import { CornerDownRight } from "lucide-react";
 import { TbSquareRoundedLetterH } from "react-icons/tb";
 
+function min(a: number, b: number) {
+  return (a<b ? a : b);
+}
+
 function getGoalsFilter(
   inputValue: string | undefined
 ): (_goal: Goal) => boolean {
@@ -219,7 +223,7 @@ export function HabitHeaderLineGrid({
             textcolor(score)
           )}
         >
-          {score.toFixed(2)}
+          {min(1, score).toFixed(2)}
         </span>
         <HabitSheet habitId={id}>
           <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>

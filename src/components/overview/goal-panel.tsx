@@ -420,7 +420,7 @@ function ScoringSection({
   );
 }
 
-function GoalPanel({ goalId }: { goalId: string }) {
+function GoalPanel({ goalId, score }: { goalId: string, score: number }) {
   const context = api.useContext();
 
   const deleteGoal = api.goals.deleteGoal.useMutation({
@@ -472,7 +472,7 @@ function GoalPanel({ goalId }: { goalId: string }) {
               </div>
               <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
                 <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
-                  {0}
+                  {score.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -541,9 +541,11 @@ function GoalPanel({ goalId }: { goalId: string }) {
 export function GoalSheet({
   goalId,
   children,
+  score
 }: {
   goalId: string;
   children: ReactNode;
+  score: number;
 }) {
   return (
     <Sheet>
@@ -553,7 +555,7 @@ export function GoalSheet({
         size="lg"
         className="overflow-scroll max-md:w-full"
       >
-        <GoalPanel goalId={goalId}></GoalPanel>
+        <GoalPanel goalId={goalId} score={score}></GoalPanel>
       </SheetContent>
     </Sheet>
   );

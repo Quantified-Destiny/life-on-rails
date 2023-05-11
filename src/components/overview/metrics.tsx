@@ -6,7 +6,9 @@ import { textcolor } from "./lib";
 import { CornerDownRight } from "lucide-react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { TbSquareRoundedLetterM } from "react-icons/tb";
-
+function min(a: number, b: number) {
+  return (a<b ? a : b);
+}
 export function LinkedMetric({
   id,
   weight,
@@ -61,7 +63,7 @@ export function LinkedMetric({
             textcolor(score)
           )}
         >
-          {score.toFixed(2)}
+          {min(1, score).toFixed(2)}
         </span>
         <DropdownMenu
           options={[
