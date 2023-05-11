@@ -2,7 +2,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { ReactNode, useEffect } from "react";
 
 import {
   BarChart,
@@ -30,7 +30,6 @@ function Sidebar(props: {
   open: boolean;
   setOpen: (open: boolean) => void;
   Menus: MenuItem[];
-  
 }) {
   const router = useRouter();
   const path = router.asPath;
@@ -94,14 +93,14 @@ function Sidebar(props: {
           </span>
         </Link>
       ))}
-      <hr className="h-px my-8 mx-2 bg-gray-500 border-0 dark:bg-gray-700"></hr>
+      <hr className="mx-2 my-8 h-px border-0 bg-gray-500 dark:bg-gray-700"></hr>
 
       <Link
         href="/profile"
         key="profile"
         className={classNames(
-          "flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm text-white hover:bg-slate-200 hover:bg-opacity-10 mt-2",
-          path.includes('profile') ? "bg-slate-200 bg-opacity-10" : ""
+          "mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm text-white hover:bg-slate-200 hover:bg-opacity-10",
+          path.includes("profile") ? "bg-slate-200 bg-opacity-10" : ""
         )}
       >
         <div>
@@ -115,12 +114,12 @@ function Sidebar(props: {
           Profile
         </span>
       </Link>
-      
+
       <Link
         href="/"
         onClick={sessionData ? handleSignOut : undefined}
         key="logout"
-        className={`flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm text-white	hover:bg-white hover:bg-opacity-10 mt-2`}
+        className={`mt-2 flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm	text-white hover:bg-white hover:bg-opacity-10`}
       >
         <div>
           {React.createElement(LogOut, {
@@ -138,9 +137,9 @@ function Sidebar(props: {
 }
 
 const menus = [
-  { name: "Journal", link: "/newjournal", icon: Book , gap: true },
+  { name: "Journal", link: "/newjournal", icon: Book, gap: true },
   // { name: "Legacy Journal", link: "/journal", icon: CalendarRange },
-  { name: "Dashboard", link: "/dashboard", icon: BarChart},
+  { name: "Dashboard", link: "/dashboard", icon: BarChart },
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
   { name: "Help", link: "/help", icon: HelpCircle },
   // { name: "New Journal", link: "/newjournal", icon: HelpCircle },
@@ -149,7 +148,7 @@ const menus = [
   // { name: "delete account", link: "/deactivate", icon: HelpCircle },
 ];
 
-function Layout({ main }: { main: () => JSX.Element }) {
+function Layout({ children }: { children: ReactNode }) {
   const { open, setOpen } = useSidebarStore();
 
   const isFetching = useIsFetching();
@@ -170,11 +169,7 @@ function Layout({ main }: { main: () => JSX.Element }) {
 
   return (
     <>
-      <Sidebar
-        open={open}
-        setOpen={setOpen}
-        Menus={menus}
-      ></Sidebar>
+      <Sidebar open={open} setOpen={setOpen} Menus={menus}></Sidebar>
       <div
         className={classNames("h-1 w-full", {
           "animate-pulse bg-green-600": isFetching,
@@ -191,7 +186,7 @@ function Layout({ main }: { main: () => JSX.Element }) {
             "container mx-auto h-full overflow-scroll pt-5 scrollbar-none"
           )}
         >
-          {main()}
+          {children}
         </main>
       </div>
     </>

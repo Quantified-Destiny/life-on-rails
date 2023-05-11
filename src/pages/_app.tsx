@@ -16,7 +16,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Layout main={() => <Component {...pageProps} />}></Layout>;
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+      ;
     </SessionProvider>
   );
 };

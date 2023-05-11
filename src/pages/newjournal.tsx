@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "../components/layout";
 import TimePicker from "../components/time-picker";
 
 import { RxGear } from "react-icons/rx";
@@ -11,7 +10,6 @@ import classNames from "classnames";
 import { api } from "../utils/api";
 
 // fixes zoomed in icons
-import "@fortawesome/fontawesome-svg-core/styles.css";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { CheckCircle, CircleDot, CircleIcon } from "lucide-react";
 import Link from "next/link";

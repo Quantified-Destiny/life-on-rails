@@ -1,25 +1,5 @@
 import { useState } from "react";
 import Calendar from "react-calendar";
-// import 'react-calendar/dist/Calendar.css';
-import dynamic from "next/dynamic";
-
-import { AiOutlineFire, AiTwotoneFire } from "react-icons/ai";
-import { GiBackwardTime } from "react-icons/gi";
-import { MdScoreboard } from "react-icons/md";
-// import HeatMap from '@uiw/react-heat-map';
-
-// import "@uiw/react-heat-map/dist.css";
-// import "@uiw/react-heat-map/esm/style/index.css";
-
-// import '@uiw/react-tooltip/esm/style/index.css';
-// import '@uiw/react-tooltip/dist.css';
-
-const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
-
-// const Tooltip = dynamic(
-//   () => import("@uiw/react-tooltip"),
-//   { ssr: false }
-// );
 
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import type { HabitCompletion } from "@prisma/client";
@@ -32,6 +12,9 @@ import {
 } from "date-fns";
 import { useRouter } from "next/router";
 import type { Value } from "react-calendar/dist/cjs/shared/types";
+import { AiOutlineFire, AiTwotoneFire } from "react-icons/ai";
+import { GiBackwardTime } from "react-icons/gi";
+import { MdScoreboard } from "react-icons/md";
 import { RxRocket } from "react-icons/rx";
 import { DropdownMenu } from "../../components/createMenu";
 import {

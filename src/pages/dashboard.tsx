@@ -1,10 +1,6 @@
-// import dynamic from "next/dynamic";
-import { RxRocket } from "react-icons/rx";
-import Layout from "../components/layout";
-
+import { Loader } from "../components/ui/loader";
 import type { ExpandedHabit } from "../server/queries";
 import { api } from "../utils/api";
-import { Loader } from "../components/ui/loader";
 
 function StatsCardRow() {
   const goalsQuery = api.goals.getAllGoals.useQuery();

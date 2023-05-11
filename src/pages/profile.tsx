@@ -1,7 +1,6 @@
 import { format } from "date-fns";
-import Layout from "../components/layout";
-import { api } from "../utils/api";
 import { RxRocket } from "react-icons/rx";
+import { api } from "../utils/api";
 
 const ProfilePage = () => {
   const context = api.useContext();
@@ -44,7 +43,7 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <div className=" px-4 py-5 sm:px-6">
+              <div className="px-4 py-5 sm:px-6">
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">
