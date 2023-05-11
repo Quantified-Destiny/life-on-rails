@@ -36,7 +36,7 @@ export function LinkedMetric({
     <>
       <div
         className={classNames("col-span-1 flex flex-row items-baseline gap-2", {
-          "ml-4": offset == 1,
+          "ml-0": offset == 1,
           "ml-8": offset == 2,
         })}
       >
