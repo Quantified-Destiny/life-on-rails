@@ -2,12 +2,12 @@ import { useIsFetching } from "@tanstack/react-query";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { ReactNode, useEffect } from "react";
+import type { ReactNode } from "react";
+import React, { useEffect } from "react";
 
 import {
   BarChart,
   Book,
-  CalendarRange,
   ChevronLeft,
   HelpCircle,
   LayoutDashboard,

@@ -13,6 +13,7 @@ import { api } from "../utils/api";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { CheckCircle, CircleDot, CircleIcon } from "lucide-react";
 import Link from "next/link";
+import { AiFillCaretDown, AiFillCaretRight } from "react-icons/ai";
 import { RxExternalLink } from "react-icons/rx";
 import { CreateMenu } from "../components/createMenu";
 import { HabitSheet } from "../components/overview/habit-panel";
@@ -201,6 +202,10 @@ interface RowProps {
   tags: string[];
   type: "Habit" | "Metric";
   actions?: React.ReactNode;
+  panel?: {
+    open: boolean;
+    togglePanel: (open: boolean) => void;
+  };
 }
 
 const Row = ({
@@ -212,6 +217,7 @@ const Row = ({
   metrics,
   tags,
   actions,
+  panel,
 }: RowProps): JSX.Element => {
   return (
     <tr
@@ -219,6 +225,21 @@ const Row = ({
       className="h-12 rounded border border-gray-100 focus:outline-none"
       key={key}
     >
+      <td className="cursor-pointer text-center opacity-50">
+        {panel && (
+          <button>
+            {panel.open ? (
+              <AiFillCaretDown
+                onClick={() => panel.togglePanel(false)}
+              ></AiFillCaretDown>
+            ) : (
+              <AiFillCaretRight
+                onClick={() => panel.togglePanel(true)}
+              ></AiFillCaretRight>
+            )}
+          </button>
+        )}
+      </td>
       <TypeIcon type={type}></TypeIcon>
       <td>{completion && <Status completion={completion}></Status>}</td>
       <td>
@@ -371,10 +392,6 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
   });
 
   const [panelOpen, setPanelOpen] = useState<boolean>(false);
-  const status =
-    habit.completions >= habit.frequency
-      ? CompletionStatus.COMPLETED
-      : CompletionStatus.INCOMPLETE;
 
   habit.metrics;
   return (
@@ -388,8 +405,15 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
         metrics={habit.metrics}
         score={habit.score}
         actions={<Actions id={habit.id}></Actions>}
+        panel={{
+          open: panelOpen,
+          togglePanel: setPanelOpen,
+        }}
         completion={{
-          status: status,
+          status:
+            habit.completions >= habit.frequency
+              ? CompletionStatus.COMPLETED
+              : CompletionStatus.INCOMPLETE,
           schedule: {
             current: habit.completions,
             frequency: habit.frequency,
@@ -409,7 +433,8 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
 function MetricPanel({ metrics }: { metrics: ExpandedMetric[] }) {
   return (
     <tr>
-      <td colSpan={7} className="rounded border border-gray-100">
+      <td colSpan={4} className="bg-gray-100/70"></td>
+      <td colSpan={5} className="rounded border border-gray-100">
         <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
           <div className="flex items-center">
             {metrics.map((metric) => (
@@ -453,7 +478,11 @@ function MetricRows({ metric, date }: { metric: ExpandedMetric; date: Date }) {
       ></Row>
       {
         <tr>
-          <td colSpan={7} className="rounded border border-gray-100">
+          <td
+            colSpan={4}
+            className="rounded border border-gray-100 bg-gray-100/70"
+          ></td>
+          <td colSpan={6} className="rounded border border-gray-100">
             <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
               <div className="flex items-center">
                 <MetricButtonRow
@@ -514,11 +543,11 @@ function DataTable({
         <thead>
           <tr className="font-semisbold justify-between text-center text-xs">
             <td></td>
+            <td></td>
             <td className="w-2"></td>
             <td className="w-2"></td>
             <td>Score</td>
             <td>Name</td>
-            <td></td>
             <td></td>
           </tr>
         </thead>
