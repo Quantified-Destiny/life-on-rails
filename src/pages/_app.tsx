@@ -13,7 +13,16 @@ import Layout from "../components/layout";
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
+  ...appProps
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+  if ([`/`].includes(appProps.router.pathname))
+    return (
+      <SessionProvider session={session}>
+        <Component {...pageProps} />;
+      </SessionProvider>
+    );
+
   return (
     <SessionProvider session={session}>
       <Layout>

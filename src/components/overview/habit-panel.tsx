@@ -252,7 +252,7 @@ function CompletionsGrid({
                   ></XCircle>
                 </div>
                 {it.memo && (
-                  <div className="rounded-b-lg mx-2 border border-gray-200 bg-gray-50 p-3 text-left text-xs font-normal italic text-gray-500 dark:border-gray-500 dark:bg-gray-600 dark:text-gray-300">
+                  <div className="mx-2 rounded-b-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs font-normal italic text-gray-500 dark:border-gray-500 dark:bg-gray-600 dark:text-gray-300">
                     {it.memo}
                   </div>
                 )}
@@ -271,8 +271,7 @@ function HistorySection({ habitId }: { habitId: string }) {
     timeHorizon: 30 * 6,
   });
   if (
-    completionsQuery.isFetching ||
-    completionsQuery.isRefetching ||
+    completionsQuery.isLoading ||
     completionsQuery.error ||
     !completionsQuery.data
   ) {

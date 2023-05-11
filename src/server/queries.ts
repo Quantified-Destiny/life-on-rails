@@ -49,6 +49,7 @@ export async function getHabitsWithMetricsMap({
     metrics: LinkedMetric[];
     HabitTag: (HabitTag & { tag: Tag })[];
     goals: HabitMeasuresGoal[];
+    completions: HabitCompletion[];
   };
 
   const whereConditions = {
@@ -117,7 +118,10 @@ export async function getHabitsWithMetricsMap({
     goals: h.goals.map((it) => it.goalId),
     tags: h.HabitTag.map((it) => it.tag.name),
     metrics: h.metrics.map((it) => metricsMap.get(it.metricId)!),
-    completions: habitCompletionsCount.get(h.id) ?? 0,
+    completions:
+      h.frequencyHorizon == FrequencyHorizon.WEEK
+        ? h.completions.length
+        : h.completions.filter((it) => isSameDay(it.date, date)).length, //habitCompletionsCount.get(h.id) ?? 0,
   }));
   const expandedHabitsMap = new Map<string, ExpandedHabit>(
     expandedHabits.map((h) => [h.id, h])
@@ -129,10 +133,12 @@ export async function getHabits({
   prisma,
   userId,
   goalIds,
+  date = new Date(),
 }: {
   prisma: typeof prismaClient;
   userId: string;
   goalIds?: string[];
+  date?: Date;
 }): Promise<ExpandedHabit[]> {
   type HabitType = (Habit & {
     HabitTag: (HabitTag & {
@@ -167,7 +173,7 @@ export async function getHabits({
     include: {
       completions: {
         where: {
-          date: { gt: subWeeks(new Date(), 1) },
+          date: { gt: subWeeks(date, 1) },
         },
       },
       metrics: {
@@ -175,7 +181,7 @@ export async function getHabits({
           metric: {
             include: {
               metricAnswers: {
-                where: { createdAt: { gt: startOfDay(new Date()) } },
+                where: { createdAt: { gt: startOfDay(date) } },
               },
               goals: { include: { goal: true } },
               MetricTag: { include: { tag: true } },
@@ -235,7 +241,8 @@ export async function getHabits({
     const completions = habit.completions;
     const completionsCount =
       habit.frequencyHorizon == FrequencyHorizon.DAY
-        ? completions.filter(({ date }) => isSameDay(new Date(), date)).length
+        ? completions.filter((completion) => isSameDay(completion.date, date))
+            .length
         : completions.length;
     return {
       ...habit,
