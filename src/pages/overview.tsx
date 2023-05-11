@@ -54,7 +54,7 @@ function Header() {
         </div>
       </div>
       <p className="mb-2 px-2 text-xs italic text-slate-500">
-        All scores are based off the last 2 weeks based on your{" "}
+        All scores are based off the preference in your{" "}
         <Link href="/profile" className="underline">
           user settings
         </Link>
