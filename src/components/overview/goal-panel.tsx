@@ -1,4 +1,5 @@
 import type { Habit } from "@prisma/client";
+import { ScoringFormat } from "@prisma/client";
 import { subYears } from "date-fns";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -35,6 +36,10 @@ import {
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
 import { TbSquareRoundedLetterM } from "react-icons/tb";
+
+function min(a: number, b: number) {
+  return (a<b ? a : b);
+}
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
@@ -477,7 +482,7 @@ function ScoringSection({
   );
 }
 
-function GoalPanel({ goalId, score }: { goalId: string; score: number }) {
+function GoalPanel({ goalId, score, scoringUnit }: { goalId: string; score: number; scoringUnit: ScoringFormat }) {
   const context = api.useContext();
 
   const deleteGoal = api.goals.deleteGoal.useMutation({
@@ -532,7 +537,7 @@ function GoalPanel({ goalId, score }: { goalId: string; score: number }) {
               </div>
               <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
                 <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
-                  {score.toFixed(2)}
+                  {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
                 </span>
               </div>
             </div>
@@ -602,10 +607,12 @@ export function GoalSheet({
   goalId,
   children,
   score,
+  scoringUnit,
 }: {
   goalId: string;
   children: ReactNode;
   score: number;
+  scoringUnit: ScoringFormat;
 }) {
   return (
     <Sheet>
@@ -615,7 +622,7 @@ export function GoalSheet({
         size="lg"
         className="overflow-scroll max-md:w-full"
       >
-        <GoalPanel goalId={goalId} score={score}></GoalPanel>
+        <GoalPanel goalId={goalId} score={score} scoringUnit={scoringUnit}></GoalPanel>
       </SheetContent>
     </Sheet>
   );

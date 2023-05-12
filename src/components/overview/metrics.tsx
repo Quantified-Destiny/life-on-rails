@@ -6,6 +6,7 @@ import { textcolor } from "./lib";
 import { CornerDownRight } from "lucide-react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { TbSquareRoundedLetterM } from "react-icons/tb";
+import { ScoringFormat } from "@prisma/client";
 function min(a: number, b: number) {
   return (a<b ? a : b);
 }
@@ -15,12 +16,14 @@ export function LinkedMetric({
   prompt,
   score,
   offset,
+  scoringUnit,
 }: {
   id: string;
   weight: number;
   prompt: string;
   score: number;
   offset: 0 | 1 | 2;
+  scoringUnit: ScoringFormat;
 }) {
   const context = api.useContext();
   const mutation = api.metrics.editMetric.useMutation({
@@ -63,7 +66,7 @@ export function LinkedMetric({
             textcolor(score)
           )}
         >
-          {min(1, score).toFixed(2)}
+          {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
         </span>
         <DropdownMenu
           options={[

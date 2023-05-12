@@ -1,5 +1,6 @@
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import type { Metric } from "@prisma/client";
+import { ScoringFormat } from "@prisma/client";
 import { EditableField } from "../../components/inlineEdit";
 import { HabitCard } from "../../components/overview/habits";
 import type {
@@ -22,6 +23,7 @@ export function GoalCard({
   score,
   habits,
   metrics,
+  scoringUnit,
 }: ExpandedGoal & {
   score: number;
   habits: (ExpandedHabit & {
@@ -30,6 +32,7 @@ export function GoalCard({
     metrics: ExpandedMetric[];
   })[];
   metrics: (Metric & { score: number })[];
+  scoringUnit: ScoringFormat;
 }) {
   const context = api.useContext();
   const editGoal = api.goals.editGoal.useMutation({
@@ -49,9 +52,9 @@ export function GoalCard({
       </div>
       <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
         <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
-          {min(1, score).toFixed(2)}
+          {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
         </span>
-        <GoalSheet goalId={id} score={score}>
+        <GoalSheet goalId={id} score={score} scoringUnit={scoringUnit}>
           <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
         </GoalSheet>
       </div>
@@ -61,10 +64,11 @@ export function GoalCard({
           weight={0.4}
           linkedGoal={id}
           key={habit.id}
+          scoringUnit={scoringUnit}
         ></HabitCard>
       ))}
       {metrics.map((m) => (
-        <LinkedMetric {...m} weight={0.4} key={m.id} offset={1}></LinkedMetric>
+        <LinkedMetric {...m} weight={0.4} key={m.id} offset={1} scoringUnit={scoringUnit}></LinkedMetric>
       ))}
     </div>
   );

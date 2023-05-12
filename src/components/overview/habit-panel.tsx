@@ -30,6 +30,7 @@ import {
   HabitHeaderLine,
   LinkHabit,
 } from "./habits";
+import { ScoringFormat} from "@prisma/client";
 
 function GoalsSection({ habitId }: { habitId: string }) {
   const context = api.useContext();
@@ -342,7 +343,7 @@ function ScoringSection({
   );
 }
 
-function HabitPanel({ habitId }: { habitId: string }) {
+function HabitPanel({ habitId, scoringUnit }: { habitId: string, scoringUnit: ScoringFormat }) {
   const context = api.useContext();
   const deleteHabit = api.habits.deleteHabit.useMutation({
     onSuccess() {
@@ -372,7 +373,7 @@ function HabitPanel({ habitId }: { habitId: string }) {
       <div className="flex h-full flex-col gap-2">
         <SheetHeader>
           <SheetTitle>
-            <HabitHeaderLine {...data} weight={0.1}></HabitHeaderLine>
+            <HabitHeaderLine {...data} weight={0.1} scoringUnit={scoringUnit}></HabitHeaderLine>
             <TagList
               tags={data.tags}
               link={(tag) => linkHabit.mutate({ habitId, tagName: tag })}
@@ -428,9 +429,11 @@ function HabitPanel({ habitId }: { habitId: string }) {
 export function HabitSheet({
   habitId,
   children,
+  scoringUnit,
 }: {
   habitId: string;
   children: ReactNode;
+  scoringUnit: ScoringFormat;
 }) {
   return (
     <Sheet>
@@ -440,7 +443,7 @@ export function HabitSheet({
         size="lg"
         className="overflow-scroll  max-md:w-full"
       >
-        <HabitPanel habitId={habitId}></HabitPanel>
+        <HabitPanel habitId={habitId} scoringUnit={scoringUnit}></HabitPanel>
       </SheetContent>
     </Sheet>
   );

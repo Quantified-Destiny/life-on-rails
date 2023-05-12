@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import type { FrequencyHorizon, Goal } from "@prisma/client";
+import { ScoringFormat} from "@prisma/client";
 import { cva } from "class-variance-authority";
 import classNames from "classnames";
 import { useCombobox } from "downshift";
@@ -49,6 +50,7 @@ export function HabitHeaderLine({
   frequencyHorizon,
   score,
   completions,
+  scoringUnit,
 }: {
   id: string;
   weight: number | undefined;
@@ -57,6 +59,7 @@ export function HabitHeaderLine({
   frequencyHorizon: FrequencyHorizon;
   score: number;
   completions: number;
+  scoringUnit: ScoringFormat;
 }) {
   const context = api.useContext();
   const mutation = api.habits.editHabit.useMutation({
@@ -102,9 +105,9 @@ export function HabitHeaderLine({
                 textcolor(score)
               )}
             >
-              {score.toFixed(2)}
+               {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
             </span>
-            <HabitSheet habitId={id}>
+            <HabitSheet habitId={id} scoringUnit={scoringUnit}>
               {/* <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon> */}
             </HabitSheet>
           </div>
@@ -149,6 +152,7 @@ export function HabitHeaderLineGrid({
   score,
   completions,
   linked,
+  scoringUnit
 }: {
   id: string;
   weight: number | undefined;
@@ -158,6 +162,7 @@ export function HabitHeaderLineGrid({
   score: number;
   completions: number;
   linked: boolean;
+  scoringUnit: ScoringFormat;
 }) {
   const context = api.useContext();
   const mutation = api.habits.editHabit.useMutation({
@@ -223,9 +228,9 @@ export function HabitHeaderLineGrid({
             textcolor(score)
           )}
         >
-          {min(1, score).toFixed(2)}
+          {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
         </span>
-        <HabitSheet habitId={id}>
+        <HabitSheet habitId={id} scoringUnit={scoringUnit}>
           <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
         </HabitSheet>
       </div>
@@ -433,9 +438,11 @@ export function HabitCard({
   completions,
   metrics,
   tags,
+  scoringUnit,
 }: ExpandedHabit & {
   weight: number | undefined;
   linkedGoal?: string | undefined;
+  scoringUnit: ScoringFormat;
 }) {
   const v = cva("rounded-lg p-6 shadow-md space-y-2", {
     variants: {
@@ -463,6 +470,7 @@ export function HabitCard({
         score={score}
         completions={completions}
         linked={!!linkedGoal}
+        scoringUnit={scoringUnit}
       ></HabitHeaderLineGrid>
       {metrics.map((m) => (
         <LinkedMetric
@@ -470,6 +478,7 @@ export function HabitCard({
           weight={0.5}
           key={m.id}
           offset={linkedGoal ? 2 : 1}
+          scoringUnit={scoringUnit}
         ></LinkedMetric>
       ))}
       {/* <CreateMetricLinkedToHabit habitId={id}></CreateMetricLinkedToHabit> */}

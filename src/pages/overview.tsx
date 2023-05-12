@@ -67,10 +67,12 @@ function Header() {
 function OverviewPage() {
   const store = useOverviewStore();
   const goalsQuery = api.goals.getAllGoals.useQuery();
-  if (goalsQuery.isLoading) return <Loader></Loader>;
-  if (goalsQuery.isError) return <p>Query error</p>;
+  const profileQuery = api.profile.getProfile.useQuery();
+  if (goalsQuery.isLoading || profileQuery.isLoading) return <Loader></Loader>;
+  if (goalsQuery.isError || profileQuery.isError) return <p>Query error</p>;
 
   const data = goalsQuery.data;
+  const user = profileQuery.data;
   return (
     <div className="container max-w-4xl">
       <div className="mb-10 scrollbar-none">
@@ -91,6 +93,7 @@ function OverviewPage() {
               habits={goal.habits}
               metrics={goal.metrics}
               key={goal.goal.id}
+              scoringUnit={user.scoringUnit}
             ></GoalCard>
           ))}
           {/* Habit Card with Progress Bar */}
@@ -99,7 +102,7 @@ function OverviewPage() {
             <hr />
           </h1>
           {data.habits.map((habit) => (
-            <HabitCard {...habit} weight={0.5} key={habit.id}></HabitCard>
+            <HabitCard {...habit} weight={0.5} key={habit.id} scoringUnit={user.scoringUnit}></HabitCard>
           ))}
           {data.metrics.map((metric) => {
             return (
@@ -108,6 +111,7 @@ function OverviewPage() {
                 weight={0.5}
                 key={metric.id}
                 offset={0}
+                scoringUnit={user.scoringUnit}
               ></LinkedMetric>
             );
           })}
