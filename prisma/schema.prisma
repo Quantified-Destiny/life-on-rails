@@ -227,15 +227,21 @@ model Session {
   @@index([userId])
 }
 
+enum ScoringFormat {
+  Percentage
+  Normalized
+}
+
 model User {
-  id            String    @id @default(cuid())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  id            String        @id @default(cuid())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
   name          String?
-  email         String?   @unique
+  email         String?       @unique
   emailVerified DateTime?
   image         String?
-  scoringWeeks  Int       @default(2)
+  scoringWeeks  Int           @default(2)
+  scoringUnit   ScoringFormat @default(Normalized)
   accounts      Account[]
   sessions      Session[]
   Goal          Goal[]

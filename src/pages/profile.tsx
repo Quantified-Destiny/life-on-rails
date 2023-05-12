@@ -1,10 +1,16 @@
 import { format } from "date-fns";
 import { RxRocket } from "react-icons/rx";
 import { api } from "../utils/api";
+import { ScoringFormat } from "@prisma/client";
 
 const ProfilePage = () => {
   const context = api.useContext();
   const updateScoringWeeks = api.profile.updateScoringWeeks.useMutation({
+    onSuccess() {
+      void context.profile.invalidate();
+    },
+  });
+  const updateScoringUnit = api.profile.updateScoringUnit.useMutation({
     onSuccess() {
       void context.profile.invalidate();
     },
@@ -93,9 +99,17 @@ const ProfilePage = () => {
                   <select
                     id="scoring"
                     className="mt-2 block w-1/2 rounded-lg border border-gray-300 bg-gray-50 px-2 py-0.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    value={profile.scoringUnit}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      console.log(value);
+                      updateScoringUnit.mutate({
+                        scoringUnit: value as ScoringFormat,
+                      });
+                    }}
                   >
-                    <option value="percent">Percentage</option>
-                    <option value="normal">Normalized</option>
+                    <option value="Percentage">Percentage</option>
+                    <option value="Normalized">Normalized</option>
                   </select>
                 </div>
                 <div className="sm:col-span-1">

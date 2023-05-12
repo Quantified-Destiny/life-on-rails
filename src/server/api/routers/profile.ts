@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { ZodEnum, z } from "zod";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 
 export const profileRouter = createTRPCRouter({
@@ -13,6 +13,7 @@ export const profileRouter = createTRPCRouter({
           email: true,
           image: true,
           scoringWeeks: true,
+          scoringUnit: true,
           accounts: {
             select: {
               provider: true
@@ -27,6 +28,7 @@ export const profileRouter = createTRPCRouter({
         email: data.email,
         image: data.image,
         scoringWeeks: data.scoringWeeks,
+        scoringUnit: data.scoringUnit,
         providers: data.accounts.map(it => it.provider),
         createdAt: data.createdAt
       }
@@ -41,6 +43,17 @@ export const profileRouter = createTRPCRouter({
         id: ctx.session.user.id,
       },
       data: { scoringWeeks: input.scoringWeeks },
+    });
+  }),
+
+  updateScoringUnit: protectedProcedure
+  .input(z.object({ scoringUnit:  z.enum(['Percentage', 'Normalized'])}))
+  .mutation(async ({ input, ctx }) => {
+    await ctx.prisma.user.update({
+      where: {
+        id: ctx.session.user.id,
+      },
+      data: { scoringUnit: input.scoringUnit },
     });
   }),
 
