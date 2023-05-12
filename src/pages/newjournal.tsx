@@ -4,7 +4,7 @@ import TimePicker from "../components/time-picker";
 import { RxGear } from "react-icons/rx";
 import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 
-import { FrequencyHorizon, Metric } from "@prisma/client";
+import { FrequencyHorizon, Metric, ScoringFormat } from "@prisma/client";
 import classNames from "classnames";
 
 import { api } from "../utils/api";
@@ -145,10 +145,10 @@ function TagsTooltip({ tags }: { tags: string[] }) {
   );
 }
 
-function Actions({ id }: { id: string }) {
+function Actions({ id, scoringUnit }: { id: string; scoringUnit: ScoringFormat; }) {
   return (
     <div className="relative flex flex-row items-baseline gap-3 px-2 py-1">
-      <HabitSheet habitId={id}>
+      <HabitSheet habitId={id} scoringUnit={scoringUnit}>
         <RxGear className=" cursor-pointer rounded-lg text-xl text-gray-500 focus:outline-none focus:ring-1 hover:bg-gray-300"></RxGear>
       </HabitSheet>
       <Link href={`/habit/${id}`}>
@@ -206,6 +206,7 @@ interface RowProps {
     open: boolean;
     togglePanel: (open: boolean) => void;
   };
+  scoringUnit: ScoringFormat;
 }
 
 const Row = ({
@@ -218,6 +219,7 @@ const Row = ({
   tags,
   actions,
   panel,
+  scoringUnit,
 }: RowProps): JSX.Element => {
   return (
     <tr
@@ -361,6 +363,7 @@ interface JournalProps {
   date: Date;
   setDate: (date: Date) => void;
   metrics: ExpandedMetric[];
+  scoringUnit: ScoringFormat;
 }
 
 // https://tailwindcomponents.com/component/free-tailwind-css-advance-table-component
@@ -383,7 +386,7 @@ enum CompletionStatus {
   COMPLETED,
 }
 
-function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
+function HabitRows({ habit, date, scoringUnit }: { habit: ExpandedHabit; date: Date; scoringUnit: ScoringFormat; }) {
   const context = api.useContext();
   const createCompletion = api.journal.complete.useMutation({
     onSuccess() {
@@ -404,7 +407,7 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
         date={date}
         metrics={habit.metrics}
         score={habit.score}
-        actions={<Actions id={habit.id}></Actions>}
+        actions={<Actions id={habit.id} scoringUnit={scoringUnit}></Actions>}
         panel={{
           open: panelOpen,
           togglePanel: setPanelOpen,
@@ -424,6 +427,7 @@ function HabitRows({ habit, date }: { habit: ExpandedHabit; date: Date }) {
             setPanelOpen(true);
           },
         }}
+        scoringUnit={scoringUnit}
       ></Row>
       {panelOpen && <MetricPanel metrics={habit.metrics}></MetricPanel>}
     </>
@@ -465,7 +469,7 @@ function MetricPanel({ metrics }: { metrics: ExpandedMetric[] }) {
     </tr>
   );
 }
-function MetricRows({ metric, date }: { metric: ExpandedMetric; date: Date }) {
+function MetricRows({ metric, date, scoringUnit }: { metric: ExpandedMetric; date: Date; scoringUnit: ScoringFormat }) {
   return (
     <>
       <Row
@@ -475,6 +479,7 @@ function MetricRows({ metric, date }: { metric: ExpandedMetric; date: Date }) {
         tags={metric.tags.map((tag) => tag.name)}
         date={date}
         score={metric.score}
+        scoringUnit={scoringUnit}
       ></Row>
       {
         <tr>
@@ -532,10 +537,12 @@ function DataTable({
   habits,
   date,
   metrics,
+  scoringUnit,
 }: {
   habits: ExpandedHabit[];
   date: Date;
   metrics: ExpandedMetric[];
+  scoringUnit: ScoringFormat;
 }) {
   return (
     <>
@@ -553,13 +560,14 @@ function DataTable({
         </thead>
         <tbody>
           {habits.map((habit) => (
-            <HabitRows habit={habit} date={date} key={habit.id}></HabitRows>
+            <HabitRows habit={habit} date={date} key={habit.id} scoringUnit={scoringUnit}></HabitRows>
           ))}
           {metrics.map((metric) => (
             <MetricRows
               metric={metric}
               date={date}
               key={metric.id}
+              scoringUnit={scoringUnit}
             ></MetricRows>
           ))}
         </tbody>
@@ -568,7 +576,7 @@ function DataTable({
   );
 }
 
-function Journal({ date, setDate, habits, metrics }: JournalProps) {
+function Journal({ date, setDate, habits, metrics, scoringUnit }: JournalProps) {
   return (
     <>
       <div className="container flex max-w-5xl justify-center">
@@ -596,6 +604,7 @@ function Journal({ date, setDate, habits, metrics }: JournalProps) {
                 habits={habits}
                 metrics={metrics}
                 date={date}
+                scoringUnit={scoringUnit}
               ></DataTable>
             </div>
 
@@ -638,16 +647,20 @@ const JournalPage = () => {
 
   const habits = api.habits.getHabits.useQuery({ date });
   const metrics = api.metrics.getMetrics.useQuery({ date });
-  if (habits.isLoading || metrics.isLoading) return <Loader></Loader>;
-  if (habits.isError || metrics.isError) return <p>Query error</p>;
+  const profile = api.profile.getProfile.useQuery();
+  
+  if (habits.isLoading || metrics.isLoading || profile.isLoading) return <Loader></Loader>;
+  if (habits.isError || metrics.isError || profile.isError || profile.isError) return <p>Query error</p>;
   const habitsData = habits.data;
   const metricsData = metrics.data; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
+  const user = profile.data;
   return (
     <Journal
       habits={habitsData}
       date={date}
       setDate={setDate}
       metrics={metricsData.filter((it) => it.linkedHabits.length == 0)}
+      scoringUnit={user.scoringUnit}
     ></Journal>
   );
 };

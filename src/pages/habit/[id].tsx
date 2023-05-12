@@ -3,6 +3,8 @@ import Calendar from "react-calendar";
 
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import type { HabitCompletion } from "@prisma/client";
+import { ScoringFormat } from "@prisma/client";
+
 import classNames from "classnames";
 import {
   differenceInCalendarDays,
@@ -98,6 +100,9 @@ function ActivityTable({
     </div>
   );
 }
+function min(a: number, b: number) {
+  return (a<b ? a : b);
+}
 
 function _HabitsPage({ id }: { id: string }) {
   const context = api.useContext();
@@ -108,6 +113,8 @@ function _HabitsPage({ id }: { id: string }) {
     timeHorizon: 100,
   });
   const goalQuery = api.habits.getGoals.useQuery({ habitId: id });
+  const profileQuery = api.profile.getProfile.useQuery();
+  const allItemQuery = api.goals.getAllGoals.useQuery();
 
   function tileClassName({ date, view }: { date: Date; view: string }) {
     if (
@@ -144,7 +151,7 @@ function _HabitsPage({ id }: { id: string }) {
     },
   });
 
-  if (!completionsData.data || !goalQuery.data || !habitData.data) {
+  if (!completionsData.data || !goalQuery.data || !habitData.data || !profileQuery.data || !allItemQuery.data) {
     return (
       <div className="flex h-screen items-center justify-center">
         <RxRocket className="animate-spin text-2xl"></RxRocket>
@@ -360,6 +367,7 @@ function _HabitsPage({ id }: { id: string }) {
                   weight={0.5}
                   key={metric.id}
                   offset={0}
+                  scoringUnit={profileQuery.data.scoringUnit}
                 ></LinkedMetric>
               </div>
             );
@@ -371,7 +379,7 @@ function _HabitsPage({ id }: { id: string }) {
           {goalQuery.data.length == 0 && (
             <div className="items-center justify-center rounded-lg bg-white  p-4 text-center sm:flex">
               <div className="text-sm font-normal text-gray-500 dark:text-gray-300">
-                No linked metrics.
+                No linked goals.
               </div>
             </div>
           )}
@@ -401,7 +409,12 @@ function _HabitsPage({ id }: { id: string }) {
                     textcolor(0.5)
                   )}
                 >
-                  {(0.5).toFixed(2)}
+                  {   //also want to add min(1, score) to here
+                    profileQuery.data.scoringUnit === ScoringFormat.Normalized
+                      ? allItemQuery.data.goals.find(g => g.goal.id === goal.id)?.goal.score.toFixed(2)
+                      : (allItemQuery.data.goals.find(g => g.goal.id === goal.id)?.goal.score * 100).toFixed(2) + "%"
+                  }
+                  {/* {(0.5).toFixed(2)} */}
                 </span>
                 <DropdownMenu
                   options={[
