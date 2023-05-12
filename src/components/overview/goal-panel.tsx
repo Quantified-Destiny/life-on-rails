@@ -357,8 +357,8 @@ function ScoringSection({
                 width: `${(habit.weight / totalWeight) * 100}%`,
               }}
             >
-              <span className="flex flex-row items-baseline justify-center gap-2">
-                <TbSquareRoundedLetterH></TbSquareRoundedLetterH>
+              <span className="flex flex-row items-center justify-center gap-2">
+                <TbSquareRoundedLetterH className="h-6 w-6"></TbSquareRoundedLetterH>
                 {habit.description}
               </span>
               <TooltipTrigger asChild>
