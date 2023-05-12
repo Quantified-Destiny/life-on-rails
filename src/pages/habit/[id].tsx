@@ -414,7 +414,6 @@ function _HabitsPage({ id }: { id: string }) {
                       ? allItemQuery.data.goals.find(g => g.goal.id === goal.id)?.goal.score.toFixed(2)
                       : (allItemQuery.data.goals.find(g => g.goal.id === goal.id)?.goal.score * 100).toFixed(2) + "%"
                   }
-                  {/* {(0.5).toFixed(2)} */}
                 </span>
                 <DropdownMenu
                   options={[
