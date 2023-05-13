@@ -18,7 +18,12 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",
@@ -28,7 +33,8 @@
     "**/*.mjs",
     "next.config.mjs",
     "postcss.config.js",
-    "tailwind.config.js"
+    "tailwind.config.js",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

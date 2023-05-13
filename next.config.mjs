@@ -6,6 +6,7 @@
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.mjs"));
 
 import removeImports from "next-remove-imports";
+import withMDX from "@next/mdx";
 
 /** @type {function(import("next").NextConfig): import("next").NextConfig}} */
 const removeImportsFn = removeImports({
@@ -13,15 +14,25 @@ const removeImportsFn = removeImports({
   // matchImports: "\\.(less|css|scss|sass|styl)$"
 });
 
-let rem = removeImportsFn({
-  webpack(config, _options) {
-    return config;
+const mdx = withMDX({
+  extension: /\.mdx?$/,
+  options: {
+    // If you use remark-gfm, you'll need to use next.config.mjs
+    // as the package is ESM only
+    // https://github.com/remarkjs/remark-gfm#install
+    remarkPlugins: [],
+    rehypePlugins: [],
+    // If you use `MDXProvider`, uncomment the following line.
+    // providerImportSource: "@mdx-js/react",
   },
 });
 
 /** @type {import("next").NextConfig} */
 const config = {
-  ...rem,
+  experimental: {
+    appDir: true,
+    mdxRs: true,
+  },
   reactStrictMode: true,
   /* If trying out the experimental appDir, comment the i18n config out
    * @see https://github.com/vercel/next.js/issues/41980 */
@@ -34,6 +45,7 @@ const config = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
 };
 
-export default config;
+export default mdx(config);
