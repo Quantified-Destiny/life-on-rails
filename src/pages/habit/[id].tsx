@@ -28,7 +28,6 @@ import { textcolor } from "../../components/overview/lib";
 import { LinkedMetric } from "../../components/overview/metrics";
 import { CreateTag } from "../../components/overview/tags";
 import { api } from "../../utils/api";
-import { ExpandedGoal } from "../../server/queries";
 
 function isSameDay(a: Date, b: Date) {
   return differenceInCalendarDays(a, b) === 0;
