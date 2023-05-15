@@ -41,33 +41,4 @@ export const createRouter = createTRPCRouter({
         },
       });
     }),
-
-  createSubjective: protectedProcedure
-    .input(z.object({ prompt: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.metric.create({
-        data: {
-          prompt: input.prompt,
-          ownerId: ctx.session.user.id,
-        },
-      });
-    }),
-  createLinkedSubjective: protectedProcedure
-    .input(z.object({ prompt: z.string(), goalId: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      // fucking prisma
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const metric: Metric = await ctx.prisma.metric.create({
-        data: {
-          prompt: input.prompt,
-          ownerId: ctx.session.user.id,
-        },
-      });
-      await ctx.prisma.metricMeasuresGoal.create({
-        data: {
-          goalId: input.goalId,
-          metricId: metric.id,
-        },
-      });
-    }),
 });

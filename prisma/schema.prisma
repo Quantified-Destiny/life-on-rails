@@ -156,31 +156,42 @@ model MetricMeasuresGoal {
   @@index([metricId])
 }
 
-enum AnswerFormat {
+enum Format {
   FIVE_POINT
-  FIVE_POINT_MID
   NUMERIC_INPUT
 }
 
+model AnswerFormat {
+  id     String   @id @default(cuid())
+  format Format
+  start  Float?
+  end    Float?
+  Metric Metric[]
+}
+
 model Metric {
-  id               String               @id @default(cuid())
-  prompt           String
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-  ownerId          String
-  owner            User                 @relation(fields: [ownerId], references: [id])
-  goals            MetricMeasuresGoal[]
-  format           AnswerFormat         @default(FIVE_POINT)
+  id        String               @id @default(cuid())
+  prompt    String
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  ownerId   String
+  owner     User                 @relation(fields: [ownerId], references: [id])
+  goals     MetricMeasuresGoal[]
+  formatId  String
+
+  format           AnswerFormat   @relation(fields: [formatId], references: [id])
   metricAnswers    MetricAnswer[]
   completionMetric LinkedMetric[]
   MetricTag        MetricTag[]
 
   @@index([ownerId])
+  @@index([formatId])
 }
 
 model MetricAnswer {
   id        String   @id @default(cuid())
   value     Float
+  score     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   metricId  String

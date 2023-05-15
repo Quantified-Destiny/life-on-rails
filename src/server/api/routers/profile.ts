@@ -1,5 +1,5 @@
-import { ZodEnum, z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const profileRouter = createTRPCRouter({
   getProfile: protectedProcedure

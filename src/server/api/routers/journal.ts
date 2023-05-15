@@ -32,17 +32,6 @@ export const journalRouter = createTRPCRouter({
       });
     }),
 
-  addSubjective: protectedProcedure
-    .input(z.object({ prompt: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.metric.create({
-        data: {
-          prompt: input.prompt,
-          ownerId: ctx.session.user.id,
-        },
-      });
-    }),
-
   complete: protectedProcedure
     .input(z.object({ date: z.date(), habitId: z.string() }))
     .mutation(async ({ input, ctx }) => {

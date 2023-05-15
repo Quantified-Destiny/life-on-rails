@@ -28,6 +28,7 @@ import { textcolor } from "../../components/overview/lib";
 import { LinkedMetric } from "../../components/overview/metrics";
 import { CreateTag } from "../../components/overview/tags";
 import { api } from "../../utils/api";
+import { ExpandedGoal } from "../../server/queries";
 
 function isSameDay(a: Date, b: Date) {
   return differenceInCalendarDays(a, b) === 0;
@@ -40,6 +41,27 @@ function HabitsPage() {
 
   if (typeof id != "string") return <p>Error</p>;
   else return <_HabitsPage id={id}></_HabitsPage>;
+}
+
+function ScorePill({
+  scoringUnit,
+  score,
+}: {
+  scoringUnit: ScoringFormat;
+  score: number;
+}) {
+  return (
+    <span
+      className={classNames(
+        "rounded-lg bg-gray-100 p-2 text-xl",
+        textcolor(0.5)
+      )}
+    >
+      {scoringUnit === ScoringFormat.Normalized
+        ? score.toFixed(2)
+        : (score * 100).toFixed(2) + "%"}
+    </span>
+  );
 }
 
 function ActivityTable({
@@ -101,7 +123,7 @@ function ActivityTable({
   );
 }
 function min(a: number, b: number) {
-  return (a<b ? a : b);
+  return a < b ? a : b;
 }
 
 function _HabitsPage({ id }: { id: string }) {
@@ -151,7 +173,13 @@ function _HabitsPage({ id }: { id: string }) {
     },
   });
 
-  if (!completionsData.data || !goalQuery.data || !habitData.data || !profileQuery.data || !allItemQuery.data) {
+  if (
+    !completionsData.data ||
+    !goalQuery.data ||
+    !habitData.data ||
+    !profileQuery.data ||
+    !allItemQuery.data
+  ) {
     return (
       <div className="flex h-screen items-center justify-center">
         <RxRocket className="animate-spin text-2xl"></RxRocket>
@@ -403,18 +431,10 @@ function _HabitsPage({ id }: { id: string }) {
                 </div>
               </div>
               <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
-                <span
-                  className={classNames(
-                    "rounded-lg bg-gray-100 p-2 text-xl",
-                    textcolor(0.5)
-                  )}
-                >
-                  {   //also want to add min(1, score) to here
-                    profileQuery.data.scoringUnit === ScoringFormat.Normalized
-                      ? allItemQuery.data.goals.find(g => g.goal.id === goal.id)?.goal.score.toFixed(2)
-                      : (allItemQuery.data.goals.find(g => g.goal.id === goal.id)?.goal.score * 100).toFixed(2) + "%"
-                  }
-                </span>
+                <ScorePill
+                  scoringUnit={profileQuery.data.scoringUnit}
+                  score={0.3}
+                ></ScorePill>
                 <DropdownMenu
                   options={[
                     {

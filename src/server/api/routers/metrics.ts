@@ -8,15 +8,15 @@ import { getMetrics } from "../../queries";
 
 export const metricsRouter = createTRPCRouter({
   getMetrics: protectedProcedure
-  .input(z.object({ date: z.date() }))
-  .query(async ({ input, ctx }) => {
-    const [metrics, _map] = await getMetrics({
-      prisma: ctx.prisma,
-      userId: ctx.session.user.id,
-      date: input.date
-    });
-    return metrics;
-  }),
+    .input(z.object({ date: z.date() }))
+    .query(async ({ input, ctx }) => {
+      const [metrics, _map] = await getMetrics({
+        prisma: ctx.prisma,
+        userId: ctx.session.user.id,
+        date: input.date,
+      });
+      return metrics;
+    }),
 
   createMetric: protectedProcedure
     .input(
@@ -27,8 +27,16 @@ export const metricsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const format = await ctx.prisma.answerFormat.create({
+        data: { format: "FIVE_POINT" },
+      });
+
       const metric: Metric = await ctx.prisma.metric.create({
-        data: { prompt: input.prompt, ownerId: ctx.session.user.id },
+        data: {
+          prompt: input.prompt,
+          ownerId: ctx.session.user.id,
+          formatId: format.id,
+        },
       });
       if (input.habitId) {
         await ctx.prisma.linkedMetric.create({
@@ -68,6 +76,7 @@ export const metricsRouter = createTRPCRouter({
           data: {
             metricId: input.metricId,
             value: input.score,
+            score: input.score,
           },
         });
       } else {
@@ -77,6 +86,7 @@ export const metricsRouter = createTRPCRouter({
           },
           data: {
             value: input.score,
+            score: input.score,
           },
         });
       }
