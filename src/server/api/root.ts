@@ -2,7 +2,6 @@ import { createTRPCRouter } from "./trpc";
 import { exampleRouter } from "./routers/example";
 import { journalRouter } from "./routers/journal";
 import { goalsRouter } from "./routers/goals";
-import { createRouter } from "./routers/create";
 import { profileRouter } from "./routers/profile";
 import { taggingRouter } from "./routers/tags";
 import { metricsRouter } from "./routers/metrics";
@@ -17,7 +16,6 @@ export const appRouter = createTRPCRouter({
   example: exampleRouter,
   journal: journalRouter,
   goals: goalsRouter,
-  create: createRouter,
   profile: profileRouter,
   tags: taggingRouter,
   metrics: metricsRouter,
