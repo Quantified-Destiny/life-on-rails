@@ -111,11 +111,19 @@ export const habitsRouter = createTRPCRouter({
     }),
 
   createHabit: protectedProcedure
-    .input(z.object({ description: z.string() }))
+    .input(z.object({ description: z.string(), goalId: z.string().optional() }))
     .mutation(async ({ input, ctx }) => {
       const habit = await ctx.prisma.habit.create({
         data: { description: input.description, ownerId: ctx.session.user.id },
       });
+      if (input.goalId) {
+        await ctx.prisma.habitMeasuresGoal.create({
+          data: {
+            goalId: input.goalId,
+            habitId: habit.id,
+          },
+        });
+      }
       return habit;
     }),
 
