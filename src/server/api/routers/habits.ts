@@ -3,7 +3,11 @@ import { z } from "zod";
 import type { LinkedMetric, Metric } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
 import { endOfDay, startOfDay, subDays } from "date-fns";
-import { getHabitsWithMetricsMap, getMetrics } from "../../queries";
+import {
+  getHabitsWithMetricsMap,
+  getMetrics,
+  getScoringWeeks,
+} from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const habitsRouter = createTRPCRouter({
@@ -213,9 +217,15 @@ export const habitsRouter = createTRPCRouter({
   getHabits: protectedProcedure
     .input(z.object({ date: z.date() }))
     .query(async ({ input, ctx }) => {
+      const scoringWeeks = await getScoringWeeks(
+        ctx.prisma,
+        ctx.session.user.id
+      );
+
       const [_, metricsMap] = await getMetrics({
         prisma: ctx.prisma,
         userId: ctx.session.user.id,
+        scoringWeeks,
         date: input.date,
       });
 
@@ -223,6 +233,7 @@ export const habitsRouter = createTRPCRouter({
         prisma: ctx.prisma,
         metricsMap,
         userId: ctx.session.user.id,
+        scoringWeeks,
         date: input.date,
       });
       return habits;
@@ -231,16 +242,22 @@ export const habitsRouter = createTRPCRouter({
   getHabit: protectedProcedure
     .input(z.object({ habitId: z.string() }))
     .query(async ({ input, ctx }) => {
+      const scoringWeeks = await getScoringWeeks(
+        ctx.prisma,
+        ctx.session.user.id
+      );
       //TODO fix this
       const [_, metricsMap] = await getMetrics({
         prisma: ctx.prisma,
         userId: ctx.session.user.id,
+        scoringWeeks,
       });
 
       const [habits, _habitsMap] = await getHabitsWithMetricsMap({
         prisma: ctx.prisma,
         metricsMap,
         userId: ctx.session.user.id,
+        scoringWeeks,
       });
       return habits.find((habit) => habit.id === input.habitId);
     }),

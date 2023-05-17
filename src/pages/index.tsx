@@ -1,10 +1,9 @@
 import { type NextPage } from "next";
+import { signIn, useSession } from "next-auth/react";
 import Head from "next/head";
-import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
 
-import { api } from "../utils/api";
 import { useRouter } from "next/router";
+import { api } from "../utils/api";
 
 const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -15,21 +14,18 @@ const Home: NextPage = () => {
         <title>Life on Rails</title>
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,700;1,900&display=swap');
-        </style>
-
       </Head>
 
-      <section className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#5ef4ca5a] to-[#4389faab] bg-white dark:bg-gray-900">
-        <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
-          <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+      <section className="flex min-h-screen flex-col items-center justify-center bg-white bg-gradient-to-b from-[#5ef4ca5a] to-[#4389faab] dark:bg-gray-900">
+        <div className="mx-auto max-w-screen-xl px-4 py-8 text-center lg:py-16">
+          <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
             Ride the rails to success
           </h1>
-          <p className="mb-8 text-lg font-normal lg:text-xl sm:px-16 lg:px-48 dark:text-gray-400">
-            Empower your journey to success with Life on Rails - the app that tracks your goals, habits, and progress.
+          <p className="mb-8 text-lg font-normal dark:text-gray-400 sm:px-16 lg:px-48 lg:text-xl">
+            Empower your journey to success with Life on Rails - the app that
+            tracks your goals, habits, and progress.
           </p>
-          <div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-4 sm:space-y-0">
             <AuthShowcase />
             {/* <a
               href="#"
@@ -72,13 +68,13 @@ const AuthShowcase: React.FC = () => {
         // </button>
         <a
           href="#"
-          className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900"
+          className="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-3 text-center text-base font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900"
           onClick={() => void signIn()}
         >
           Get started
           <svg
             aria-hidden="true"
-            className="ml-2 -mr-1 w-5 h-5"
+            className="-mr-1 ml-2 h-5 w-5"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"

@@ -7,6 +7,7 @@ import {
   getHabits,
   getHabitsWithMetricsMap,
   getMetrics,
+  getScoringWeeks,
 } from "../../queries";
 
 export const goalsRouter = createTRPCRouter({
@@ -51,6 +52,12 @@ export const goalsRouter = createTRPCRouter({
   getGoal: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
+      const scoringWeeks = await getScoringWeeks(
+        ctx.prisma,
+        ctx.session.user.id
+      );
+
+
       const goal: Goal = await ctx.prisma.goal.findFirstOrThrow({
         where: {
           id: input.id,
@@ -61,12 +68,14 @@ export const goalsRouter = createTRPCRouter({
       const habits = await getHabits({
         prisma: ctx.prisma,
         userId: ctx.session.user.id,
+        scoringWeeks: scoringWeeks,
         goalIds: [input.id],
       });
 
       const [metrics, _map] = await getMetrics({
         prisma: ctx.prisma,
         userId: ctx.session.user.id,
+        scoringWeeks: scoringWeeks,
         goalIds: [goal.id],
       });
 
@@ -78,15 +87,23 @@ export const goalsRouter = createTRPCRouter({
     }),
 
   getAllGoals: protectedProcedure.query(async ({ ctx }) => {
+    const scoringWeeks = (
+      await ctx.prisma.user.findUniqueOrThrow({
+        where: { id: ctx.session.user.id },
+        select: { scoringWeeks: true },
+      })
+    ).scoringWeeks;
     const [metrics, metricsMap] = await getMetrics({
       prisma: ctx.prisma,
       userId: ctx.session.user.id,
+      scoringWeeks,
     });
 
     const [habits, habitsMap] = await getHabitsWithMetricsMap({
       prisma: ctx.prisma,
       metricsMap,
       userId: ctx.session.user.id,
+      scoringWeeks,
     });
 
     const goalsData = await getGoals(
@@ -106,9 +123,12 @@ export const goalsRouter = createTRPCRouter({
   }),
 
   getAllMetrics: protectedProcedure.query(async ({ ctx }) => {
+    const scoringWeeks = await getScoringWeeks(ctx.prisma, ctx.session.user.id);
+
     const [metrics, metricsMap] = await getMetrics({
       prisma: ctx.prisma,
       userId: ctx.session.user.id,
+      scoringWeeks,
     });
 
     return {

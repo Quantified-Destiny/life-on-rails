@@ -15,6 +15,7 @@ import { FrequencyHorizon } from "@prisma/client";
 import { isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
 import type { prisma as prismaClient } from "./db";
+import { cache } from "./api/cache";
 
 function avg(arr: number[]) {
   return arr.length == 0 ? 0 : arr.reduce((a, b) => a + b) / arr.length;
@@ -36,12 +37,14 @@ export async function getHabitsWithMetricsMap({
   prisma,
   metricsMap,
   userId,
+  scoringWeeks,
   goalIds,
   date = new Date(),
 }: {
   prisma: typeof prismaClient;
   metricsMap: Map<string, ExpandedMetric>;
   userId: string;
+  scoringWeeks: number;
   goalIds?: string[];
   date?: Date;
 }): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
@@ -70,12 +73,6 @@ export async function getHabitsWithMetricsMap({
   });
   const habitsMap = new Map<string, HabitType>(habits.map((h) => [h.id, h]));
 
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-  });
-
   const habitCompletions = await prisma.habitCompletion.groupBy({
     by: ["habitId"],
     _count: {
@@ -83,7 +80,7 @@ export async function getHabitsWithMetricsMap({
     },
     where: {
       Habit: { ownerId: userId },
-      date: { gt: subDays(new Date(), user.scoringWeeks * 7) },
+      date: { gt: subDays(new Date(), scoringWeeks * 7) },
     },
   });
   const habitCompletionsCount = new Map<string, number>(
@@ -98,7 +95,7 @@ export async function getHabitsWithMetricsMap({
         habit.frequencyHorizon == FrequencyHorizon.WEEK
           ? habit.frequency
           : habit.frequency * 7;
-      const maxCompletionCount = normalizedFrequency * user.scoringWeeks;
+      const maxCompletionCount = normalizedFrequency * scoringWeeks;
       const completionScore = it._count._all / maxCompletionCount;
 
       const metricsScore = avg(
@@ -132,11 +129,13 @@ export async function getHabitsWithMetricsMap({
 export async function getHabits({
   prisma,
   userId,
+  scoringWeeks,
   goalIds,
   date = new Date(),
 }: {
   prisma: typeof prismaClient;
   userId: string;
+  scoringWeeks: number;
   goalIds?: string[];
   date?: Date;
 }): Promise<ExpandedHabit[]> {
@@ -158,12 +157,6 @@ export async function getHabits({
   const whereConditions = {
     goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
   };
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-  });
 
   const habits: HabitType = await prisma.habit.findMany({
     where: {
@@ -201,7 +194,7 @@ export async function getHabits({
     },
     where: {
       Habit: { ownerId: userId },
-      date: { gt: subDays(new Date(), user.scoringWeeks * 7) },
+      date: { gt: subDays(new Date(), scoringWeeks * 7) },
     },
   });
 
@@ -224,7 +217,7 @@ export async function getHabits({
       habit.frequencyHorizon == FrequencyHorizon.WEEK
         ? habit.frequency
         : habit.frequency * 7;
-    const maxCompletionCount = normalizedFrequency * user.scoringWeeks;
+    const maxCompletionCount = normalizedFrequency * scoringWeeks;
     const completionScore =
       habitCompletionsCount.get(habit.id)! / maxCompletionCount;
 
@@ -268,12 +261,14 @@ export interface ExpandedMetric extends Metric {
 export async function getMetrics({
   prisma,
   userId,
+  scoringWeeks,
   goalIds,
   habitIds,
   date = new Date(),
 }: {
   prisma: typeof prismaClient;
   userId: string;
+  scoringWeeks: number;
   goalIds?: string[];
   habitIds?: string[];
   date?: Date;
@@ -308,12 +303,6 @@ export async function getMetrics({
     },
   });
 
-  const user = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: userId,
-    },
-  });
-
   const metricIds = metrics.map((m) => m.id);
 
   const metricAnswers = await prisma.metricAnswer.groupBy({
@@ -323,14 +312,14 @@ export async function getMetrics({
     },
     where: {
       metricId: { in: metricIds },
-      createdAt: { gt: subDays(date, 7 * user.scoringWeeks) },
+      createdAt: { gt: subDays(date, 7 * scoringWeeks) },
     },
   });
 
   const metricScores = new Map<string, number>(
     metricAnswers.map((a) => [
       a.metricId,
-      (a._sum.value ?? 0) / 5 / (7 * user.scoringWeeks),
+      (a._sum.value ?? 0) / 5 / (7 * scoringWeeks),
     ])
   );
 
@@ -416,4 +405,21 @@ export async function getGoals(
     };
   });
   return goalsData;
+}
+
+export async function getScoringWeeks(
+  prisma: typeof prismaClient,
+  userId: string
+): Promise<number> {
+  if (!cache.has(userId)) {
+    const weeks = (
+      await prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { scoringWeeks: true },
+      })
+    ).scoringWeeks;
+    cache.set(userId, weeks);
+  }
+
+  return cache.get(userId)!;
 }

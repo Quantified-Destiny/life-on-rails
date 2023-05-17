@@ -38,7 +38,7 @@ import { GoalTagList } from "./tags";
 import { TbSquareRoundedLetterM } from "react-icons/tb";
 
 function min(a: number, b: number) {
-  return (a<b ? a : b);
+  return a < b ? a : b;
 }
 
 export function CreateMetricLinkedToGoal({ goalId }: { goalId: string }) {
@@ -190,7 +190,7 @@ function InlineCreateHabit({ goalId }: { goalId: string }) {
 function CreateHabitLinkedToGoal({ goalId }: { goalId: string }) {
   const context = api.useContext();
 
-  const createLinkedHabit = api.create.createLinkedHabit.useMutation({
+  const createHabit = api.habits.createHabit.useMutation({
     onSuccess() {
       void context.invalidate();
     },
@@ -201,7 +201,7 @@ function CreateHabitLinkedToGoal({ goalId }: { goalId: string }) {
   return active ? (
     <CreateLinkedHabitInline
       createHabit={(description) =>
-        createLinkedHabit.mutate({ description: description, goalId })
+        createHabit.mutate({ description: description, goalId })
       }
       closeEdit={() => setActive(false)}
     ></CreateLinkedHabitInline>
@@ -457,7 +457,6 @@ function ScoringSection({
               {((metric.weight / totalWeight) * 100).toFixed(2)}%
             </TooltipContent>
           </Tooltip>
-
         ))}
         {/* {metrics.map((metric, i) => (
           <Tooltip key={metric.id} delayDuration={0}>
@@ -482,7 +481,15 @@ function ScoringSection({
   );
 }
 
-function GoalPanel({ goalId, score, scoringUnit }: { goalId: string; score: number; scoringUnit: ScoringFormat }) {
+function GoalPanel({
+  goalId,
+  score,
+  scoringUnit,
+}: {
+  goalId: string;
+  score: number;
+  scoringUnit: ScoringFormat;
+}) {
   const context = api.useContext();
 
   const deleteGoal = api.goals.deleteGoal.useMutation({
@@ -537,7 +544,9 @@ function GoalPanel({ goalId, score, scoringUnit }: { goalId: string; score: numb
               </div>
               <div className="flex flex-row items-center space-x-2 whitespace-nowrap">
                 <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
-                  {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
+                  {scoringUnit == ScoringFormat.Normalized
+                    ? min(1, score).toFixed(2)
+                    : (min(1, score) * 100).toFixed(2) + "%"}
                 </span>
               </div>
             </div>
@@ -622,7 +631,11 @@ export function GoalSheet({
         size="lg"
         className="overflow-scroll max-md:w-full"
       >
-        <GoalPanel goalId={goalId} score={score} scoringUnit={scoringUnit}></GoalPanel>
+        <GoalPanel
+          goalId={goalId}
+          score={score}
+          scoringUnit={scoringUnit}
+        ></GoalPanel>
       </SheetContent>
     </Sheet>
   );

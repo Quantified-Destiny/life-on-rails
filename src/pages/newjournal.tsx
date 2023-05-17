@@ -4,7 +4,8 @@ import TimePicker from "../components/time-picker";
 import { RxGear } from "react-icons/rx";
 import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 
-import { FrequencyHorizon, Metric, ScoringFormat } from "@prisma/client";
+import type { ScoringFormat } from "@prisma/client";
+import { FrequencyHorizon, Metric } from "@prisma/client";
 import classNames from "classnames";
 
 import { api } from "../utils/api";
@@ -145,11 +146,17 @@ function TagsTooltip({ tags }: { tags: string[] }) {
   );
 }
 
-function Actions({ id, scoringUnit }: { id: string; scoringUnit: ScoringFormat; }) {
+function Actions({
+  id,
+  scoringUnit,
+}: {
+  id: string;
+  scoringUnit: ScoringFormat;
+}) {
   return (
     <div className="relative flex flex-row items-baseline gap-3 px-2 py-1">
       <HabitSheet habitId={id} scoringUnit={scoringUnit}>
-        <RxGear className=" cursor-pointer rounded-lg text-xl text-gray-500 focus:outline-none focus:ring-1 hover:bg-gray-300"></RxGear>
+        <RxGear className=" cursor-pointer rounded-lg text-xl text-gray-500 hover:bg-gray-300 focus:outline-none focus:ring-1"></RxGear>
       </HabitSheet>
       <Link href={`/habit/${id}`}>
         <button className="text-xl text-gray-500 hover:bg-gray-300">
@@ -386,7 +393,15 @@ enum CompletionStatus {
   COMPLETED,
 }
 
-function HabitRows({ habit, date, scoringUnit }: { habit: ExpandedHabit; date: Date; scoringUnit: ScoringFormat; }) {
+function HabitRows({
+  habit,
+  date,
+  scoringUnit,
+}: {
+  habit: ExpandedHabit;
+  date: Date;
+  scoringUnit: ScoringFormat;
+}) {
   const context = api.useContext();
   const createCompletion = api.journal.complete.useMutation({
     onSuccess() {
@@ -469,7 +484,15 @@ function MetricPanel({ metrics }: { metrics: ExpandedMetric[] }) {
     </tr>
   );
 }
-function MetricRows({ metric, date, scoringUnit }: { metric: ExpandedMetric; date: Date; scoringUnit: ScoringFormat }) {
+function MetricRows({
+  metric,
+  date,
+  scoringUnit,
+}: {
+  metric: ExpandedMetric;
+  date: Date;
+  scoringUnit: ScoringFormat;
+}) {
   return (
     <>
       <Row
@@ -560,7 +583,12 @@ function DataTable({
         </thead>
         <tbody>
           {habits.map((habit) => (
-            <HabitRows habit={habit} date={date} key={habit.id} scoringUnit={scoringUnit}></HabitRows>
+            <HabitRows
+              habit={habit}
+              date={date}
+              key={habit.id}
+              scoringUnit={scoringUnit}
+            ></HabitRows>
           ))}
           {metrics.map((metric) => (
             <MetricRows
@@ -576,7 +604,13 @@ function DataTable({
   );
 }
 
-function Journal({ date, setDate, habits, metrics, scoringUnit }: JournalProps) {
+function Journal({
+  date,
+  setDate,
+  habits,
+  metrics,
+  scoringUnit,
+}: JournalProps) {
   return (
     <>
       <div className="container flex max-w-5xl justify-center">
@@ -589,7 +623,7 @@ function Journal({ date, setDate, habits, metrics, scoringUnit }: JournalProps) 
               >
                 Daily Journal
               </p>
-              <CreateMenu className="mt-4 inline-flex items-start justify-start rounded bg-gray-200 px-6 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 hover:bg-indigo-600 sm:mt-0"></CreateMenu>
+              <CreateMenu className="mt-4 inline-flex items-start justify-start rounded bg-gray-200 px-6 py-2 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 sm:mt-0"></CreateMenu>
             </div>
             <div className="flex w-auto items-center justify-between">
               <TimePicker date={date} setDate={setDate}></TimePicker>
@@ -648,9 +682,11 @@ const JournalPage = () => {
   const habits = api.habits.getHabits.useQuery({ date });
   const metrics = api.metrics.getMetrics.useQuery({ date });
   const profile = api.profile.getProfile.useQuery();
-  
-  if (habits.isLoading || metrics.isLoading || profile.isLoading) return <Loader></Loader>;
-  if (habits.isError || metrics.isError || profile.isError || profile.isError) return <p>Query error</p>;
+
+  if (habits.isLoading || metrics.isLoading || profile.isLoading)
+    return <Loader></Loader>;
+  if (habits.isError || metrics.isError || profile.isError || profile.isError)
+    return <p>Query error</p>;
   const habitsData = habits.data;
   const metricsData = metrics.data; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
   const user = profile.data;

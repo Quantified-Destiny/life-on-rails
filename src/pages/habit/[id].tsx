@@ -121,9 +121,6 @@ function ActivityTable({
     </div>
   );
 }
-function min(a: number, b: number) {
-  return a < b ? a : b;
-}
 
 function _HabitsPage({ id }: { id: string }) {
   const context = api.useContext();
