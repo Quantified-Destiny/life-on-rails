@@ -83,11 +83,6 @@ export async function getHabitsWithMetricsMap({
       date: { gt: subDays(new Date(), scoringWeeks * 7) },
     },
   });
-  const habitCompletionsCount = new Map<string, number>(
-    habitCompletions.map((it) => {
-      return [it.habitId, it._count._all];
-    })
-  );
   const habitScores = new Map<string, number>(
     habitCompletions.map((it) => {
       const habit = habitsMap.get(it.habitId)!;

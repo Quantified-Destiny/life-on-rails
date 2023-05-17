@@ -3,7 +3,6 @@ import { signIn, useSession } from "next-auth/react";
 import Head from "next/head";
 
 import { useRouter } from "next/router";
-import { api } from "../utils/api";
 
 const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -46,11 +45,6 @@ const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
 
   const router = useRouter();
-
-  const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: sessionData?.user !== undefined }
-  );
 
   const session = useSession();
   if (session.status == "authenticated") {
