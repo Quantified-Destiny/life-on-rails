@@ -18,7 +18,7 @@ import { AiOutlineFire, AiTwotoneFire } from "react-icons/ai";
 import { GiBackwardTime } from "react-icons/gi";
 import { MdScoreboard } from "react-icons/md";
 import { RxRocket } from "react-icons/rx";
-import { DropdownMenu } from "../../components/createMenu";
+import { Dropdown } from "../../components/createMenu";
 import {
   DropDown,
   EditableField,
@@ -431,7 +431,7 @@ function _HabitsPage({ id }: { id: string }) {
                   scoringUnit={profileQuery.data.scoringUnit}
                   score={0.3}
                 ></ScorePill>
-                <DropdownMenu
+                <Dropdown
                   options={[
                     {
                       name: "Delete",
@@ -441,7 +441,7 @@ function _HabitsPage({ id }: { id: string }) {
                   trigger={
                     <EllipsisVerticalIcon className="h-6 w-6 fill-black stroke-black opacity-40"></EllipsisVerticalIcon>
                   }
-                ></DropdownMenu>
+                ></Dropdown>
               </div>
             </div>
           ))}

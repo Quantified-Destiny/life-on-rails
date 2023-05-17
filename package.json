@@ -23,6 +23,7 @@
     "@prisma/client": "^4.11.0",
     "@radix-ui/react-accordion": "^1.1.1",
     "@radix-ui/react-dialog": "^1.0.3",
+    "@radix-ui/react-dropdown-menu": "^2.0.4",
     "@radix-ui/react-label": "^2.0.1",
     "@radix-ui/react-progress": "^1.0.2",
     "@radix-ui/react-slider": "^1.1.1",
@@ -54,7 +55,6 @@
     "react-gauge-chart": "^0.4.1",
     "react-hook-form": "^7.43.9",
     "react-icons": "^4.8.0",
-    "react-laag": "^2.0.5",
     "superjson": "^1.9.1",
     "tailwind-merge": "^1.12.0",
     "tailwindcss-animate": "^1.0.5",
@@ -62,6 +62,7 @@
     "zustand": "^4.3.7"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^13.4.2",
     "@types/lodash-es": "^4.17.7",
     "@types/node": "^20.1.4",
     "@types/prettier": "^2.7.2",
@@ -75,6 +76,7 @@
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",
     "autoprefixer": "^10.4.14",
+    "cross-env": "^7.0.3",
     "eslint": "^8.30.0",
     "eslint-config-next": "^13.1.2",
     "postcss": "^8.4.23",

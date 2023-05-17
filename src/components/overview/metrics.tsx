@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { api } from "../../utils/api";
-import { DropdownMenu } from "../createMenu";
+import { Dropdown } from "../createMenu";
 import { EditableField } from "../inlineEdit";
 import { textcolor } from "./lib";
 import { CornerDownRight } from "lucide-react";
@@ -8,7 +8,7 @@ import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { TbSquareRoundedLetterM } from "react-icons/tb";
 import { ScoringFormat } from "@prisma/client";
 function min(a: number, b: number) {
-  return (a<b ? a : b);
+  return a < b ? a : b;
 }
 export function LinkedMetric({
   id,
@@ -49,7 +49,7 @@ export function LinkedMetric({
           <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
         )}
         <div className="flex flex-row items-center gap-2">
-          <TbSquareRoundedLetterM className="text-2xl stroke-purple-500"></TbSquareRoundedLetterM>
+          <TbSquareRoundedLetterM className="stroke-purple-500 text-2xl"></TbSquareRoundedLetterM>
           <EditableField
             initialText={prompt}
             commit={(text) => {
@@ -66,9 +66,11 @@ export function LinkedMetric({
             textcolor(score)
           )}
         >
-          {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
+          {scoringUnit == ScoringFormat.Normalized
+            ? min(1, score).toFixed(2)
+            : (min(1, score) * 100).toFixed(2) + "%"}
         </span>
-        <DropdownMenu
+        <Dropdown
           options={[
             {
               name: "Delete",
@@ -78,7 +80,7 @@ export function LinkedMetric({
           trigger={
             <EllipsisVerticalIcon className="h-6 w-6 fill-black stroke-black opacity-40"></EllipsisVerticalIcon>
           }
-        ></DropdownMenu>
+        ></Dropdown>
       </div>
     </>
   );

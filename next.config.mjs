@@ -7,6 +7,7 @@
 
 import removeImports from "next-remove-imports";
 import withMDX from "@next/mdx";
+import bundleAnalyzer from "@next/bundle-analyzer";
 
 /** @type {function(import("next").NextConfig): import("next").NextConfig}} */
 const removeImportsFn = removeImports({
@@ -25,6 +26,10 @@ const mdx = withMDX({
     // If you use `MDXProvider`, uncomment the following line.
     // providerImportSource: "@mdx-js/react",
   },
+});
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
 });
 
 /** @type {import("next").NextConfig} */
@@ -48,4 +53,4 @@ const config = {
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
 };
 
-export default mdx(config);
+export default withBundleAnalyzer(mdx(config));
