@@ -1,5 +1,5 @@
 import { Loader } from "../components/ui/loader";
-import type { ExpandedHabit } from "../server/queries";
+import type { ExpandedHabit, GoalsReturnType, ExpandedMetric } from "../server/queries";
 import { api } from "../utils/api";
 
 function StatsCardRow() {
@@ -129,6 +129,114 @@ function StatsCardRow() {
   );
 }
 
+function GoalTableRow({
+  goal,
+  habits,
+  metrics,
+}: GoalsReturnType) {
+  return (
+    <tr>
+      <td className="border-blue-gray-50  px-5 py-3">
+        <div className="flex items-center gap-4">
+          <p className="text-blue-gray-900 block text-sm leading-normal antialiased">
+            {goal.name}
+          </p>
+        </div>
+      </td>
+      <td className="border-blue-gray-50 px-5 py-3">
+        <div className="w-10/12">
+          <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
+            {(goal.score * 100).toFixed(1)}
+            {/* */}%
+          </p>
+          <div className="flex-start bg-blue-gray-50 flex h-1 w-full overflow-hidden rounded-sm bg-gray-200 font-sans text-xs font-medium">
+            <div
+              className="flex h-full items-baseline justify-center overflow-hidden break-all bg-gradient-to-tr from-red-600 to-red-400 text-white"
+              style={{
+                width: `${goal.score * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+      </td>
+      <td className="border-blue-gray-50 px-1 py-3 text-center font-sans text-sm">
+        <p className="text-blue-gray-900 block text-xs leading-normal antialiased">
+          {habits.length}
+        </p>
+      </td>
+      <td className="border-blue-gray-50 px-1 py-3 text-center font-sans text-sm">
+        <p className="text-blue-gray-900 block text-xs leading-normal antialiased">
+          {metrics.length}
+        </p>
+      </td>
+    </tr>
+  );
+}
+
+function GoalsTable() {
+  const query = api.goals.getAllGoals.useQuery();
+
+  if (query.isLoading) {
+    return <Loader></Loader>;
+  } else if (query.error) {
+    return <div>Error!</div>;
+  }
+  const goalsData = query.data;
+  const goals = goalsData.goals;
+
+  return (
+    <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
+      <div className="relative flex flex-col overflow-auto rounded-xl border border-indigo-800 bg-white bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
+        <div className="relative m-0 flex items-center justify-between overflow-hidden border-b-2 bg-indigo-800 p-6 text-gray-700 shadow-none">
+          <div>
+            <h6 className="mb-1 block font-sans text-xl font-semibold leading-relaxed tracking-normal text-white antialiased">
+              Goals at Risk
+            </h6>
+          </div>
+        </div>
+        <div className="overflow-x-scroll p-6 px-0 pb-2 pt-0">
+          <table className="w-full min-w-[640px] table-auto">
+            <thead>
+              <tr>
+                <th className="border-blue-gray-50 border-b px-6 py-3 text-left">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Goals
+                  </p>
+                </th>
+                <th className="border-blue-gray-50 border-b px-6 py-3 text-center">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Score
+                  </p>
+                </th>
+                <th className="border-blue-gray-50 border-b px-1 py-3 text-center">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Habits
+                  </p>
+                </th>
+                <th className="border-blue-gray-50 border-b px-6 py-3 text-center">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Metrics
+                  </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {goals
+                .sort((a, b) => a.goal.score - b.goal.score)
+                .map((each) => {
+                  if (each.goal.score < 0.4)
+                    return (
+                      <GoalTableRow key={each.goal.id} {...each}></GoalTableRow>
+                    );
+                })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HabitTableRow({
   description,
   frequency,
@@ -240,9 +348,97 @@ function HabitsTable() {
               {habits
                 .sort((a, b) => a.score - b.score)
                 .map((habit) => {
-                  if (habit.score < 0.5)
+                  if (habit.score < 0.4)
                     return (
                       <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
+                    );
+                })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MetricTableRow({
+  prompt,
+  score,
+}: ExpandedMetric) {
+  return (
+    <tr>
+      <td className="border-blue-gray-50  px-5 py-3">
+        <div className="flex items-center gap-4">
+          <p className="text-blue-gray-900 block text-sm leading-normal antialiased">
+            {prompt}
+          </p>
+        </div>
+      </td>
+      <td className="border-blue-gray-50 px-5 py-3">
+        <div className="w-10/12">
+          <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
+            {(score * 100).toFixed(1)}
+            {/* */}%
+          </p>
+          <div className="flex-start bg-blue-gray-50 flex h-1 w-full overflow-hidden rounded-sm bg-gray-200 font-sans text-xs font-medium">
+            <div
+              className="flex h-full items-baseline justify-center overflow-hidden break-all bg-gradient-to-tr from-red-600 to-red-400 text-white"
+              style={{
+                width: `${score * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+
+function MetricsTable() {
+  const query = api.goals.getAllMetrics.useQuery();
+
+  if (query.isLoading) {
+    return <Loader></Loader>;
+  } else if (query.error) {
+    return <div>Error!</div>;
+  }
+  const metricData = query.data;
+  const metrics = metricData.metrics;
+
+  return (
+    <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
+      <div className="relative flex flex-col overflow-auto rounded-xl border border-indigo-800 bg-white bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
+        <div className="relative m-0 flex items-center justify-between overflow-hidden border-b-2 bg-indigo-800 p-6 text-gray-700 shadow-none">
+          <div>
+            <h6 className="mb-1 block font-sans text-xl font-semibold leading-relaxed tracking-normal text-white antialiased">
+              Metrics at Risk
+            </h6>
+          </div>
+        </div>
+        <div className="overflow-x-scroll p-6 px-0 pb-2 pt-0">
+          <table className="w-full min-w-[640px] table-auto">
+            <thead>
+              <tr>
+                <th className="border-blue-gray-50 border-b px-6 py-3 text-left">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Metrics
+                  </p>
+                </th>
+                <th className="border-blue-gray-50 border-b px-6 py-3 text-center">
+                  <p className="text-blue-gray-400 block font-sans text-[11px] font-medium uppercase antialiased">
+                    Score
+                  </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {metrics
+                .sort((a, b) => a.score - b.score)
+                .map((metric) => {
+                  if (metric.score < 0.4)
+                    return (
+                      <MetricTableRow key={metric.id} {...metric}></MetricTableRow>
                     );
                 })}
             </tbody>
@@ -258,7 +454,9 @@ export function Home() {
     <div className="">
       <div className="m-auto h-full max-w-3xl pt-2">
         <StatsCardRow></StatsCardRow>
+        <GoalsTable></GoalsTable>
         <HabitsTable></HabitsTable>
+        <MetricsTable></MetricsTable>
 
         {/* <div className="mb-6 mt-5 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 xl:grid-cols-3">
           {statisticsChartsData.map((props) => (
