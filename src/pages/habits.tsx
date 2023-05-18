@@ -1,3 +1,4 @@
+import { startOfDay } from "date-fns";
 import type { ExpandedHabit } from "../server/queries";
 import { api } from "../utils/api";
 
@@ -54,7 +55,7 @@ function HabitTableRow({
 }
 
 function HabitsTable() {
-  const query = api.habits.getHabits.useQuery({ date: new Date() });
+  const query = api.habits.getHabits.useQuery({ date: startOfDay(new Date()) });
 
   // api.habits.getHabits.useQuery();
 
