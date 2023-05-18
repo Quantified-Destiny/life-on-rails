@@ -16,7 +16,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   ...appProps
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-  if ([`/`].includes(appProps.router.pathname))
+  if ([`/`, '/login'].includes(appProps.router.pathname))
     return (
       <SessionProvider session={session}>
         <Component {...pageProps} />;
