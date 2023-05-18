@@ -500,9 +500,10 @@ function MetricsTable({
   );
 }
 
+const today = new Date();
 export function Home() {
   const goalsQuery = api.goals.getAllGoals.useQuery();
-  const habitsQuery = api.habits.getHabits.useQuery({ date: new Date() });
+  const habitsQuery = api.habits.getHabits.useQuery({ date: today });
   const metricsQuery = api.goals.getAllMetrics.useQuery();
   const profileQuery = api.profile.getProfile.useQuery();
 
