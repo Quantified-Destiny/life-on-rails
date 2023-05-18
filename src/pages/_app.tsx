@@ -19,7 +19,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   if ([`/`, '/login'].includes(appProps.router.pathname))
     return (
       <SessionProvider session={session}>
-        <Component {...pageProps} />;
+        <Component {...pageProps} />
       </SessionProvider>
     );
 
@@ -28,7 +28,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <Layout>
         <Component {...pageProps} />
       </Layout>
-      ;
     </SessionProvider>
   );
 };
