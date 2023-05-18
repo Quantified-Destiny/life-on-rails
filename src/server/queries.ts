@@ -2,7 +2,6 @@ import type {
   Goal,
   Habit,
   HabitCompletion,
-  HabitMeasuresGoal,
   HabitTag,
   LinkedMetric,
   Metric,
@@ -14,8 +13,8 @@ import type {
 import { FrequencyHorizon } from "@prisma/client";
 import { isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
-import type { prisma as prismaClient } from "./db";
 import { cache } from "./api/cache";
+import type { prisma as prismaClient } from "./db";
 
 function avg(arr: number[]) {
   return arr.length == 0 ? 0 : arr.reduce((a, b) => a + b) / arr.length;
@@ -48,13 +47,6 @@ export async function getHabitsWithMetricsMap({
   goalIds?: string[];
   date?: Date;
 }): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
-  type HabitType = Habit & {
-    metrics: LinkedMetric[];
-    HabitTag: (HabitTag & { tag: Tag })[];
-    goals: HabitMeasuresGoal[];
-    completions: HabitCompletion[];
-  };
-
   const whereConditions = {
     goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
   };
@@ -62,6 +54,7 @@ export async function getHabitsWithMetricsMap({
   const habits = await prisma.habit.findMany({
     where: {
       ownerId: userId,
+      archived: false,
       ...whereConditions,
     },
     include: {
@@ -150,7 +143,7 @@ export async function getHabits({
         goals: { goal: Goal }[];
       };
     })[];
-    goals: HabitMeasuresGoal[];
+    goals: { goalId: string }[];
   })[];
 
   const whereConditions = {
@@ -182,7 +175,7 @@ export async function getHabits({
         },
       },
       HabitTag: { include: { tag: true } },
-      goals: true,
+      goals: { select: { goalId: true }, where: { goal: { archived: false } } },
     },
   });
 
