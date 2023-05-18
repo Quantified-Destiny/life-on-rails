@@ -263,6 +263,19 @@ export const goalsRouter = createTRPCRouter({
       });
     }),
 
+  unarchive: protectedProcedure
+    .input(z.object({ goalId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.goal.update({
+        data: {
+          archived: false,
+        },
+        where: {
+          id: input.goalId,
+        },
+      });
+    }),
+
   updateMetricWeight: protectedProcedure
     .input(
       z.object({

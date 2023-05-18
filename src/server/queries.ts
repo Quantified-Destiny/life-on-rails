@@ -369,7 +369,7 @@ export async function getGoals(
       },
 
       metrics: true,
-      GoalTag: { include: { tag: true } },
+      tags: { include: { tag: true } },
     },
   });
 
@@ -392,7 +392,7 @@ export async function getGoals(
     const linkedHabits = g.habits.map((h) => habitsMap.get(h.habitId)!);
 
     return {
-      goal: { ...g, score, tags: g.GoalTag.map((it) => it.tag.name) },
+      goal: { ...g, score, tags: g.tags.map((it) => it.tag.name) },
       habits: linkedHabits.filter((it) => it.archived === false),
       metrics: g.metrics.map((m) => ({
         ...metricsMap.get(m.metricId)!,

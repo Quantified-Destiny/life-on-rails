@@ -61,6 +61,32 @@ export const metricsRouter = createTRPCRouter({
       }
     }),
 
+  archive: protectedProcedure
+    .input(z.object({ metricId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.metric.update({
+        data: {
+          archived: true,
+        },
+        where: {
+          id: input.metricId,
+        },
+      });
+    }),
+
+  unarchive: protectedProcedure
+    .input(z.object({ metricId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.metric.update({
+        data: {
+          archived: false,
+        },
+        where: {
+          id: input.metricId,
+        },
+      });
+    }),
+    
   setScore: protectedProcedure
     .input(
       z.object({

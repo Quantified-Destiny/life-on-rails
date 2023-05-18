@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useIsFetching } from "@tanstack/react-query";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -7,17 +7,16 @@ import type { ReactNode } from "react";
 import React, { useEffect } from "react";
 
 import {
-  BarChart,
   Book,
+  BookOpen,
   ChevronLeft,
+  HeartPulse,
   HelpCircle,
+  History,
   LayoutDashboard,
   LogOut,
-  User,
-  BookOpen, 
-  TagIcon, 
-  TimerIcon,
-  History
+  ToyBrick,
+  User
 } from "lucide-react";
 
 import classNames from "classnames";
@@ -144,10 +143,11 @@ function Sidebar(props: {
 const menus = [
   { name: "Journal", link: "/newjournal", icon: Book, gap: true },
   // { name: "Legacy Journal", link: "/journal", icon: CalendarRange },
-  { name: "Dashboard", link: "/dashboard", icon: BarChart },
+  { name: "Dashboard", link: "/dashboard", icon: HeartPulse },
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
-  { name: "Blog", link: "/blog/intro", icon: BookOpen },
   { name: "Timeline", link: "/timeline", icon: History },
+  { name: "Templates", link: "/templates", icon: ToyBrick },
+  { name: "Blog", link: "/blog/intro", icon: BookOpen },
   { name: "Help", link: "/help", icon: HelpCircle },
   // { name: "Metric Modal", link: "/metric_modal", icon: HelpCircle },
   // { name: "delete account", link: "/deactivate", icon: HelpCircle },
