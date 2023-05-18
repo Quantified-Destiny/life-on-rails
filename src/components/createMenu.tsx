@@ -36,7 +36,7 @@ export function Dropdown({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>{trigger}</DropdownMenuTrigger>
+      <DropdownMenuTrigger className={className}>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent>
         {options.map((option) => (
           <DropdownMenuItem key={option.name} onClick={option.onClick}>

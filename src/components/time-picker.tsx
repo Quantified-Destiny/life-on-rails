@@ -1,6 +1,6 @@
 import {
   faChevronLeft,
-  faChevronRight
+  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // fixes zoomed in icons
@@ -8,8 +8,11 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 
 import { addDays, subDays } from "date-fns";
 
-import DatePicker from "react-datepicker";
+import dynamic from "next/dynamic";
 import "react-datepicker/dist/react-datepicker.css";
+//import DatePicker from "react-datepicker";
+// defer loading the date picker js
+const DatePicker = dynamic(() => import("react-datepicker"), { ssr: false });
 
 const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
 const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
@@ -47,7 +50,7 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
         </button>
         <DatePicker
           selected={date}
-          onChange={(date) => date && setDate(date)}
+          onChange={(date) => date instanceof Date && setDate(date)}
           maxDate={maxDate}
           className="text-center"
           dateFormat="EEEE, MMMM dd, yyyy"

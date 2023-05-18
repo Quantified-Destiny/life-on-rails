@@ -370,7 +370,7 @@ interface JournalProps {
   date: Date;
   setDate: (date: Date) => void;
   metrics: ExpandedMetric[];
-  scoringUnit: ScoringFormat;
+  scoringUnit?: ScoringFormat;
 }
 
 // https://tailwindcomponents.com/component/free-tailwind-css-advance-table-component
@@ -638,7 +638,7 @@ function Journal({
                 habits={habits}
                 metrics={metrics}
                 date={date}
-                scoringUnit={scoringUnit}
+                scoringUnit={scoringUnit ?? "Normalized"}
               ></DataTable>
             </div>
 
@@ -683,10 +683,8 @@ const JournalPage = () => {
   const metrics = api.metrics.getMetrics.useQuery({ date });
   const profile = api.profile.getProfile.useQuery();
 
-  if (habits.isLoading || metrics.isLoading || profile.isLoading)
-    return <Loader></Loader>;
-  if (habits.isError || metrics.isError || profile.isError || profile.isError)
-    return <p>Query error</p>;
+  if (habits.isLoading || metrics.isLoading) return <Loader></Loader>;
+  if (habits.isError || metrics.isError) return <p>Query error</p>;
   const habitsData = habits.data;
   const metricsData = metrics.data; //query.data.subjectives.map((subjective) => ({ editable: true, ...subjective }));
   const user = profile.data;
@@ -696,7 +694,7 @@ const JournalPage = () => {
       date={date}
       setDate={setDate}
       metrics={metricsData.filter((it) => it.linkedHabits.length == 0)}
-      scoringUnit={user.scoringUnit}
+      scoringUnit={user?.scoringUnit}
     ></Journal>
   );
 };
