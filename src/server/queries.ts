@@ -9,6 +9,7 @@ import type {
   MetricAnswer,
   MetricMeasuresGoal,
   MetricTag,
+  ScoringFormat,
   Tag,
 } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";

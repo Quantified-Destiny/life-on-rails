@@ -1,22 +1,39 @@
 import { Loader } from "../components/ui/loader";
-import type { ExpandedHabit, GoalsReturnType, ExpandedMetric } from "../server/queries";
+import type {
+  ExpandedHabit,
+  GoalsReturnType,
+  ExpandedMetric,
+} from "../server/queries";
+import { ScoringFormat } from "@prisma/client";
 import { api } from "../utils/api";
 
-function StatsCardRow() {
-  const goalsQuery = api.goals.getAllGoals.useQuery();
-  const metricsQuery = api.goals.getAllMetrics.useQuery();
-  if (goalsQuery.isLoading || metricsQuery.isLoading)
-    return <p>Loading dashboard...</p>;
-  if (goalsQuery.isError || metricsQuery.isError) return <p>Query error</p>;
-  const goalData = goalsQuery.data;
-  const metricData = metricsQuery.data;
+function min(a: number, b: number) {
+  return a < b ? a : b;
+}
+
+function StatsCardRow({
+  goals,
+  habits,
+  metrics,
+}: {
+  goals: GoalsReturnType[];
+  habits: ExpandedHabit[];
+  metrics: ExpandedMetric[];
+}) {
+  // const goalsQuery = api.goals.getAllGoals.useQuery();
+  // const metricsQuery = api.goals.getAllMetrics.useQuery();
+  // if (goalsQuery.isLoading || metricsQuery.isLoading)
+  //   return <p>Loading dashboard...</p>;
+  // if (goalsQuery.isError || metricsQuery.isError) return <p>Query error</p>;
+  // const goalData = goalsQuery.data;
+  // const metricData = metricsQuery.data;
 
   let redGoal = 0;
   let yellowGoal = 0;
   let greenGoal = 0;
 
-  for (let i = 0; i < goalData.goals.length; i++) {
-    const g = goalData.goals[i];
+  for (let i = 0; i < goals.length; i++) {
+    const g = goals[i];
     //console.log(`goal ${g?.goal.name} - ${g?.goal.score}`)
     if ((g?.goal?.score ?? 0) < 0.4 || isNaN(g?.goal?.score ?? 0)) {
       redGoal += 1;
@@ -31,10 +48,10 @@ function StatsCardRow() {
   let yellowHabit = 0;
   let greenHabit = 0;
 
-  for (let i = 0; i < goalData.goals.length; i++) {
+  for (let i = 0; i < goals.length; i++) {
     //habit that links to a goal
-    for (let j = 0; j < (goalData.goals[i]?.habits?.length ?? 0); j++) {
-      const h = goalData.goals[i]?.habits[j];
+    for (let j = 0; j < (goals[i]?.habits?.length ?? 0); j++) {
+      const h = goals[i]?.habits[j];
       if ((h?.score ?? 0) < 0.4) {
         redHabit += 1;
       } else if ((h?.score ?? 0) < 0.7) {
@@ -44,9 +61,9 @@ function StatsCardRow() {
       }
     }
   }
-  for (let i = 0; i < goalData.habits.length; i++) {
+  for (let i = 0; i < habits.length; i++) {
     //standalone habit
-    const h = goalData.habits[i];
+    const h = habits[i];
     if ((h?.score ?? 0) < 0.4) {
       redHabit += 1;
     } else if ((h?.score ?? 0) < 0.7) {
@@ -59,13 +76,12 @@ function StatsCardRow() {
   let redMetric = 0;
   let yellowMetric = 0;
   let greenMetric = 0;
-  const metric = metricData.metrics;
 
-  for (let i = 0; i < metric.length; i++) {
+  for (let i = 0; i < metrics.length; i++) {
     //all metrics
-    if ((metric[i]?.score ?? 0) < 0.4) {
+    if ((metrics[i]?.score ?? 0) < 0.4) {
       redMetric += 1;
-    } else if ((metric[i]?.score ?? 0) < 0.7) {
+    } else if ((metrics[i]?.score ?? 0) < 0.7) {
       yellowMetric += 1;
     } else {
       greenMetric += 1;
@@ -133,7 +149,8 @@ function GoalTableRow({
   goal,
   habits,
   metrics,
-}: GoalsReturnType) {
+  scoringUnit,
+}: GoalsReturnType & { scoringUnit: ScoringFormat }) {
   return (
     <tr>
       <td className="border-blue-gray-50  px-5 py-3">
@@ -146,8 +163,9 @@ function GoalTableRow({
       <td className="border-blue-gray-50 px-5 py-3">
         <div className="w-10/12">
           <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
-            {(goal.score * 100).toFixed(1)}
-            {/* */}%
+            {scoringUnit == ScoringFormat.Normalized
+              ? min(1, goal.score).toFixed(2)
+              : (min(1, goal.score) * 100).toFixed(2) + "%"}
           </p>
           <div className="flex-start bg-blue-gray-50 flex h-1 w-full overflow-hidden rounded-sm bg-gray-200 font-sans text-xs font-medium">
             <div
@@ -173,16 +191,22 @@ function GoalTableRow({
   );
 }
 
-function GoalsTable() {
-  const query = api.goals.getAllGoals.useQuery();
+function GoalsTable({
+  goals,
+  scoringUnit,
+}: {
+  goals: GoalsReturnType[];
+  scoringUnit: ScoringFormat;
+}) {
+  // const query = api.goals.getAllGoals.useQuery();
 
-  if (query.isLoading) {
-    return <Loader></Loader>;
-  } else if (query.error) {
-    return <div>Error!</div>;
-  }
-  const goalsData = query.data;
-  const goals = goalsData.goals;
+  // if (query.isLoading) {
+  //   return <Loader></Loader>;
+  // } else if (query.error) {
+  //   return <div>Error!</div>;
+  // }
+  // const goalsData = query.data;
+  // const goals = goalsData.goals;
 
   return (
     <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
@@ -226,7 +250,11 @@ function GoalsTable() {
                 .map((each) => {
                   if (each.goal.score < 0.4)
                     return (
-                      <GoalTableRow key={each.goal.id} {...each}></GoalTableRow>
+                      <GoalTableRow
+                        key={each.goal.id}
+                        {...each}
+                        scoringUnit={scoringUnit}
+                      ></GoalTableRow>
                     );
                 })}
             </tbody>
@@ -237,14 +265,17 @@ function GoalsTable() {
   );
 }
 
-function HabitTableRow({
-  description,
-  frequency,
-  frequencyHorizon,
-  score,
-  completions,
-  metrics,
-}: ExpandedHabit) {
+function HabitTableRow(
+  {
+    description,
+    frequency,
+    frequencyHorizon,
+    score,
+    completions,
+    metrics,
+    scoringUnit
+  }: ExpandedHabit & { scoringUnit: ScoringFormat }
+) {
   return (
     <tr>
       <td className="border-blue-gray-50  px-5 py-3">
@@ -257,8 +288,9 @@ function HabitTableRow({
       <td className="border-blue-gray-50 px-5 py-3">
         <div className="w-10/12">
           <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
-            {(score * 100).toFixed(1)}
-            {/* */}%
+            {scoringUnit == ScoringFormat.Normalized
+              ? min(1, score).toFixed(2)
+              : (min(1, score) * 100).toFixed(2) + "%"}
           </p>
           <div className="flex-start bg-blue-gray-50 flex h-1 w-full overflow-hidden rounded-sm bg-gray-200 font-sans text-xs font-medium">
             <div
@@ -289,19 +321,23 @@ function HabitTableRow({
   );
 }
 
-const date = new Date();
+function HabitsTable({
+  habits,
+  scoringUnit,
+}: {
+  habits: ExpandedHabit[];
+  scoringUnit: ScoringFormat;
+}) {
+  // const query = api.habits.getHabits.useQuery({ date: date });
 
-function HabitsTable() {
-  const query = api.habits.getHabits.useQuery({ date: date });
+  // // api.habits.getHabits.useQuery();
 
-  // api.habits.getHabits.useQuery();
-
-  if (query.isLoading) {
-    return <Loader></Loader>;
-  } else if (query.error) {
-    return <div>Error!</div>;
-  }
-  const habits = query.data;
+  // if (query.isLoading) {
+  //   return <Loader></Loader>;
+  // } else if (query.error) {
+  //   return <div>Error!</div>;
+  // }
+  // const habits = query.data;
 
   return (
     <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
@@ -350,7 +386,11 @@ function HabitsTable() {
                 .map((habit) => {
                   if (habit.score < 0.4)
                     return (
-                      <HabitTableRow key={habit.id} {...habit}></HabitTableRow>
+                      <HabitTableRow
+                        key={habit.id}
+                        {...habit}
+                        scoringUnit={scoringUnit}
+                      ></HabitTableRow>
                     );
                 })}
             </tbody>
@@ -361,10 +401,11 @@ function HabitsTable() {
   );
 }
 
-function MetricTableRow({
-  prompt,
-  score,
-}: ExpandedMetric) {
+function MetricTableRow(
+  {
+    prompt, score, scoringUnit
+  }: ExpandedMetric & { scoringUnit: ScoringFormat }
+) {
   return (
     <tr>
       <td className="border-blue-gray-50  px-5 py-3">
@@ -377,8 +418,9 @@ function MetricTableRow({
       <td className="border-blue-gray-50 px-5 py-3">
         <div className="w-10/12">
           <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
-            {(score * 100).toFixed(1)}
-            {/* */}%
+            {scoringUnit == ScoringFormat.Normalized
+              ? min(1, score).toFixed(2)
+              : (min(1, score) * 100).toFixed(2) + "%"}
           </p>
           <div className="flex-start bg-blue-gray-50 flex h-1 w-full overflow-hidden rounded-sm bg-gray-200 font-sans text-xs font-medium">
             <div
@@ -394,17 +436,22 @@ function MetricTableRow({
   );
 }
 
+function MetricsTable({
+  metrics,
+  scoringUnit,
+}: {
+  metrics: ExpandedMetric[];
+  scoringUnit: ScoringFormat;
+}) {
+  // const query = api.goals.getAllMetrics.useQuery();
 
-function MetricsTable() {
-  const query = api.goals.getAllMetrics.useQuery();
-
-  if (query.isLoading) {
-    return <Loader></Loader>;
-  } else if (query.error) {
-    return <div>Error!</div>;
-  }
-  const metricData = query.data;
-  const metrics = metricData.metrics;
+  // if (query.isLoading) {
+  //   return <Loader></Loader>;
+  // } else if (query.error) {
+  //   return <div>Error!</div>;
+  // }
+  // const metricData = query.data;
+  // const metrics = metricData.metrics;
 
   return (
     <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
@@ -438,7 +485,11 @@ function MetricsTable() {
                 .map((metric) => {
                   if (metric.score < 0.4)
                     return (
-                      <MetricTableRow key={metric.id} {...metric}></MetricTableRow>
+                      <MetricTableRow
+                        key={metric.id}
+                        {...metric}
+                        scoringUnit={scoringUnit}
+                      ></MetricTableRow>
                     );
                 })}
             </tbody>
@@ -450,13 +501,50 @@ function MetricsTable() {
 }
 
 export function Home() {
+  const goalsQuery = api.goals.getAllGoals.useQuery();
+  const habitsQuery = api.habits.getHabits.useQuery({ date: new Date() });
+  const metricsQuery = api.goals.getAllMetrics.useQuery();
+  const profileQuery = api.profile.getProfile.useQuery();
+
+  if (
+    goalsQuery.isLoading ||
+    metricsQuery.isLoading ||
+    habitsQuery.isLoading ||
+    profileQuery.isLoading
+  )
+    return <Loader></Loader>;
+  if (
+    goalsQuery.isError ||
+    metricsQuery.isError ||
+    habitsQuery.isError ||
+    profileQuery.isError
+  )
+    return <p>Query error</p>;
+  
+
   return (
     <div className="">
       <div className="m-auto h-full max-w-3xl pt-2">
-        <StatsCardRow></StatsCardRow>
-        <GoalsTable></GoalsTable>
-        <HabitsTable></HabitsTable>
-        <MetricsTable></MetricsTable>
+        <StatsCardRow
+          goals={goalsQuery.data.goals}
+          habits={goalsQuery.data.habits}
+          metrics={metricsQuery.data.metrics}
+        ></StatsCardRow>
+
+        <GoalsTable
+          goals={goalsQuery.data.goals}
+          scoringUnit={profileQuery.data.scoringUnit}
+        ></GoalsTable>
+
+        <HabitsTable
+          habits={habitsQuery.data}
+          scoringUnit={profileQuery.data.scoringUnit}
+        ></HabitsTable>
+
+        <MetricsTable
+          metrics={metricsQuery.data.metrics}
+          scoringUnit={profileQuery.data.scoringUnit}
+        ></MetricsTable>
 
         {/* <div className="mb-6 mt-5 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 xl:grid-cols-3">
           {statisticsChartsData.map((props) => (
