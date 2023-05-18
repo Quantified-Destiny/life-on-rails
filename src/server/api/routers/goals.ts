@@ -57,7 +57,6 @@ export const goalsRouter = createTRPCRouter({
         ctx.session.user.id
       );
 
-
       const goal: Goal = await ctx.prisma.goal.findFirstOrThrow({
         where: {
           id: input.id,
@@ -247,6 +246,19 @@ export const goalsRouter = createTRPCRouter({
         },
         data: {
           weight: input.weight,
+        },
+      });
+    }),
+
+  archive: protectedProcedure
+    .input(z.object({ goalId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.goal.update({
+        data: {
+          archived: true,
+        },
+        where: {
+          id: input.goalId,
         },
       });
     }),

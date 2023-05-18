@@ -102,7 +102,12 @@ function OverviewPage() {
             <hr />
           </h1>
           {data.habits.map((habit) => (
-            <HabitCard {...habit} weight={0.5} key={habit.id} scoringUnit={user.scoringUnit}></HabitCard>
+            <HabitCard
+              {...habit}
+              weight={0.5}
+              key={habit.id}
+              scoringUnit={user.scoringUnit}
+            ></HabitCard>
           ))}
           {data.metrics.map((metric) => {
             return (

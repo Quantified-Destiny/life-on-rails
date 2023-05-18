@@ -502,6 +502,13 @@ function GoalPanel({
       void context.goals.getAllGoals.invalidate();
     },
   });
+
+  const archiveGoal = api.goals.archive.useMutation({
+    onSettled: () => {
+      void context.goals.getAllGoals.invalidate();
+    },
+  });
+
   const goalQuery = api.goals.getGoal.useQuery({ id: goalId });
   const goalWeightsQuery = api.goals.getWeights.useQuery({ goalId: goalId });
 
@@ -597,7 +604,11 @@ function GoalPanel({
           </AccordionItem>
         </Accordion>
         <div className="w-full space-x-2 bg-gray-100 px-4 py-2 text-right">
-          <Button variant="default">
+          <Button
+            className="cursor-pointer"
+            variant="default"
+            onClick={() => archiveGoal.mutate({ goalId })}
+          >
             <Label>Archive</Label>
           </Button>
           <Button
