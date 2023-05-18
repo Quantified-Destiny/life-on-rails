@@ -66,15 +66,18 @@ model MetricTag {
 }
 
 model Goal {
-  id        String               @id @default(cuid())
-  name      String
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-  ownerId   String
-  owner     User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  habits    HabitMeasuresGoal[]
-  metrics   MetricMeasuresGoal[]
-  GoalTag   GoalTag[]
+  id         String   @id @default(cuid())
+  name       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  archived   Boolean  @default(false)
+  archivedAt DateTime @default(now())
+
+  ownerId String
+  owner   User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  habits  HabitMeasuresGoal[]
+  metrics MetricMeasuresGoal[]
+  GoalTag GoalTag[]
 
   @@index([ownerId])
 }
@@ -92,9 +95,11 @@ model Habit {
   ownerId          String
   frequencyHorizon FrequencyHorizon    @default(DAY)
   frequency        Int                 @default(1)
-  owner            User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   // the weight for completions in calculating score. Should be 0-1
   completionWeight Float               @default(1)
+  archived         Boolean             @default(false)
+  archivedAt       DateTime            @default(now())
+  owner            User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   completions      HabitCompletion[]
   goals            HabitMeasuresGoal[]
   HabitTag         HabitTag[]
@@ -170,14 +175,16 @@ model AnswerFormat {
 }
 
 model Metric {
-  id        String               @id @default(cuid())
-  prompt    String
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-  ownerId   String
-  owner     User                 @relation(fields: [ownerId], references: [id])
-  goals     MetricMeasuresGoal[]
-  formatId  String
+  id         String               @id @default(cuid())
+  prompt     String
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  ownerId    String
+  owner      User                 @relation(fields: [ownerId], references: [id])
+  goals      MetricMeasuresGoal[]
+  formatId   String
+  archived   Boolean              @default(false)
+  archivedAt DateTime             @default(now())
 
   format           AnswerFormat   @relation(fields: [formatId], references: [id])
   metricAnswers    MetricAnswer[]
