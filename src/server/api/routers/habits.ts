@@ -239,6 +239,19 @@ export const habitsRouter = createTRPCRouter({
       return habits;
     }),
 
+  archive: protectedProcedure
+    .input(z.object({ habitId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.habit.update({
+        data: {
+          archived: true,
+        },
+        where: {
+          id: input.habitId,
+        },
+      });
+    }),
+
   getHabit: protectedProcedure
     .input(z.object({ habitId: z.string() }))
     .query(async ({ input, ctx }) => {

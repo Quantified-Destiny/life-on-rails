@@ -1,3 +1,4 @@
+import type { ScoringFormat } from "@prisma/client";
 import {
   addDays,
   differenceInCalendarDays,
@@ -7,8 +8,7 @@ import {
 } from "date-fns";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
-import { useMemo } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { api } from "../../utils/api";
 import {
   Accordion,
@@ -30,7 +30,6 @@ import {
   HabitHeaderLine,
   LinkHabit,
 } from "./habits";
-import { ScoringFormat} from "@prisma/client";
 
 function GoalsSection({ habitId }: { habitId: string }) {
   const context = api.useContext();
@@ -289,12 +288,12 @@ function HistorySection({ habitId }: { habitId: string }) {
 
 import type { HabitCompletion, Metric } from "@prisma/client";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { XCircle } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { Loader } from "../ui/loader";
 import { Slider } from "../ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider } from "../ui/tooltip";
 import { TagList } from "./tags";
-import { XCircle } from "lucide-react";
-import { Loader } from "../ui/loader";
 
 const DonutChart = dynamic(() => import("react-donut-chart"), { ssr: false });
 
@@ -343,9 +342,20 @@ function ScoringSection({
   );
 }
 
-function HabitPanel({ habitId, scoringUnit }: { habitId: string, scoringUnit: ScoringFormat }) {
+function HabitPanel({
+  habitId,
+  scoringUnit,
+}: {
+  habitId: string;
+  scoringUnit: ScoringFormat;
+}) {
   const context = api.useContext();
   const deleteHabit = api.habits.deleteHabit.useMutation({
+    onSuccess() {
+      void context.invalidate();
+    },
+  });
+  const archiveHabit = api.habits.archive.useMutation({
     onSuccess() {
       void context.invalidate();
     },
@@ -373,7 +383,11 @@ function HabitPanel({ habitId, scoringUnit }: { habitId: string, scoringUnit: Sc
       <div className="flex h-full flex-col gap-2">
         <SheetHeader>
           <SheetTitle>
-            <HabitHeaderLine {...data} weight={0.1} scoringUnit={scoringUnit}></HabitHeaderLine>
+            <HabitHeaderLine
+              {...data}
+              weight={0.1}
+              scoringUnit={scoringUnit}
+            ></HabitHeaderLine>
             <TagList
               tags={data.tags}
               link={(tag) => linkHabit.mutate({ habitId, tagName: tag })}
@@ -411,7 +425,10 @@ function HabitPanel({ habitId, scoringUnit }: { habitId: string, scoringUnit: Sc
           </AccordionItem>
         </Accordion>
         <div className="w-full space-x-2 bg-gray-100 px-4 py-2 text-right">
-          <Button variant="default">
+          <Button
+            variant="default"
+            onClick={() => archiveHabit.mutate({ habitId })}
+          >
             <Label>Archive</Label>
           </Button>
           <Button

@@ -161,7 +161,7 @@ function GoalTableRow({
         </div>
       </td>
       <td className="border-blue-gray-50 px-5 py-3">
-        <div className="w-10/12">
+        <div className="">
           <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
             {scoringUnit == ScoringFormat.Normalized
               ? min(1, goal.score).toFixed(2)
@@ -286,7 +286,7 @@ function HabitTableRow(
         </div>
       </td>
       <td className="border-blue-gray-50 px-5 py-3">
-        <div className="w-10/12">
+        <div className="">
           <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
             {scoringUnit == ScoringFormat.Normalized
               ? min(1, score).toFixed(2)
@@ -416,7 +416,7 @@ function MetricTableRow(
         </div>
       </td>
       <td className="border-blue-gray-50 px-5 py-3">
-        <div className="w-10/12">
+        <div className="">
           <p className="text-blue-gray-600  mb-1 block text-center font-sans text-xs font-medium antialiased">
             {scoringUnit == ScoringFormat.Normalized
               ? min(1, score).toFixed(2)

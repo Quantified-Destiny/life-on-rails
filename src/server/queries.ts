@@ -2,7 +2,6 @@ import type {
   Goal,
   Habit,
   HabitCompletion,
-  HabitMeasuresGoal,
   HabitTag,
   LinkedMetric,
   Metric,
@@ -15,8 +14,8 @@ import type {
 import { FrequencyHorizon } from "@prisma/client";
 import { isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
-import type { prisma as prismaClient } from "./db";
 import { cache } from "./api/cache";
+import type { prisma as prismaClient } from "./db";
 
 function avg(arr: number[]) {
   return arr.length == 0 ? 0 : arr.reduce((a, b) => a + b) / arr.length;
@@ -49,30 +48,26 @@ export async function getHabitsWithMetricsMap({
   goalIds?: string[];
   date?: Date;
 }): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
-  type HabitType = Habit & {
-    metrics: LinkedMetric[];
-    HabitTag: (HabitTag & { tag: Tag })[];
-    goals: HabitMeasuresGoal[];
-    completions: HabitCompletion[];
-  };
-
   const whereConditions = {
     goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
   };
 
-  const habits: HabitType[] = await prisma.habit.findMany({
+  const habits = await prisma.habit.findMany({
     where: {
       ownerId: userId,
+      archived: false,
       ...whereConditions,
     },
     include: {
       metrics: true,
       HabitTag: { include: { tag: true } },
-      goals: true,
+      goals: { select: { goalId: true, goal: { select: { archived: true } } } },
       completions: { where: { date: { gt: subDays(date, 7) } } },
     },
   });
-  const habitsMap = new Map<string, HabitType>(habits.map((h) => [h.id, h]));
+  const habitsMap = new Map<string, (typeof habits)[0]>(
+    habits.map((h) => [h.id, h])
+  );
 
   const habitCompletions = await prisma.habitCompletion.groupBy({
     by: ["habitId"],
@@ -108,7 +103,9 @@ export async function getHabitsWithMetricsMap({
   const expandedHabits = habits.map((h) => ({
     ...h,
     score: habitScores.get(h.id) ?? 0,
-    goals: h.goals.map((it) => it.goalId),
+    goals: h.goals
+      .filter((it) => it.goal.archived == false)
+      .map((it) => it.goalId),
     tags: h.HabitTag.map((it) => it.tag.name),
     metrics: h.metrics.map((it) => metricsMap.get(it.metricId)!),
     completions:
@@ -147,7 +144,7 @@ export async function getHabits({
         goals: { goal: Goal }[];
       };
     })[];
-    goals: HabitMeasuresGoal[];
+    goals: { goalId: string }[];
   })[];
 
   const whereConditions = {
@@ -179,7 +176,7 @@ export async function getHabits({
         },
       },
       HabitTag: { include: { tag: true } },
-      goals: true,
+      goals: { select: { goalId: true }, where: { goal: { archived: false } } },
     },
   });
 
@@ -356,6 +353,7 @@ export async function getGoals(
   const goals = await prisma.goal.findMany({
     where: {
       ownerId: userId,
+      archived: false,
     },
     include: {
       habits: {
@@ -369,6 +367,7 @@ export async function getGoals(
           },
         },
       },
+
       metrics: true,
       GoalTag: { include: { tag: true } },
     },
@@ -394,7 +393,7 @@ export async function getGoals(
 
     return {
       goal: { ...g, score, tags: g.GoalTag.map((it) => it.tag.name) },
-      habits: linkedHabits,
+      habits: linkedHabits.filter((it) => it.archived === false),
       metrics: g.metrics.map((m) => ({
         ...metricsMap.get(m.metricId)!,
       })),

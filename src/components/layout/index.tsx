@@ -14,6 +14,8 @@ import {
   LayoutDashboard,
   LogOut,
   User,
+  BookOpen, 
+  TagIcon
 } from "lucide-react";
 
 import classNames from "classnames";
@@ -142,8 +144,8 @@ const menus = [
   // { name: "Legacy Journal", link: "/journal", icon: CalendarRange },
   { name: "Dashboard", link: "/dashboard", icon: BarChart },
   { name: "All Items", link: "/overview", icon: LayoutDashboard },
+  { name: "Blog", link: "/blog/intro", icon: BookOpen },
   { name: "Help", link: "/help", icon: HelpCircle },
-  // { name: "New Journal", link: "/newjournal", icon: HelpCircle },
   // { name: "Habit Page", link: "/habit", icon: HelpCircle },
   // { name: "Metric Modal", link: "/metric_modal", icon: HelpCircle },
   // { name: "delete account", link: "/deactivate", icon: HelpCircle },
