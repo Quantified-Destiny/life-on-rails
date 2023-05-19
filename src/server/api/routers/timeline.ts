@@ -7,88 +7,7 @@ import type {
   MetricMeasuresGoal,
 } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-
-enum EventType {
-  GOAL_ADDED,
-  GOAL_ARCHIVED,
-  HABIT_ADDED,
-  HABIT_ARCHIVED,
-}
-
-interface Event {
-  eventType: EventType;
-  date: Date;
-}
-
-interface GoalAddedEvent extends Event {
-  eventType: EventType.GOAL_ADDED;
-  goal: {
-    id: string;
-    name: string;
-  };
-  habits: {
-    id: string;
-    description: string;
-  }[];
-  metrics: {
-    id: string;
-    prompt: string;
-  }[];
-}
-
-interface GoalArchivedEvent extends Event {
-  eventType: EventType.GOAL_ARCHIVED;
-  goal: {
-    id: string;
-    name: string;
-  };
-  habits: {
-    id: string;
-    description: string;
-  }[];
-  metrics: {
-    id: string;
-    prompt: string;
-  }[];
-}
-
-interface HabitAddedEvent extends Event {
-  eventType: EventType.HABIT_ADDED;
-  habit: {
-    id: string;
-    description: string;
-  };
-  goals: {
-    id: string;
-    name: string;
-  }[];
-  metrics: {
-    id: string;
-    prompt: string;
-  }[];
-}
-
-interface HabitArchivedEvent extends Event {
-  eventType: EventType.HABIT_ARCHIVED;
-  habit: {
-    id: string;
-    description: string;
-  };
-  goals: {
-    id: string;
-    name: string;
-  }[];
-  metrics: {
-    id: string;
-    prompt: string;
-  }[];
-}
-
-type TimelineEvent =
-  | GoalAddedEvent
-  | GoalArchivedEvent
-  | HabitAddedEvent
-  | HabitArchivedEvent;
+import { TimelineEvent, TimelineEventType } from "../types";
 
 export const timelineRouter = createTRPCRouter({
   getTimeline: protectedProcedure.query(async ({ ctx }) => {
@@ -102,6 +21,9 @@ export const timelineRouter = createTRPCRouter({
     })[];
 
     const goals: QueryType = await ctx.prisma.goal.findMany({
+      where: {
+        ownerId: ctx.session.user.id,
+      },
       include: {
         metrics: {
           include: {
@@ -125,6 +47,9 @@ export const timelineRouter = createTRPCRouter({
       })[];
     })[];
     const habits: QueryType2 = await ctx.prisma.habit.findMany({
+      where: {
+        ownerId: ctx.session.user.id,
+      },
       include: {
         metrics: {
           include: {
@@ -143,7 +68,7 @@ export const timelineRouter = createTRPCRouter({
 
     goals.forEach((goal) => {
       events.push({
-        eventType: EventType.GOAL_ADDED,
+        eventType: TimelineEventType.GOAL_ADDED,
         goal: goal,
         habits: goal.habits.map((habit) => habit.habit),
         metrics: goal.metrics.map((metric) => metric.metric),
@@ -151,8 +76,9 @@ export const timelineRouter = createTRPCRouter({
       });
       if (goal.archived) {
         events.push({
-          eventType: EventType.GOAL_ARCHIVED,
+          eventType: TimelineEventType.GOAL_ARCHIVED,
           goal: goal,
+          created: goal.createdAt,
           habits: goal.habits.map((habit) => habit.habit),
           metrics: goal.metrics.map((metric) => metric.metric),
           date: goal.archivedAt,
@@ -161,7 +87,7 @@ export const timelineRouter = createTRPCRouter({
     });
     habits.forEach((habit) => {
       events.push({
-        eventType: EventType.HABIT_ADDED,
+        eventType: TimelineEventType.HABIT_ADDED,
         goals: habit.goals.map((goal) => goal.goal),
         habit: habit,
         metrics: habit.metrics.map((metric) => metric.metric),
@@ -169,7 +95,8 @@ export const timelineRouter = createTRPCRouter({
       });
       if (habit.archived) {
         events.push({
-          eventType: EventType.HABIT_ARCHIVED,
+          eventType: TimelineEventType.HABIT_ARCHIVED,
+          created: habit.createdAt,
           goals: habit.goals.map((goal) => goal.goal),
           habit: habit,
           metrics: habit.metrics.map((metric) => metric.metric),
