@@ -1,31 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Link from "next/link";
+import {
+  TbSquareRoundedLetterG,
+  TbSquareRoundedLetterH,
+  TbSquareRoundedLetterM,
+} from "react-icons/tb";
 import { CreateMenu } from "../components/createMenu";
 import { EllipsisIcon } from "../components/icons";
-import {
-  CreateGoalModal,
-  CreateHabitModal,
-  CreateMetricModal,
-} from "../components/modals";
 import { GoalCard } from "../components/overview/goals";
 import { HabitCard } from "../components/overview/habits";
 import { LinkedMetric } from "../components/overview/metrics";
-import { State, useAppState } from "../components/layout/overviewState";
-import { Loader } from "../components/ui/loader";
-import { api } from "../utils/api";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../components/ui/accordion";
-import {
-  TbSquareRoundedLetterG,
-  TbSquareRoundedLetterH,
-  TbSquareRoundedLetterM,
-} from "react-icons/tb";
 import { Button } from "../components/ui/button";
+import { Loader } from "../components/ui/loader";
+import { api } from "../utils/api";
 
 function ArchivedItems() {
   const archivedItemsQuery = api.overview.getArchivedItems.useQuery();
@@ -51,7 +45,16 @@ function ArchivedItems() {
     },
   });
 
-  if (!archivedItemsQuery.data) return <Loader></Loader>;
+  if (!archivedItemsQuery.data)
+    return (
+      <Accordion type="single" collapsible>
+        <AccordionItem value="archived">
+          <AccordionContent>
+            <Loader></Loader>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    );
   const { goals, habits, metrics } = archivedItemsQuery.data;
   return (
     <Accordion type="single" collapsible>

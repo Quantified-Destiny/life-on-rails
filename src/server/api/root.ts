@@ -7,6 +7,7 @@ import { taggingRouter } from "./routers/tags";
 import { metricsRouter } from "./routers/metrics";
 import { habitsRouter } from "./routers/habits";
 import { overviewRouter } from "./routers/overview";
+import { timelineRouter } from "./routers/timeline";
 
 /**
  * This is the primary router for your server.
@@ -21,7 +22,8 @@ export const appRouter = createTRPCRouter({
   tags: taggingRouter,
   metrics: metricsRouter,
   habits: habitsRouter,
-  overview: overviewRouter
+  overview: overviewRouter,
+  timeline: timelineRouter,
 });
 
 // export type definition of API

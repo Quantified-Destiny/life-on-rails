@@ -91,19 +91,29 @@ function StatsCardRow({
   return (
     <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
-        <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
-          <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
+        <div className="relative flex flex-1 flex-col rounded-xl text-gray-700 shadow-md items-center">
+          <div className="rounded-t-xl bg-indigo-800 p-4 text-left text-2xl text-white">
             Goals
           </div>
-          <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
-            <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
+          <div className="flex w-2/3 flex-col content-stretch justify-left rounded-b-xl border-2  border-indigo-800 p-1 text-left">
+            <span>
               {greenGoal}
+              <span className="m-1 rounded-sm p-4 font-semibold text-green-500 ">
+                okay
+              </span>
             </span>
-            <span className="m-1 flex-1 rounded-sm bg-yellow-500 p-4 font-semibold text-white">
+            <span>
               {yellowGoal}
+              <span className="m-1 rounded-sm p-4 font-semibold text-yellow-500">
+                at risk
+              </span>
             </span>
-            <span className="m-1 flex-1 rounded-sm bg-red-500 p-4 font-semibold text-white">
+
+            <span>
               {redGoal}
+              <span className="m-1 rounded-sm p-4 font-semibold text-red-500 ">
+                off the rails
+              </span>
             </span>
           </div>
         </div>
@@ -265,17 +275,15 @@ function GoalsTable({
   );
 }
 
-function HabitTableRow(
-  {
-    description,
-    frequency,
-    frequencyHorizon,
-    score,
-    completions,
-    metrics,
-    scoringUnit
-  }: ExpandedHabit & { scoringUnit: ScoringFormat }
-) {
+function HabitTableRow({
+  description,
+  frequency,
+  frequencyHorizon,
+  score,
+  completions,
+  metrics,
+  scoringUnit,
+}: ExpandedHabit & { scoringUnit: ScoringFormat }) {
   return (
     <tr>
       <td className="border-blue-gray-50  px-5 py-3">
@@ -401,11 +409,11 @@ function HabitsTable({
   );
 }
 
-function MetricTableRow(
-  {
-    prompt, score, scoringUnit
-  }: ExpandedMetric & { scoringUnit: ScoringFormat }
-) {
+function MetricTableRow({
+  prompt,
+  score,
+  scoringUnit,
+}: ExpandedMetric & { scoringUnit: ScoringFormat }) {
   return (
     <tr>
       <td className="border-blue-gray-50  px-5 py-3">
@@ -521,7 +529,6 @@ export function Home() {
     profileQuery.isError
   )
     return <p>Query error</p>;
-  
 
   return (
     <div className="">
