@@ -7,7 +7,9 @@ import type {
   MetricMeasuresGoal,
 } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { TimelineEvent, TimelineEventType } from "../types";
+import type { TimelineEvent } from "../types";
+import { TimelineEventType } from "../types";
+import { startOfDay } from "date-fns";
 
 export const timelineRouter = createTRPCRouter({
   getTimeline: protectedProcedure.query(async ({ ctx }) => {
@@ -104,6 +106,22 @@ export const timelineRouter = createTRPCRouter({
         });
       }
     });
-    return events.sort((a, b) => a.date.getTime() - b.date.getTime()).reverse();
+    //return events;
+    return groupEvents(events);
   }),
 });
+
+function groupEvents(events: TimelineEvent[]) {
+  const grouped: Map<number, TimelineEvent[]> = new Map();
+  events.forEach((event) => {
+    const day = startOfDay(event.date).getTime();
+    if (!grouped.has(day)) {
+      grouped.set(day, []);
+    }
+    grouped.get(day)!.push(event);
+  });
+  console.log(grouped);
+  const groups = Array.from(grouped.entries());
+  const e = groups.sort((a, b) => b[0] - a[0]);
+  return e;
+}
