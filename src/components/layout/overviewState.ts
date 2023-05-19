@@ -23,7 +23,7 @@ interface HabitPanel {
   habitId: string;
 }
 
-interface OverviewStore {
+interface AppState {
   modal: CreateGoal | CreateHabit | CreateMetric | HabitPanel | undefined;
   openCreateGoalModal: () => void;
   openCreateHabitModal: () => void;
@@ -32,7 +32,7 @@ interface OverviewStore {
   reset: () => void;
 }
 
-export const useOverviewStore = create<OverviewStore>()((set) => ({
+export const useAppState = create<AppState>()((set) => ({
   modal: undefined,
   openCreateGoalModal() {
     set(() => ({

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNode } from "react";
 import React, { useEffect } from "react";
+import Image from "next/image";
 
 import {
   Book,
@@ -16,7 +17,7 @@ import {
   LayoutDashboard,
   LogOut,
   ToyBrick,
-  User
+  User,
 } from "lucide-react";
 
 import classNames from "classnames";
@@ -61,7 +62,7 @@ function Sidebar(props: {
 
       <div className="flex items-center gap-x-4">
         <Link href="/newjournal">
-          <img
+          <Image
             src="lor-logo.png"
             alt=""
             width="40"

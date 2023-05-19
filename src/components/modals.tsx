@@ -3,7 +3,6 @@ import classNames from "classnames";
 import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "../utils/api";
-import { useOverviewStore } from "./overviewState";
 
 function Modal({
   close,
@@ -27,11 +26,11 @@ function Modal({
   );
 }
 
-export function CreateGoalModal() {
+export function CreateGoalModal({ close }: { close: () => void }) {
   interface GoalCreate {
     name: string;
   }
-  const reset = useOverviewStore((store) => store.reset);
+  //const reset = useOverviewStore((store) => store.reset);
 
   const context = api.useContext();
   const mutation = api.goals.createGoal.useMutation({
@@ -42,7 +41,7 @@ export function CreateGoalModal() {
 
   const { register, handleSubmit } = useForm<GoalCreate>();
   const onSubmit = (data: GoalCreate) => {
-    reset();
+    close();
     console.log(data);
     mutation.mutate({
       name: data.name,
@@ -50,13 +49,13 @@ export function CreateGoalModal() {
   };
 
   return (
-    <Modal close={reset}>
+    <Modal close={close}>
       <div className="relative max-h-full w-full max-w-md">
         <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
           <button
             type="button"
             className="absolute right-2.5 top-3 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
-            onClick={reset}
+            onClick={close}
           >
             <svg
               className="h-5 w-5"
@@ -101,11 +100,10 @@ export function CreateGoalModal() {
     </Modal>
   );
 }
-export function CreateHabitModal() {
+export function CreateHabitModal({ close }: { close: () => void }) {
   interface HabitCreate {
     description: string;
   }
-  const reset = useOverviewStore((store) => store.reset);
 
   const context = api.useContext();
   const mutation = api.habits.createHabit.useMutation({
@@ -116,7 +114,7 @@ export function CreateHabitModal() {
 
   const { register, handleSubmit } = useForm<HabitCreate>();
   const onSubmit = (data: HabitCreate) => {
-    reset();
+    close();
     console.log(data);
     mutation.mutate({
       description: data.description,
@@ -124,13 +122,13 @@ export function CreateHabitModal() {
   };
 
   return (
-    <Modal close={reset}>
+    <Modal close={close}>
       <div className="relative max-h-full w-full max-w-md">
         <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
           <button
             type="button"
             className="absolute right-2.5 top-3 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
-            onClick={reset}
+            onClick={close}
           >
             <svg
               className="h-5 w-5"
@@ -188,11 +186,10 @@ export function CreateHabitModal() {
     </Modal>
   );
 }
-export function CreateMetricModal() {
+export function CreateMetricModal({ close }: { close: () => void }) {
   interface MetricCreate {
     prompt: string;
   }
-  const reset = useOverviewStore((store) => store.reset);
 
   const context = api.useContext();
   const mutation = api.metrics.createMetric.useMutation({
@@ -203,7 +200,7 @@ export function CreateMetricModal() {
 
   const { register, handleSubmit } = useForm<MetricCreate>();
   const onSubmit = (data: MetricCreate) => {
-    reset();
+    close();
     console.log(data);
     mutation.mutate({
       prompt: data.prompt,
@@ -211,13 +208,13 @@ export function CreateMetricModal() {
   };
 
   return (
-    <Modal close={reset}>
+    <Modal close={close}>
       <div className="relative max-h-full w-full max-w-md">
         <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
           <button
             type="button"
             className="absolute right-2.5 top-3 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
-            onClick={reset}
+            onClick={close}
           >
             <svg
               className="h-5 w-5"

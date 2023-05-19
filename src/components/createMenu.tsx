@@ -1,4 +1,4 @@
-import { useOverviewStore } from "./overviewState";
+import { useAppState } from "./layout/overviewState";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,13 +90,13 @@ export function CreateMenu({
   className?: string;
   triggerIcon?: JSX.Element;
 }) {
-  const openCreateGoalModal = useOverviewStore(
+  const openCreateGoalModal = useAppState(
     (store) => store.openCreateGoalModal
   );
-  const openCreateHabitModal = useOverviewStore(
+  const openCreateHabitModal = useAppState(
     (store) => store.openCreateHabitModal
   );
-  const openCreateMetricModal = useOverviewStore(
+  const openCreateMetricModal = useAppState(
     (store) => store.openCreateMetricModal
   );
 

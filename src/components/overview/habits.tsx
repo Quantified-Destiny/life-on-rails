@@ -15,7 +15,7 @@ import {
   EditableField,
   EditableNumberField,
 } from "../inlineEdit";
-import { useOverviewStore } from "../overviewState";
+import { useAppState } from "../layout/overviewState";
 import { HabitSheet } from "./habit-panel";
 import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";
@@ -386,7 +386,7 @@ export function HabitFooter({
     },
   });
 
-  const openHabitPanel = useOverviewStore((store) => store.openHabitPanel);
+  const openHabitPanel = useAppState((store) => store.openHabitPanel);
 
   return (
     <div className="mt-6 border-t-2 border-gray-200/50 pt-4">

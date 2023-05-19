@@ -11,7 +11,7 @@ import {
 import { GoalCard } from "../components/overview/goals";
 import { HabitCard } from "../components/overview/habits";
 import { LinkedMetric } from "../components/overview/metrics";
-import { State, useOverviewStore } from "../components/overviewState";
+import { State, useAppState } from "../components/layout/overviewState";
 import { Loader } from "../components/ui/loader";
 import { api } from "../utils/api";
 import {
@@ -173,7 +173,6 @@ function Header() {
 }
 
 function OverviewPage() {
-  const store = useOverviewStore();
   const goalsQuery = api.goals.getAllGoals.useQuery();
   const profileQuery = api.profile.getProfile.useQuery();
   if (goalsQuery.isLoading || profileQuery.isLoading) return <Loader></Loader>;
@@ -184,15 +183,6 @@ function OverviewPage() {
   return (
     <div className="container max-w-4xl">
       <div className="mb-10 scrollbar-none">
-        {store.modal?.state === State.CreateGoal && (
-          <CreateGoalModal></CreateGoalModal>
-        )}
-        {store.modal?.state === State.CreateHabit && (
-          <CreateHabitModal></CreateHabitModal>
-        )}
-        {store.modal?.state === State.CreateMetric && (
-          <CreateMetricModal></CreateMetricModal>
-        )}
         <Header></Header>
         <div className="mx-auto mt-3 grid grid-cols-2 items-center gap-2 p-6 ">
           {data.goals.map((goal) => (
