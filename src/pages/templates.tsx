@@ -1,16 +1,14 @@
-import { IceCream, InfoIcon } from "lucide-react";
+import { InfoIcon } from "lucide-react";
+import { useState } from "react";
 import {
   Card,
-  CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "../components/ui/card";
-import { useState } from "react";
 
 import Image from "next/image";
-import { templateRouter } from "../server/api/routers/templates";
-import { api } from "../utils/api";
 import { Button } from "../components/ui/button";
+import { api } from "../utils/api";
 const templates = [
   {
     key: "fitness",
