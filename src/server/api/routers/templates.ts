@@ -4,19 +4,43 @@ import { z } from "zod";
 
 let rawdata = {
   fitness: {
-    goal: "Get in shape",
+    goal: "Improve cardiovascular health and endurance",
     habits: [
       {
-        description: "go jogging for 1 hour",
-        linkedmetrics: [{ name: "how was your jog?" }],
+        description: "1 hour of cardio exercise (running, cycling, swimming)",
+        linkedmetrics: [{ name: "Rate your perceived exertion level during each cardio session"}],
       },
     ],
     metrics: [
       {
-        prompt: "how fit do you feel?",
+        prompt: "Rate your overall energy level after each cardio workout",
       },
     ],
   },
+  productivity: {
+    goal: "Enhance focus and time management skills", 
+    habits: [
+        {description: "Time blocking for focused work periods.", 
+        linkedmetrics: [{ name: "Rate your level of focus and productivity"}]}
+    ],
+    metrics:[
+        {
+            prompt: "Rate your ability to stick to the scheduled time blocks",
+        },
+    ]
+  },
+  peace: {
+    goal: "Cultivate daily mindfulness and reduce stress.", 
+    habits: [
+        {description: "Mindful breathing exercises", 
+        linkedmetrics: [{ name: "Rate your ability to maintain focus on your breath without distractions"}]}
+    ],
+    metrics:[
+        {
+            prompt: "Rate your level of relaxation and peace of mind after each mindfulness practice"
+        },
+    ]
+  }
 };
 
 let data = new Map(Object.entries(rawdata));
