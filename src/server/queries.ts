@@ -59,7 +59,7 @@ export async function getHabitsWithMetricsMap({
     },
     include: {
       metrics: true,
-      HabitTag: { include: { tag: true } },
+      tags: { include: { tag: true } },
       goals: { select: { goalId: true, goal: { select: { archived: true } } } },
       completions: { where: { date: { gt: subDays(date, 7) } } },
     },
@@ -108,7 +108,7 @@ export async function getHabitsWithMetricsMap({
     goals: h.goals
       .filter((it) => it.goal && it.goal.archived == false)
       .map((it) => it.goalId),
-    tags: h.HabitTag.map((it) => it.tag.name),
+    tags: h.tags.map((it) => it.tag.name),
     metrics: h.metrics.map((it) => metricsMap.get(it.metricId)!),
     completions:
       h.frequencyHorizon == FrequencyHorizon.WEEK
@@ -135,14 +135,14 @@ export async function getHabits({
   date?: Date;
 }): Promise<ExpandedHabit[]> {
   type HabitType = (Habit & {
-    HabitTag: (HabitTag & {
+    tags: (HabitTag & {
       tag: Tag;
     })[];
     completions: HabitCompletion[];
     metrics: (LinkedMetric & {
       metric: Metric & {
         metricAnswers: MetricAnswer[];
-        MetricTag: { tag: Tag }[];
+        tags: { tag: Tag }[];
         goals: { goal: Goal }[];
       };
     })[];
@@ -172,12 +172,12 @@ export async function getHabits({
                 where: { createdAt: { gt: startOfDay(date) } },
               },
               goals: { include: { goal: true } },
-              MetricTag: { include: { tag: true } },
+              tags: { include: { tag: true } },
             },
           },
         },
       },
-      HabitTag: { include: { tag: true } },
+      tags: { include: { tag: true } },
       goals: { select: { goalId: true }, where: { goal: { archived: false } } },
     },
   });
@@ -203,7 +203,7 @@ export async function getHabits({
     const expandedMetrics = habit.metrics.map((m) => {
       const value = m.metric.metricAnswers[0]?.value ?? 0;
       const score = avg(m.metric.metricAnswers.map((it) => it.value));
-      const tags = m.metric.MetricTag.map((it) => it.tag);
+      const tags = m.metric.tags.map((it) => it.tag);
       const goals = m.metric.goals.map((it) => it.goal);
       return { ...m.metric, score, tags, linkedHabits: [], goals, value };
     });
@@ -237,7 +237,7 @@ export async function getHabits({
       score,
       metrics: expandedMetrics,
       goals: habit.goals.map((it) => it.goalId),
-      tags: habit.HabitTag.map((it) => it.tag.name),
+      tags: habit.tags.map((it) => it.tag.name),
       completions: completionsCount,
     };
   });
@@ -289,7 +289,7 @@ export async function getMetrics({
     include: {
       completionMetric: true,
       metricAnswers: { where: { createdAt: { gt: startOfDay(date) } } },
-      MetricTag: {
+      tags: {
         include: { tag: true },
       },
       goals: {
@@ -364,7 +364,7 @@ export async function getGoals(
             include: {
               metrics: true,
               goals: true,
-              HabitTag: { include: { tag: true } },
+              tags: { include: { tag: true } },
             },
           },
         },

@@ -27,7 +27,7 @@ export const goalsRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       return await ctx.prisma.tag.findMany({
         where: {
-          GoalTag: {
+          goals: {
             some: {
               goalId: input.goalId,
             },

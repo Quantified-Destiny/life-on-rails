@@ -117,7 +117,7 @@ export const journalRouter = createTRPCRouter({
         }[];
         completions: HabitCompletion[];
         description: string;
-        HabitTag: (HabitTag & { tag: Tag })[];
+        tags: (HabitTag & { tag: Tag })[];
       }[];
 
       const data: QueryType = await ctx.prisma.habit.findMany({
@@ -127,7 +127,7 @@ export const journalRouter = createTRPCRouter({
         select: {
           id: true,
           description: true,
-          HabitTag: {
+          tags: {
             include: {
               tag: true,
             },
@@ -153,12 +153,12 @@ export const journalRouter = createTRPCRouter({
         },
       });
       const habitsData = data.map(
-        ({ id, description, metrics, completions, HabitTag }) => ({
+        ({ id, description, metrics, completions, tags }) => ({
           id,
           description,
           metrics: metrics.map((m) => m.metric),
           completions,
-          tags: HabitTag.map((it) => it.tag),
+          tags: tags.map((it) => it.tag),
         })
       );
 
@@ -180,9 +180,10 @@ export const journalRouter = createTRPCRouter({
         prompt: string;
         metricAnswers: MetricAnswer[];
         completionMetric: LinkedMetric[];
-        MetricTag: (MetricTag & { tag: Tag })[];
+        tags: (MetricTag & { tag: Tag })[];
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const data: QueryType[] = await ctx.prisma.metric.findMany({
         where: {
           ownerId: ctx.session.user.id,
@@ -191,7 +192,7 @@ export const journalRouter = createTRPCRouter({
           id: true,
           prompt: true,
           completionMetric: true,
-          MetricTag: { include: { tag: true } },
+          tags: { include: { tag: true } },
           metricAnswers: {
             where: {
               createdAt: onDay(input.date),
@@ -204,10 +205,10 @@ export const journalRouter = createTRPCRouter({
       });
 
       const metrics = data.map(
-        ({ id, prompt, metricAnswers, completionMetric, MetricTag }) => ({
+        ({ id, prompt, metricAnswers, completionMetric, tags }) => ({
           id,
           prompt,
-          tags: MetricTag.map((it) => it.tag),
+          tags: tags.map((it) => it.tag),
           score: metricAnswers[0]?.value,
           habits: completionMetric.map((m) => m.habitId),
         })

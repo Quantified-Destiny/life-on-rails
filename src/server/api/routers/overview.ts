@@ -11,11 +11,11 @@ export const overviewRouter = createTRPCRouter({
     });
     const habits = ctx.prisma.habit.findMany({
       where: { archived: true },
-      include: { HabitTag: true },
+      include: { tags: true },
     });
     const metrics = ctx.prisma.metric.findMany({
       where: { archived: true },
-      include: { MetricTag: true },
+      include: { tags: true },
     });
 
     return {
