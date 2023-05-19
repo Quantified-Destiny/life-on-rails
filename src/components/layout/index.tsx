@@ -1,11 +1,11 @@
 "use client";
 import { useIsFetching } from "@tanstack/react-query";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNode } from "react";
 import React, { useEffect } from "react";
-import Image from "next/image";
 
 import {
   Book,
@@ -63,7 +63,7 @@ function Sidebar(props: {
       <div className="flex items-center gap-x-4">
         <Link href="/newjournal">
           <Image
-            src="lor-logo.png"
+            src="/lor-logo.png"
             alt=""
             width="40"
             height="40"

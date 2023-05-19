@@ -23,7 +23,7 @@ interface HabitPanel {
   habitId: string;
 }
 
-interface AppState {
+interface AppState   {
   modal: CreateGoal | CreateHabit | CreateMetric | HabitPanel | undefined;
   openCreateGoalModal: () => void;
   openCreateHabitModal: () => void;

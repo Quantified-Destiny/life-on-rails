@@ -1,7 +1,7 @@
-import React from "react";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const TopNav = () => {
   const { data: sessionData } = useSession();
@@ -39,7 +39,7 @@ const TopNav = () => {
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-          <img src="lor-logo.png" className="w-9" alt="" />
+          <Image src="/lor-logo.png" className="w-9" alt="" />
           {/* <svg
             aria-hidden="true"
             focusable="false"
