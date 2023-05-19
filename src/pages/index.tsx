@@ -30,7 +30,7 @@ function Hero() {
               <span className="sr-only">TP6</span>
               <img
                 className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                src="/lor-logo-new.png"
                 alt=""
               />
             </a>
@@ -67,7 +67,7 @@ function Hero() {
                 <span className="sr-only">Your Company</span>
                 <img
                   className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                  src="img/lor-logo-2.png"
                   alt=""
                 />
               </a>

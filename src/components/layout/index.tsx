@@ -63,11 +63,11 @@ function Sidebar(props: {
       <div className="flex items-center gap-x-4">
         <Link href="/newjournal">
           <Image
-            src="/lor-logo.png"
+            src="/lor-logo-new.png"
             alt=""
             width="40"
             height="40"
-            className="cursor-pointer opacity-90 duration-100"
+            className="cursor-pointer opacity-90 duration-100 bg-gray-100 rounded-lg"
           />
         </Link>
         <h1 className={`origin-left text-white ${!props.open ? "hidden" : ""}`}>
