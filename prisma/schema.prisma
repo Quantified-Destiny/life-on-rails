@@ -77,7 +77,7 @@ model Goal {
   owner   User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   habits  HabitMeasuresGoal[]
   metrics MetricMeasuresGoal[]
-  tags GoalTag[]
+  tags    GoalTag[]
 
   @@index([ownerId])
 }

@@ -1,4 +1,4 @@
-import { IceCream } from "lucide-react";
+import { IceCream, InfoIcon } from "lucide-react";
 import {
   Card,
   CardDescription,
@@ -10,6 +10,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { templateRouter } from "../server/api/routers/templates";
 import { api } from "../utils/api";
+import { Button } from "../components/ui/button";
 const templates = [
   {
     key: "fitness",
@@ -37,7 +38,7 @@ const TemplatesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Step 1: State variable for modal open/closed
   const [selectedTemplateKey, setSelectedTemplateKey] = useState(""); // New state variable for selected template key
 
-  const openModal = (key:string) => {
+  const openModal = (key: string) => {
     setSelectedTemplateKey(key); // Set the selected template key
     setIsModalOpen(true);
   };
@@ -49,7 +50,7 @@ const TemplatesPage = () => {
   const context = api.useContext();
   const createFromTemplate = api.templates.createFromTemplate.useMutation({
     onSettled() {
-      void context.goals.invalidate();
+      void context.invalidate();
     },
   });
   return (
@@ -68,7 +69,6 @@ const TemplatesPage = () => {
               // onClick={() => createFromTemplate.mutate({ key: template.key })}
               onClick={() => openModal(template.key)}
             >
-
               <div className="relative flex h-full flex-row items-center">
                 <div className="flex h-[156px] w-[156px] flex-col items-center justify-center bg-gray-200 text-white">
                   <Image
@@ -90,28 +90,40 @@ const TemplatesPage = () => {
         })}
       </div>
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white p-5 rounded-lg">
-          Are you sure you want to create a {selectedTemplateKey} template?
-            <div className="flex justify-end mt-4">
-              <button
-                className="px-4 py-2 mr-2 bg-red-500 text-white rounded"
-                onClick={closeModal}
-              >
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
+          <div className="rounded-lg bg-white p-5">
+            <div className="text-md mb-5 font-semibold">
+              You are about to use the{" "}
+              <span className="bg-gray-200 font-mono">
+                {selectedTemplateKey}
+              </span>{" "}
+              template.{" "}
+            </div>
+            <div className="font-light text-gray-500">
+              This will create multiple goals, habits, and metrics. This
+              operation is irreversible.
+            </div>
+            <div className="mt-2 whitespace-nowrap align-baseline font-light text-gray-300">
+              <InfoIcon className="inline"></InfoIcon> You can delete these
+              items from the `All Items` page at any time.
+            </div>{" "}
+            <div className="mt-4 flex justify-end">
+              <Button variant="ghost" onClick={closeModal}>
                 Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-green-500 text-white rounded"
-                onClick={(key) => {
+              </Button>
+
+              <Button
+                variant="default"
+                onClick={() => {
                   // Perform the goal creation action here
-                  if (selectedTemplateKey){
-                    createFromTemplate.mutate({key: selectedTemplateKey});
+                  if (selectedTemplateKey) {
+                    createFromTemplate.mutate({ key: selectedTemplateKey });
                   }
                   closeModal(); // Close the modal after confirming
                 }}
               >
                 Confirm
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -120,7 +120,6 @@ function groupEvents(events: TimelineEvent[]) {
     }
     grouped.get(day)!.push(event);
   });
-  console.log(grouped);
   const groups = Array.from(grouped.entries());
   const e = groups.sort((a, b) => b[0] - a[0]);
   return e;
