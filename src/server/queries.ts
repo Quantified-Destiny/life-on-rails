@@ -8,7 +8,6 @@ import type {
   MetricAnswer,
   MetricMeasuresGoal,
   MetricTag,
-  ScoringFormat,
   Tag,
 } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
@@ -80,31 +79,34 @@ export async function getHabitsWithMetricsMap({
     },
   });
   const habitScores = new Map<string, number>(
-    habitCompletions.map((it) => {
-      const habit = habitsMap.get(it.habitId)!;
-      const normalizedFrequency =
-        habit.frequencyHorizon == FrequencyHorizon.WEEK
-          ? habit.frequency
-          : habit.frequency * 7;
-      const maxCompletionCount = normalizedFrequency * scoringWeeks;
-      const completionScore = it._count._all / maxCompletionCount;
+    habitCompletions
+      .filter((it) => habitsMap.has(it.habitId))
+      .map((it) => {
+        const habit = habitsMap.get(it.habitId)!;
 
-      const metricsScore = avg(
-        habit.metrics.map((m) => metricsMap.get(m.metricId)!.score)
-      );
+        const normalizedFrequency =
+          habit.frequencyHorizon == FrequencyHorizon.WEEK
+            ? habit.frequency
+            : habit.frequency * 7;
+        const maxCompletionCount = normalizedFrequency * scoringWeeks;
+        const completionScore = it._count._all / maxCompletionCount;
 
-      const score =
-        habit.completionWeight * completionScore +
-        (1 - habit.completionWeight) * metricsScore;
+        const metricsScore = avg(
+          habit.metrics.map((m) => metricsMap.get(m.metricId)!.score)
+        );
 
-      return [it.habitId, score];
-    })
+        const score =
+          habit.completionWeight * completionScore +
+          (1 - habit.completionWeight) * metricsScore;
+
+        return [it.habitId, score];
+      })
   );
   const expandedHabits = habits.map((h) => ({
     ...h,
     score: habitScores.get(h.id) ?? 0,
     goals: h.goals
-      .filter((it) => it.goal.archived == false)
+      .filter((it) => it.goal && it.goal.archived == false)
       .map((it) => it.goalId),
     tags: h.HabitTag.map((it) => it.tag.name),
     metrics: h.metrics.map((it) => metricsMap.get(it.metricId)!),
@@ -393,7 +395,7 @@ export async function getGoals(
 
     return {
       goal: { ...g, score, tags: g.tags.map((it) => it.tag.name) },
-      habits: linkedHabits.filter((it) => it.archived === false),
+      habits: linkedHabits.filter((it) => it && it.archived === false),
       metrics: g.metrics.map((m) => ({
         ...metricsMap.get(m.metricId)!,
       })),
