@@ -1,14 +1,18 @@
-import type { Metric, Goal, Habit } from "@prisma/client";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import type { Metric } from "@prisma/client";
 import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
-let rawdata = {
+const templateMetadata = {
   fitness: {
     goal: "Improve cardiovascular health and endurance",
     habits: [
       {
         description: "1 hour of cardio exercise (running, cycling, swimming)",
-        linkedmetrics: [{ name: "Rate your perceived exertion level during each cardio session"}],
+        linkedmetrics: [
+          {
+            name: "Rate your perceived exertion level during each cardio session",
+          },
+        ],
       },
     ],
     metrics: [
@@ -18,38 +22,47 @@ let rawdata = {
     ],
   },
   productivity: {
-    goal: "Enhance focus and time management skills", 
+    goal: "Enhance focus and time management skills",
     habits: [
-        {description: "Time blocking for focused work periods.", 
-        linkedmetrics: [{ name: "Rate your level of focus and productivity"}]}
+      {
+        description: "Time blocking for focused work periods.",
+        linkedmetrics: [{ name: "Rate your level of focus and productivity" }],
+      },
     ],
-    metrics:[
-        {
-            prompt: "Rate your ability to stick to the scheduled time blocks",
-        },
-    ]
+    metrics: [
+      {
+        prompt: "Rate your ability to stick to the scheduled time blocks",
+      },
+    ],
   },
   peace: {
-    goal: "Cultivate daily mindfulness and reduce stress.", 
+    goal: "Cultivate daily mindfulness and reduce stress.",
     habits: [
-        {description: "Mindful breathing exercises", 
-        linkedmetrics: [{ name: "Rate your ability to maintain focus on your breath without distractions"}]}
+      {
+        description: "Mindful breathing exercises",
+        linkedmetrics: [
+          {
+            name: "Rate your ability to maintain focus on your breath without distractions",
+          },
+        ],
+      },
     ],
-    metrics:[
-        {
-            prompt: "Rate your level of relaxation and peace of mind after each mindfulness practice"
-        },
-    ]
-  }
+    metrics: [
+      {
+        prompt:
+          "Rate your level of relaxation and peace of mind after each mindfulness practice",
+      },
+    ],
+  },
 };
 
-let data = new Map(Object.entries(rawdata));
+const data = new Map(Object.entries(templateMetadata));
 
 export const templateRouter = createTRPCRouter({
   createFromTemplate: protectedProcedure
     .input(z.object({ key: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      let createMeta = data.get(input.key)!;
+      const createMeta = data.get(input.key)!;
 
       const goal = await ctx.prisma.goal.create({
         data: {
@@ -58,60 +71,61 @@ export const templateRouter = createTRPCRouter({
         },
       });
 
-      createMeta.habits.forEach(async (habit) => {
-        const h = await ctx.prisma.habit.create({
+      createMeta.habits.map(async (habit) => {
+        const createdHabit = await ctx.prisma.habit.create({
           data: {
             description: habit.description,
             ownerId: ctx.session.user.id,
           },
         });
-        await ctx.prisma.habitMeasuresGoal.create({
+        void ctx.prisma.habitMeasuresGoal.create({
           data: {
             goalId: goal.id,
-            habitId: h.id,
+            habitId: createdHabit.id,
           },
         });
 
-        habit.linkedmetrics.forEach(async (linkedmetric) => {
-            const format = await ctx.prisma.answerFormat.create({
-                data: { format: "FIVE_POINT" },
-              });
+        habit.linkedmetrics.map(async (linkedmetric) => {
+          const format = await ctx.prisma.answerFormat.create({
+            data: { format: "FIVE_POINT" },
+          });
 
-            const m: Metric = await ctx.prisma.metric.create({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const createdMetric: Metric = await ctx.prisma.metric.create({
             data: {
-                prompt: linkedmetric.name,
-                ownerId: ctx.session.user.id,
-                formatId: format.id,
-            }
-            });  
-            await ctx.prisma.linkedMetric.create({
-                data: {
-                  metricId: m.id,
-                  habitId: h.id,
-                },
-            });
+              prompt: linkedmetric.name,
+              ownerId: ctx.session.user.id,
+              formatId: format.id,
+            },
+          });
+          return ctx.prisma.linkedMetric.create({
+            data: {
+              metricId: createdMetric.id,
+              habitId: createdHabit.id,
+            },
+          });
         });
       }); // end habits
 
-      createMeta.metrics.forEach(async (metric) => {
+      createMeta.metrics.map(async (metric) => {
         const format = await ctx.prisma.answerFormat.create({
           data: { format: "FIVE_POINT" },
         });
-        const m = await ctx.prisma.metric.create({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const m: Metric = await ctx.prisma.metric.create({
           data: {
             prompt: metric.prompt,
             ownerId: ctx.session.user.id,
             formatId: format.id,
-          }
-        });  
+          },
+        });
 
-        await ctx.prisma.metricMeasuresGoal.create({
-            data: {
-              metricId: m.id,
-              goalId: goal.id,
-            },
-          });
-      })
-      
+        return ctx.prisma.metricMeasuresGoal.create({
+          data: {
+            metricId: m.id,
+            goalId: goal.id,
+          },
+        });
+      });
     }),
 });
