@@ -275,13 +275,15 @@ export async function getMetrics({
       : undefined,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const metrics: (Metric & {
+  type MetricsType = (Metric & {
     completionMetric: LinkedMetric[];
-    MetricTag: (MetricTag & { tag: Tag })[];
+    tags: (MetricTag & { tag: Tag })[];
     goals: (MetricMeasuresGoal & { goal: Goal })[];
     metricAnswers: MetricAnswer[];
-  })[] = await prisma.metric.findMany({
+  })[];
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const metrics: MetricsType = await prisma.metric.findMany({
     where: {
       ownerId: userId,
       ...whereConditions,
@@ -318,14 +320,16 @@ export async function getMetrics({
     ])
   );
 
+  console.log(metrics);
   const expandedMetrics = metrics.map((m) => ({
     ...m,
     linkedHabits: m.completionMetric.map((it) => it.habitId),
-    tags: m.MetricTag.map((mt) => mt.tag),
+    tags: m.tags.map((mt) => mt.tag),
     goals: m.goals.map((g) => g.goal),
     score: metricScores.get(m.id) ?? 0,
     value: m.metricAnswers[0]?.value ?? 0,
   }));
+  console.log("ahodnlaskndanoiadshofihefl");
 
   const metricsMap = new Map<string, ExpandedMetric>();
   expandedMetrics.forEach((m) => {
