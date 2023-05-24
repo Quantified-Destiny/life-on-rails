@@ -27,6 +27,7 @@ import {
   TooltipTrigger,
 } from "../components/ui/tooltip";
 import type { ExpandedHabit, ExpandedMetric } from "../server/queries";
+import { textcolor } from "../components/overview/lib";
 
 function Status({
   completion: { status, action },
@@ -261,7 +262,7 @@ const Row = ({
         )}
       </td>
       <td className="pl-2">
-        <div className="w-full text-center text-sm">{score.toFixed(1)}</div>
+        <div className={classNames("w-full text-center text-sm", textcolor(score))}>{score.toFixed(2)}</div>
       </td>
       <td className="">
         <div className="flex items-center pl-2">

@@ -12,6 +12,8 @@ import type {
 import { api } from "../../utils/api";
 import { GoalSheet } from "./goal-panel";
 import { LinkedMetric } from "./metrics";
+import classNames from "classnames";
+import { textcolor } from "./lib";
 
 function min(a: number, b: number) {
   return (a<b ? a : b);
@@ -51,7 +53,10 @@ export function GoalCard({
         ></EditableField>
       </div>
       <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
-        <span className="h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl text-yellow-500">
+        <span className={classNames(
+            "h-fit w-fit rounded-lg bg-yellow-300 bg-opacity-20 font-semibold  p-2 text-xl",
+            textcolor(score)
+          )}>
           {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
         </span>
         <GoalSheet goalId={id} score={score} scoringUnit={scoringUnit}>
