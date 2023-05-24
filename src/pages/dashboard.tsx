@@ -6,6 +6,10 @@ import type {
 } from "../server/queries";
 import { ScoringFormat } from "@prisma/client";
 import { api } from "../utils/api";
+import DonutChart from "react-donut-chart";
+import { PieChart, pieChartDefaultProps } from 'react-minimal-pie-chart';
+import { useState } from "react";
+
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -88,33 +92,58 @@ function StatsCardRow({
     }
   }
 
+  const goalData = [
+    { title: 'Good', value: greenGoal, color: '#21C55D' },
+    { title: 'OK', value: yellowGoal, color: '#EAB305' },
+    { title: 'Bad', value: redGoal, color: '#EF4444' },
+  ];
+
+  const habitData = [
+    { title: 'Good', value: greenHabit, color: '#21C55D' },
+    { title: 'OK', value: yellowHabit, color: '#EAB305' },
+    { title: 'Bad', value: redHabit, color: '#EF4444' },
+  ];
+
+  const metricsData = [
+    { title: 'Good', value: greenMetric, color: '#21C55D' },
+    { title: 'OK', value: yellowMetric, color: '#EAB305' },
+    { title: 'Bad', value: redMetric, color: '#EF4444' },
+  ];
+
   return (
     <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
-        <div className="relative flex flex-1 flex-col rounded-xl text-gray-700 shadow-md items-center">
-          <div className="rounded-t-xl bg-indigo-800 p-4 text-left text-2xl text-white">
+      <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
+          <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
             Goals
           </div>
-          <div className="flex w-2/3 flex-col content-stretch justify-left rounded-b-xl border-2  border-indigo-800 p-1 text-left">
-            <span>
-              {greenGoal}
-              <span className="m-1 rounded-sm p-4 font-semibold text-green-500 ">
-                okay
-              </span>
+          <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
+          <PieChart
+              style={{
+                fontSize: '8px',
+              }}
+              data={goalData}
+              radius={pieChartDefaultProps.radius - 6}
+              lineWidth={60}
+              // segmentsStyle={{ transition: 'stroke .3s', cursor: 'pointer' }}
+              animate
+              label={({ dataEntry }) => (dataEntry.value === 0 ? "" : Math.round(dataEntry.value))}
+              labelPosition={100 - 60 / 2}
+              labelStyle={{
+                fill: '#fff',
+                opacity: 1,
+                pointerEvents: 'none',
+              }}
+            />
+            {/* <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
+              {greenHabit}
             </span>
-            <span>
-              {yellowGoal}
-              <span className="m-1 rounded-sm p-4 font-semibold text-yellow-500">
-                at risk
-              </span>
+            <span className="m-1 flex-1 rounded-sm bg-yellow-500 p-4 font-semibold text-white">
+              {yellowHabit}
             </span>
-
-            <span>
-              {redGoal}
-              <span className="m-1 rounded-sm p-4 font-semibold text-red-500 ">
-                off the rails
-              </span>
-            </span>
+            <span className="m-1 flex-1 rounded-sm bg-red-500 p-4 font-semibold text-white">
+              {redHabit}
+            </span> */}
           </div>
         </div>
 
@@ -123,7 +152,24 @@ function StatsCardRow({
             Habits
           </div>
           <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
-            <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
+          <PieChart
+              style={{
+                fontSize: '8px',
+              }}
+              data={habitData}
+              radius={pieChartDefaultProps.radius - 6}
+              lineWidth={60}
+              // segmentsStyle={{ transition: 'stroke .3s', cursor: 'pointer' }}
+              animate
+              label={({ dataEntry }) => (dataEntry.value === 0 ? "" : Math.round(dataEntry.value))}
+              labelPosition={100 - 60 / 2}
+              labelStyle={{
+                fill: '#fff',
+                opacity: 1,
+                pointerEvents: 'none',
+              }}
+            />
+            {/* <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
               {greenHabit}
             </span>
             <span className="m-1 flex-1 rounded-sm bg-yellow-500 p-4 font-semibold text-white">
@@ -131,14 +177,14 @@ function StatsCardRow({
             </span>
             <span className="m-1 flex-1 rounded-sm bg-red-500 p-4 font-semibold text-white">
               {redHabit}
-            </span>
+            </span> */}
           </div>
         </div>
         <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
           <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
             Metrics
           </div>
-          <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
+          {/* <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center">
             <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
               {greenMetric}
             </span>
@@ -148,6 +194,25 @@ function StatsCardRow({
             <span className="m-1 flex-1 rounded-sm bg-red-500 p-4 font-semibold text-white">
               {redMetric}
             </span>
+          </div> */}
+          <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center rounded-b-xl border-2 border-indigo-800">
+            <PieChart
+              style={{
+                fontSize: '8px',
+              }}
+              data={metricsData}
+              radius={pieChartDefaultProps.radius - 6}
+              lineWidth={60}
+              // segmentsStyle={{ transition: 'stroke .3s', cursor: 'pointer' }}
+              animate
+              label={({ dataEntry }) => (dataEntry.value === 0 ? "" : Math.round(dataEntry.value))}
+              labelPosition={100 - 60 / 2}
+              labelStyle={{
+                fill: '#fff',
+                opacity: 1,
+                pointerEvents: 'none',
+              }}
+            />
           </div>
         </div>
       </div>
