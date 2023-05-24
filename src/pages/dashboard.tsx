@@ -6,10 +6,7 @@ import type {
 } from "../server/queries";
 import { ScoringFormat } from "@prisma/client";
 import { api } from "../utils/api";
-import DonutChart from "react-donut-chart";
 import { PieChart, pieChartDefaultProps } from 'react-minimal-pie-chart';
-import { useState } from "react";
-
 
 function min(a: number, b: number) {
   return a < b ? a : b;
