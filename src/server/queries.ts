@@ -320,7 +320,6 @@ export async function getMetrics({
     ])
   );
 
-  console.log(metrics);
   const expandedMetrics = metrics.map((m) => ({
     ...m,
     linkedHabits: m.completionMetric.map((it) => it.habitId),
@@ -340,7 +339,7 @@ export async function getMetrics({
 }
 
 export interface ExpandedGoal extends Goal {
-  tags: string[];
+  tags: Tag[];
   score: number;
 }
 
@@ -398,7 +397,7 @@ export async function getGoals(
     const linkedHabits = g.habits.map((h) => habitsMap.get(h.habitId)!);
 
     return {
-      goal: { ...g, score, tags: g.tags.map((it) => it.tag.name) },
+      goal: { ...g, score, tags: g.tags.map((it) => it.tag) },
       habits: linkedHabits.filter((it) => it && it.archived === false),
       metrics: g.metrics.map((m) => ({
         ...metricsMap.get(m.metricId)!,

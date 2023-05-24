@@ -1,6 +1,7 @@
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import type { Metric } from "@prisma/client";
 import { ScoringFormat } from "@prisma/client";
+import { TbSquareRoundedLetterG } from "react-icons/tb";
 import { EditableField } from "../../components/inlineEdit";
 import { HabitCard } from "../../components/overview/habits";
 import type {
@@ -11,7 +12,6 @@ import type {
 import { api } from "../../utils/api";
 import { GoalSheet } from "./goal-panel";
 import { LinkedMetric } from "./metrics";
-import { TbSquareRoundedLetterG, TbSquareRoundedLetterH } from "react-icons/tb";
 
 function min(a: number, b: number) {
   return (a<b ? a : b);

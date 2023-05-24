@@ -2,45 +2,57 @@ import { MinusCircleIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { api } from "../../utils/api";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Button } from "../ui/button";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "../ui/command";
+import { cn } from "../../lib/utils";
 
 export function CreateTag({ commit }: { commit: (name: string) => void }) {
-  const [active, setActive] = useState<boolean>(false);
-  const [text, setText] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const tagsQuery = api.tags.getTags.useQuery();
+  const context = api.useContext();
+  const tags = tagsQuery.data ?? [];
+
   return (
-    <div
-      className="cursor-pointer rounded-r-full bg-gray-200  text-xs hover:bg-gray-200"
-      onClick={() => setActive(true)}
-    >
-      {active ? (
-        <input
-          autoFocus
-          type="text"
-          value={text}
-          className="h-4 rounded-r-full bg-gray-100 text-xs"
-          onBlur={() => setActive(false)}
-          onChange={(event) => {
-            setText(event.target.value);
-          }}
-          onKeyDown={(event) => {
-            if (event.key == "Enter") {
-              console.log(text);
-              commit(text);
-              setActive(false);
-            } else if (event.key == "Escape") {
-              setText("");
-              setActive(false);
-            }
-          }}
-        ></input>
-      ) : (
-        <span className="w-content group flex h-4 flex-row items-center gap-1">
-          <PlusIcon className="h-4 w-4"></PlusIcon>
-          <span className="hidden whitespace-nowrap group-hover:inline-block">
-            New Tag
-          </span>
-        </span>
-      )}
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="px-4 py-2"
+        >
+          <Plus className="h-4 w-4"></Plus>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandInput placeholder="Search framework..." />
+          <CommandEmpty>No framework found.</CommandEmpty>
+          <CommandGroup>
+            {tags.map((tag) => (
+              <CommandItem
+                key={tag.name}
+                onSelect={(currentValue) => {
+                  commit(currentValue);
+                  void context.tags.getTags.invalidate();
+                  setOpen(false);
+                }}
+              >
+                {tag.name}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -54,9 +66,9 @@ export function TagList(props: {
       {props.tags.map((tag) => (
         <div
           key={tag}
-          className="hover:bg-slate:300 flex flex-row flex-nowrap items-center rounded-r-full bg-slate-200"
+          className="hover:bg-slate:300 flex flex-row flex-nowrap items-center gap-3 bg-slate-200 px-4 py-2"
         >
-          <span className="h-4 text-xs">{tag}</span>
+          <span className="h-4 text-sm">{tag}</span>
           <button
             className="h-6 w-6 hover:stroke-red-300"
             onClick={() => props.unlink(tag)}
@@ -73,6 +85,8 @@ export function TagList(props: {
 export function GoalTagList({ goalId }: { goalId: string }) {
   const context = api.useContext();
 
+  const tagsQuery = api.goals.getTags.useQuery({ goalId });
+
   const linkGoal = api.tags.linkGoal.useMutation({
     onSettled: () => {
       void context.goals.getAllGoals.invalidate();
@@ -84,31 +98,11 @@ export function GoalTagList({ goalId }: { goalId: string }) {
     },
   });
 
-  const tagsQuery = api.goals.getTags.useQuery({ goalId: goalId });
-
-  const tags = tagsQuery.data ?? [];
-
   return (
-    <div className="flex items-center space-x-2 pt-2">
-      {tags.map((tag) => (
-        <div
-          key={tag.name}
-          className="hover:bg-slate:300 flex flex-row flex-nowrap items-center rounded-r-full bg-slate-200"
-        >
-          <span className="h-4 text-xs">{tag.name}</span>
-          <button
-            className="h-6 w-6 hover:stroke-red-300"
-            onClick={() =>
-              unlinkGoal.mutate({ goalId: goalId, tagName: tag.name })
-            }
-          >
-            <MinusCircleIcon></MinusCircleIcon>
-          </button>
-        </div>
-      ))}
-      <CreateTag
-        commit={(name) => linkGoal.mutate({ goalId: goalId, tagName: name })}
-      ></CreateTag>
-    </div>
+    <TagList
+      tags={tagsQuery.data?.map((it) => it.name) ?? []}
+      link={(tag) => linkGoal.mutate({ goalId, tagName: tag })}
+      unlink={(tag) => unlinkGoal.mutate({ goalId, tagName: tag })}
+    ></TagList>
   );
 }

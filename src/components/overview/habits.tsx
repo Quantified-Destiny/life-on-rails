@@ -455,10 +455,6 @@ export function HabitCard({
 
   const classes = v({ variant: linkedGoal ? "linked" : "freestanding" });
 
-  // const classes = linkedGoal
-  //   ? "rounded-sm p-6 shadow-md"
-  //   : "rounded-lg bg-white p-6 shadow-md";
-
   return (
     <>
       <HabitHeaderLineGrid

@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import type { Tag } from "@prisma/client";
+import { Check, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import {
   TbSquareRoundedLetterG,
   TbSquareRoundedLetterH,
   TbSquareRoundedLetterM,
 } from "react-icons/tb";
 import { CreateMenu } from "../components/createMenu";
-import { EllipsisIcon } from "../components/icons";
 import { GoalCard } from "../components/overview/goals";
 import { HabitCard } from "../components/overview/habits";
 import { LinkedMetric } from "../components/overview/metrics";
@@ -18,7 +20,22 @@ import {
   AccordionTrigger,
 } from "../components/ui/accordion";
 import { Button } from "../components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "../components/ui/command";
+import { Label } from "../components/ui/label";
 import { Loader } from "../components/ui/loader";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../components/ui/popover";
+import { cn } from "../lib/utils";
+import type { RouterOutputs } from "../utils/api";
 import { api } from "../utils/api";
 
 function ArchivedItems() {
@@ -126,7 +143,94 @@ function ArchivedItems() {
   );
 }
 
-function Header() {
+function ConfigureOverview({
+  filters,
+  setFilters,
+}: {
+  filters: Filters | undefined;
+  setFilters: (filters: Filters) => void;
+}) {
+  const tagsQuery = api.tags.getTags.useQuery();
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+  if (!tagsQuery.data) {
+    return (
+      <div className="mx-auto w-full text-center">
+        <div className="mb-4">
+          <h4 className="font-semibold uppercase leading-none">Configure</h4>
+        </div>
+        <div className="">
+          <div className="flex flex-row items-center gap-4">
+            <Label className="text-sm uppercase text-gray-500">Tags</Label>
+            <div>
+              <Loader></Loader>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="mx-auto w-full text-center">
+      <div className="mb-4">
+        <h4 className="font-semibold uppercase leading-none">Configure</h4>
+      </div>
+      <div className="">
+        <div className="flex flex-row items-center gap-4">
+          <Label className="text-sm uppercase text-gray-500">Tags</Label>
+          <div className="flex flex-row items-center gap-2">
+            {filters?.tags.map((tag) => (
+              <span key={tag} className="rounded-lg bg-gray-200">
+                {tag}
+              </span>
+            ))}
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="secondary">Add a tag</Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <Command>
+                  <CommandInput placeholder="Pick a tag..." />
+                  <CommandEmpty>No tag found.</CommandEmpty>
+                  <CommandGroup>
+                    {tagsQuery.data.map((tag) => (
+                      <CommandItem
+                        key={tag.name}
+                        onSelect={(currentValue) => {
+                          setValue(currentValue === value ? "" : currentValue);
+                          setFilters({
+                            tags: [...(filters?.tags ?? []), currentValue],
+                          });
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            value === tag.name ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {tag.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Header({
+  filters,
+  setFilters,
+}: {
+  filters: Filters | undefined;
+  setFilters: (filters: Filters) => void;
+}) {
   return (
     <>
       <div className="mb-2 flex w-full items-center justify-between">
@@ -136,31 +240,19 @@ function Header() {
           </h1>
         </div>
         <div className="flex">
-          <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
-            Filter
-          </button>
-          <button className="rounded px-2 py-2 text-gray-500 hover:bg-gray-200">
-            Sort
-          </button>
-          <button className="rounded px-2 py-2 hover:bg-gray-200">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.7}
-              stroke="currentColor"
-              className="h-6 w-6 stroke-gray-400"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
-            </svg>
-          </button>
           <CreateMenu></CreateMenu>
-          <button className="rounded stroke-gray-500 px-2 py-2 hover:bg-gray-200">
-            <EllipsisIcon></EllipsisIcon>
+          <button className="rounded px-2 py-2 hover:bg-gray-200">
+            <Popover>
+              <PopoverTrigger asChild>
+                <SlidersHorizontal className="fill-gray-500 stroke-gray-500" />
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <ConfigureOverview
+                  filters={filters}
+                  setFilters={setFilters}
+                ></ConfigureOverview>
+              </PopoverContent>
+            </Popover>
           </button>
         </div>
       </div>
@@ -175,18 +267,56 @@ function Header() {
   );
 }
 
+type Filters = {
+  tags: string[];
+};
+
+function filteredData(
+  data: RouterOutputs["goals"]["getAllGoals"],
+  filters: Filters | undefined
+) {
+  if (!filters) return data;
+  const selectedTags = new Set(filters.tags);
+
+  const goals = data.goals.filter(
+    (goal) =>
+      goal.goal.tags.some((tag) => selectedTags.has(tag.name)) ||
+      goal.habits.some((habit) =>
+        habit.tags.some((tag) => selectedTags.has(tag))
+      ) ||
+      goal.metrics.some((metric) =>
+        metric.tags.some((tag) => selectedTags.has(tag.name))
+      )
+  );
+  const habits = data.habits.filter((it) =>
+    it.tags.some((tag) => selectedTags.has(tag))
+  );
+  const metrics = data.metrics.filter((it) =>
+    it.tags.some((tag) => selectedTags.has(tag.name))
+  );
+  console.log(data.habits);
+  console.log(selectedTags);
+  return {
+    goals,
+    habits,
+    metrics,
+  };
+}
+
 function OverviewPage() {
+  const [filters, setFilters] = useState<Filters>();
   const goalsQuery = api.goals.getAllGoals.useQuery();
   const profileQuery = api.profile.getProfile.useQuery();
   if (goalsQuery.isLoading || profileQuery.isLoading) return <Loader></Loader>;
   if (goalsQuery.isError || profileQuery.isError) return <p>Query error</p>;
 
-  const data = goalsQuery.data;
+  const data = filteredData(goalsQuery.data, filters);
   const user = profileQuery.data;
+  console.log(data);
   return (
     <div className="container max-w-4xl">
       <div className="mb-10 scrollbar-none">
-        <Header></Header>
+        <Header filters={filters} setFilters={setFilters}></Header>
         <div className="mx-auto mt-3 grid grid-cols-2 items-center gap-2 p-6 ">
           {data.goals.map((goal) => (
             <GoalCard

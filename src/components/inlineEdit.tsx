@@ -1,7 +1,8 @@
 import type { FrequencyHorizon } from "@prisma/client";
-import type { BaseSyntheticEvent, ChangeEvent, KeyboardEvent } from "react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 
 export const useInlineEdit = ({
@@ -100,7 +101,11 @@ export const EditableField = ({
       {...triggerProps}
     >
       {isActive ? (
-        <input {...editProps} autoFocus className={className} />
+        <input
+          {...editProps}
+          autoFocus
+          className={cn(className, "overflow-ellipsis")}
+        />
       ) : (
         <>
           <span className={className}>{initialText}</span>
