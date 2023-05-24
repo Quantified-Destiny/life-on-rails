@@ -146,11 +146,11 @@ function ConfigureOverview({
   setFilters,
 }: {
   filters: Filters | undefined;
-  setFilters: (filters: Filters) => void;
+  setFilters: (filters: Filters | undefined) => void;
 }) {
   const tagsQuery = api.tags.getTags.useQuery();
   const [open, setOpen] = useState(false);
-  
+
   if (!tagsQuery.data) {
     return (
       <div className="mx-auto w-full text-center">
@@ -192,9 +192,11 @@ function ConfigureOverview({
                     placeholder="Pick a tag..."
                     onKeyDown={(it) => {
                       if (it.key === "Enter") {
-
                         setFilters({
-                          tags: [...(filters?.tags ?? []), it.currentTarget.value],
+                          tags: [
+                            ...(filters?.tags ?? []),
+                            it.currentTarget.value,
+                          ],
                         });
                         setOpen(false);
                       }
@@ -222,6 +224,19 @@ function ConfigureOverview({
           </div>
         </div>
       </div>
+      {filters && (
+        <div className="mt-6">
+          <Button
+            variant="link"
+            onClick={() => {
+              setFilters(undefined);
+              setOpen(false);
+            }}
+          >
+            Clear all filters
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -231,7 +246,7 @@ function Header({
   setFilters,
 }: {
   filters: Filters | undefined;
-  setFilters: (filters: Filters) => void;
+  setFilters: (filters: Filters | undefined) => void;
 }) {
   return (
     <>
