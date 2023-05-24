@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import type { Tag } from "@prisma/client";
-import { Check, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -34,7 +33,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../components/ui/popover";
-import { cn } from "../lib/utils";
 import type { RouterOutputs } from "../utils/api";
 import { api } from "../utils/api";
 
@@ -152,7 +150,7 @@ function ConfigureOverview({
 }) {
   const tagsQuery = api.tags.getTags.useQuery();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  
   if (!tagsQuery.data) {
     return (
       <div className="mx-auto w-full text-center">
@@ -190,26 +188,30 @@ function ConfigureOverview({
               </PopoverTrigger>
               <PopoverContent>
                 <Command>
-                  <CommandInput placeholder="Pick a tag..." />
+                  <CommandInput
+                    placeholder="Pick a tag..."
+                    onKeyDown={(it) => {
+                      if (it.key === "Enter") {
+
+                        setFilters({
+                          tags: [...(filters?.tags ?? []), it.currentTarget.value],
+                        });
+                        setOpen(false);
+                      }
+                    }}
+                  />
                   <CommandEmpty>No tag found.</CommandEmpty>
                   <CommandGroup>
                     {tagsQuery.data.map((tag) => (
                       <CommandItem
                         key={tag.name}
                         onSelect={(currentValue) => {
-                          setValue(currentValue === value ? "" : currentValue);
                           setFilters({
                             tags: [...(filters?.tags ?? []), currentValue],
                           });
                           setOpen(false);
                         }}
                       >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            value === tag.name ? "opacity-100" : "opacity-0"
-                          )}
-                        />
                         {tag.name}
                       </CommandItem>
                     ))}

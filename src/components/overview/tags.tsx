@@ -1,10 +1,8 @@
 import { MinusCircleIcon } from "@heroicons/react/24/outline";
-import { PlusIcon } from "@heroicons/react/24/solid";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { api } from "../../utils/api";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -12,10 +10,11 @@ import {
   CommandInput,
   CommandItem,
 } from "../ui/command";
-import { cn } from "../../lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 export function CreateTag({ commit }: { commit: (name: string) => void }) {
   const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
   const tagsQuery = api.tags.getTags.useQuery();
   const context = api.useContext();
   const tags = tagsQuery.data ?? [];
@@ -34,14 +33,18 @@ export function CreateTag({ commit }: { commit: (name: string) => void }) {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
-          <CommandEmpty>No framework found.</CommandEmpty>
+          <CommandInput
+            placeholder="Pick a tag..."
+            value={value}
+            onValueChange={setValue}
+          />
+          <CommandEmpty>Create tag</CommandEmpty>
           <CommandGroup>
             {tags.map((tag) => (
               <CommandItem
                 key={tag.name}
-                onSelect={(currentValue) => {
-                  commit(currentValue);
+                onSelect={() => {
+                  commit(tag.name);
                   void context.tags.getTags.invalidate();
                   setOpen(false);
                 }}
@@ -50,6 +53,19 @@ export function CreateTag({ commit }: { commit: (name: string) => void }) {
               </CommandItem>
             ))}
           </CommandGroup>
+          {value != "" && (
+            <CommandGroup>
+              <CommandItem
+                onSelect={() => {
+                  commit(value);
+                  void context.tags.getTags.invalidate();
+                  setOpen(false);
+                }}
+              >
+                {value} (create)
+              </CommandItem>
+            </CommandGroup>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
