@@ -29,7 +29,7 @@ const GoalArchived = ({ event }: { event: GoalArchivedEvent }) => (
       Created on {event.date.toUTCString()} (active for{" "}
       {differenceInCalendarDays(event.date, event.created)} days)
     </p>
-    {JSON.stringify(event.habits)}
+    {/* {JSON.stringify(event.habits)} */}
     <div className="flex flex-col text-sm font-normal text-gray-500 dark:text-gray-400">
       <div className="flex flex-col">
         <div className="flex flex-row p-2">
@@ -52,7 +52,7 @@ const GoalArchived = ({ event }: { event: GoalArchivedEvent }) => (
 const GoalAdded = ({ event }: { event: GoalAddedEvent }) => (
   <div>
     <time className="mb text-sm font-normal text-gray-500 dark:text-gray-400">
-      {format(event.date, "h a")}
+      {format(event.date, "h:mm:ss a")}
     </time>
     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
       You created{" "}

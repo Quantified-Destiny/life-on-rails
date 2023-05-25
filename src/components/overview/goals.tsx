@@ -55,7 +55,7 @@ export function GoalCard({
       <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
         <span
           className={classNames(
-            "h-fit w-fit rounded-lg bg-yellow-300 bg-opacity-20 p-2  text-xl font-semibold",
+            "h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl font-semibold",
             textcolor(score)
           )}
         >
