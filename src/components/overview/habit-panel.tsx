@@ -32,7 +32,13 @@ import {
 } from "./habits";
 import { GoalSheet } from "./goal-panel";
 
-function GoalsSection({ habitId, scoringUnit }: { habitId: string; scoringUnit: ScoringFormat}) {
+function GoalsSection({
+  habitId,
+  scoringUnit,
+}: {
+  habitId: string;
+  scoringUnit: ScoringFormat;
+}) {
   const context = api.useContext();
   const unlinkGoalMutation = api.habits.unlinkHabit.useMutation({
     onSuccess() {
@@ -77,12 +83,12 @@ function GoalsSection({ habitId, scoringUnit }: { habitId: string; scoringUnit: 
                 >
                   Unlink
                 </Button>
-                <GoalSheet goalId={goal.id} score={0.6} scoringUnit={scoringUnit}>
-                <Button
-                 className="bg-gray-500"
+                <GoalSheet
+                  goalId={goal.id}
+                  score={0.6}
+                  scoringUnit={scoringUnit}
                 >
-                  Manage
-                </Button>
+                  <Button className="bg-gray-500">Manage</Button>
                 </GoalSheet>
               </div>
             </>
@@ -427,7 +433,7 @@ function HabitPanel({
           <AccordionItem value="goals">
             <AccordionTrigger>Goals</AccordionTrigger>
             <AccordionContent>
-              <GoalsSection habitId={habitId} scoringUnit={scoringUnit}/>
+              <GoalsSection habitId={habitId} scoringUnit={scoringUnit} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

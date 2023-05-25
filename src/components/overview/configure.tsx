@@ -1,12 +1,21 @@
 import { Label } from "@radix-ui/react-dropdown-menu";
-import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
-import { CommandInput, CommandEmpty, CommandGroup, CommandItem } from "../ui/command";
-import { Loader, Command } from "lucide-react";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@radix-ui/react-popover";
+import {
+  Command,
+  CommandInput,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "../ui/command";
+import { Loader } from "lucide-react";
 import { useState } from "react";
 import type { RouterOutputs } from "../../utils/api";
 import { api } from "../../utils/api";
 import { Button } from "../ui/button";
-
 
 export function ConfigureOverview({
   filters,
@@ -55,20 +64,7 @@ export function ConfigureOverview({
               </PopoverTrigger>
               <PopoverContent>
                 <Command>
-                  <CommandInput
-                    placeholder="Pick a tag..."
-                    onKeyDown={(it) => {
-                      if (it.key === "Enter") {
-                        setFilters({
-                          tags: [
-                            ...(filters?.tags ?? []),
-                            it.currentTarget.value,
-                          ],
-                        });
-                        setOpen(false);
-                      }
-                    }}
-                  />
+                  <CommandInput placeholder="Pick a tag..." />
                   <CommandEmpty>No tag found.</CommandEmpty>
                   <CommandGroup>
                     {tagsQuery.data.map((tag) => (
