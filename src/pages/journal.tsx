@@ -4,7 +4,7 @@ import TimePicker from "../components/time-picker";
 import { RxGear } from "react-icons/rx";
 import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 
-import type { ScoringFormat } from "@prisma/client";
+import { ScoringFormat } from "@prisma/client";
 import { FrequencyHorizon, Metric } from "@prisma/client";
 import classNames from "classnames";
 
@@ -28,6 +28,10 @@ import {
 } from "../components/ui/tooltip";
 import type { ExpandedHabit, ExpandedMetric } from "../server/queries";
 import { textcolor } from "../components/overview/lib";
+
+function min(a: number, b: number) {
+  return a < b ? a : b;
+}
 
 function Status({
   completion: { status, action },
@@ -262,7 +266,12 @@ const Row = ({
         )}
       </td>
       <td className="pl-2">
-        <div className={classNames("w-full text-center text-sm", textcolor(score))}>{score.toFixed(2)}</div>
+        <div className={classNames("w-full text-center text-sm", textcolor(score))}
+        >
+          {scoringUnit == ScoringFormat.Normalized
+            ? min(1, score).toFixed(2)
+            : (min(1, score) * 100).toFixed(2) + "%"}
+        </div>
       </td>
       <td className="">
         <div className="flex items-center pl-2">
