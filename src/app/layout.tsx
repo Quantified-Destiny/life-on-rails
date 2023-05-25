@@ -39,6 +39,9 @@ const TopNav = () => {
 function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <title>Life on Rails</title>
+      </head>
       <body className="relative">
         <div className="flex flex-col">
           <TopNav></TopNav>

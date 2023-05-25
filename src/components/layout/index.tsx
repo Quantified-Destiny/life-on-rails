@@ -23,6 +23,7 @@ import {
 import classNames from "classnames";
 import type { LucideIcon } from "lucide-react";
 import { useSidebarStore } from "./state";
+import Head from "next/head";
 
 interface MenuItem {
   name: string;
@@ -67,7 +68,7 @@ function Sidebar(props: {
             alt=""
             width="40"
             height="40"
-            className="cursor-pointer opacity-90 duration-100 bg-gray-100 rounded-lg"
+            className="cursor-pointer rounded-lg bg-gray-100 opacity-90 duration-100"
           />
         </Link>
         <h1 className={`origin-left text-white ${!props.open ? "hidden" : ""}`}>
@@ -175,6 +176,10 @@ function Layout({ children }: { children: ReactNode }) {
 
   return (
     <>
+      <Head>
+        <title>Life on Rails</title>
+      </Head>
+
       <Sidebar open={open} setOpen={setOpen} Menus={menus}></Sidebar>
       <div
         className={classNames("h-1 w-full", {
