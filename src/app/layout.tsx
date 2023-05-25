@@ -28,7 +28,7 @@ const TopNav = () => {
 
         <div className="relative flex items-center">
           <button className="rounded-full bg-gray-500 px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-black/20">
-            <Link href="/newjournal">Go to app</Link>
+            <Link href="/journal">Go to app</Link>
           </button>
         </div>
       </div>
