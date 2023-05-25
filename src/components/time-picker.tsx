@@ -1,21 +1,11 @@
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// fixes zoomed in icons
-import "@fortawesome/fontawesome-svg-core/styles.css";
-
 import { addDays, subDays } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import dynamic from "next/dynamic";
 import "react-datepicker/dist/react-datepicker.css";
 //import DatePicker from "react-datepicker";
 // defer loading the date picker js
 const DatePicker = dynamic(() => import("react-datepicker"), { ssr: false });
-
-const LeftChevron = () => <FontAwesomeIcon icon={faChevronLeft} />;
-const RightChevron = () => <FontAwesomeIcon icon={faChevronRight} />;
 
 interface TimePickerProps {
   date: Date;
@@ -46,13 +36,13 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
     >
       <div id="selector-controls" className="flex items-center">
         <button onClick={handlePrevDay} className="bg-white bg-opacity-20 px-2">
-          <LeftChevron></LeftChevron>
+          <ChevronLeft></ChevronLeft>
         </button>
         <DatePicker
           selected={date}
           onChange={(date) => date instanceof Date && setDate(date)}
           maxDate={maxDate}
-          className="text-center w-60"
+          className="w-60 text-center"
           dateFormat="EEEE, MMMM dd, yyyy"
         />
 
@@ -63,10 +53,9 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
           }`}
           disabled={date >= maxDate}
         >
-          <FontAwesomeIcon
-            icon={faChevronRight}
-            color={date >= maxDate ? "#ccc" : "#000"}
-          />
+          <ChevronRight
+            className={date >= maxDate ? "fill-[#ccc]" : "fill-[#000]"}
+          ></ChevronRight>
         </button>
       </div>
     </div>
