@@ -607,7 +607,7 @@ const AuthShowcase: React.FC = () => {
 
   const session = useSession();
   if (session.status == "authenticated") {
-    void router.push("/newjournal");
+    void router.push("/journal");
   }
 
   return (
