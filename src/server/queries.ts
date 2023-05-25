@@ -354,7 +354,7 @@ export async function getGoals(
   userId: string,
   metricsMap: Map<string, ExpandedMetric>,
   habitsMap: Map<string, ExpandedHabit>
-): Promise<GoalsReturnType[]> {
+): Promise<[GoalsReturnType[], Map<string, GoalsReturnType>]> {
   const goals = await prisma.goal.findMany({
     where: {
       ownerId: userId,
@@ -404,7 +404,11 @@ export async function getGoals(
       })),
     };
   });
-  return goalsData;
+  const goalsMap = new Map<string, GoalsReturnType>();
+  goalsData.forEach((g) => {
+    goalsMap.set(g.goal.id, g);
+  });
+  return [goalsData, goalsMap];
 }
 
 export async function getScoringWeeks(

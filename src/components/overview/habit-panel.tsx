@@ -46,13 +46,15 @@ function GoalsSection({
     },
   });
   const goalQuery = api.habits.getGoals.useQuery({ habitId: habitId });
+  const goalMapQuery = api.goals.getAllGoals.useQuery();
 
-  if (goalQuery.isError) {
+  if (goalQuery.isError || goalMapQuery.isError) {
     return <p>ERROR</p>;
   }
-  if (goalQuery.isLoading) {
+  if (goalQuery.isLoading || goalMapQuery.isLoading) {
     return <p>LOADING</p>;
   }
+  const goalsMap = goalMapQuery.data.goalsMap;
 
   return (
     <>
@@ -85,7 +87,7 @@ function GoalsSection({
                 </Button>
                 <GoalSheet
                   goalId={goal.id}
-                  score={0.6}
+                  score={goalsMap.get(goal.id)?.goal.score ?? 0}
                   scoringUnit={scoringUnit}
                 >
                   <Button className="bg-gray-500">Manage</Button>

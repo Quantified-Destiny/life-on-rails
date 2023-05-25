@@ -187,6 +187,7 @@ function _HabitsPage({ id }: { id: string }) {
   const maxDate = calendarData.reduce(function (a, b) {
     return a > b ? a : b;
   });
+  const goalsMap = allItemQuery.data.goalsMap;
 
   return (
     <>
@@ -429,7 +430,7 @@ function _HabitsPage({ id }: { id: string }) {
               <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
                 <ScorePill
                   scoringUnit={profileQuery.data.scoringUnit}
-                  score={0.3}
+                  score={goalsMap.get(goal.id)?.goal.score ?? 0}
                 ></ScorePill>
                 <Dropdown
                   options={[
