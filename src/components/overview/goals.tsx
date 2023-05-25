@@ -16,7 +16,7 @@ import classNames from "classnames";
 import { textcolor } from "./lib";
 
 function min(a: number, b: number) {
-  return (a<b ? a : b);
+  return a < b ? a : b;
 }
 
 export function GoalCard({
@@ -44,7 +44,7 @@ export function GoalCard({
   });
   return (
     <div className="contents" onClick={console.log}>
-      <div className="col-span-1 w-auto flex flex-row items-center gap-2">
+      <div className="col-span-1 flex w-auto flex-row items-center gap-2">
         <TbSquareRoundedLetterG className="text-2xl text-yellow-500"></TbSquareRoundedLetterG>
         <EditableField
           initialText={name}
@@ -53,11 +53,15 @@ export function GoalCard({
         ></EditableField>
       </div>
       <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
-        <span className={classNames(
-            "h-fit w-fit rounded-lg bg-yellow-300 bg-opacity-20 font-semibold  p-2 text-xl",
+        <span
+          className={classNames(
+            "h-fit w-fit rounded-lg bg-yellow-300 bg-opacity-20 p-2  text-xl font-semibold",
             textcolor(score)
-          )}>
-          {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
+          )}
+        >
+          {scoringUnit == ScoringFormat.Normalized
+            ? min(1, score).toFixed(2)
+            : (min(1, score) * 100).toFixed(2) + "%"}
         </span>
         <GoalSheet goalId={id} score={score} scoringUnit={scoringUnit}>
           <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
@@ -73,7 +77,13 @@ export function GoalCard({
         ></HabitCard>
       ))}
       {metrics.map((m) => (
-        <LinkedMetric {...m} weight={0.4} key={m.id} offset={1} scoringUnit={scoringUnit}></LinkedMetric>
+        <LinkedMetric
+          {...m}
+          weight={0.4}
+          key={m.id}
+          offset={1}
+          scoringUnit={scoringUnit}
+        ></LinkedMetric>
       ))}
     </div>
   );

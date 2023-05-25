@@ -5,10 +5,9 @@ import { api } from "../../utils/api";
 import { Button } from "../ui/button";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
+  CommandItem
 } from "../ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
@@ -38,7 +37,6 @@ export function CreateTag({ commit }: { commit: (name: string) => void }) {
             value={value}
             onValueChange={setValue}
           />
-          <CommandEmpty>Create tag</CommandEmpty>
           <CommandGroup>
             {tags.map((tag) => (
               <CommandItem
@@ -106,11 +104,13 @@ export function GoalTagList({ goalId }: { goalId: string }) {
   const linkGoal = api.tags.linkGoal.useMutation({
     onSettled: () => {
       void context.goals.getAllGoals.invalidate();
+      void context.goals.getGoal.invalidate();
     },
   });
   const unlinkGoal = api.tags.linkGoal.useMutation({
     onSettled: () => {
       void context.goals.getAllGoals.invalidate();
+      void context.goals.getGoal.invalidate();
     },
   });
 
