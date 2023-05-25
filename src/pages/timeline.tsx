@@ -29,7 +29,7 @@ const GoalArchived = ({ event }: { event: GoalArchivedEvent }) => (
       Created on {event.date.toUTCString()} (active for{" "}
       {differenceInCalendarDays(event.date, event.created)} days)
     </p>
-
+    {JSON.stringify(event.habits)}
     <div className="flex flex-col text-sm font-normal text-gray-500 dark:text-gray-400">
       <div className="flex flex-col">
         <div className="flex flex-row p-2">
@@ -62,8 +62,7 @@ const GoalAdded = ({ event }: { event: GoalAddedEvent }) => (
       </div>
       .
     </h3>
-
-    <div className="flex flex-col text-sm font-normal text-gray-500 dark:text-gray-400">
+    {/* <div className="flex flex-col text-sm font-normal text-gray-500 dark:text-gray-400">
       <div className="flex flex-col">
         <div className="flex flex-row p-2">
           <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
@@ -73,13 +72,21 @@ const GoalAdded = ({ event }: { event: GoalAddedEvent }) => (
           <TbSquareRoundedLetterM className="ml-4 text-xl text-purple-500"></TbSquareRoundedLetterM>
           <p className="">This is a linked Metric</p>
         </div>
-      </div>
-      <div className="flex p-2">
-        <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
-        <p className="">This is a habit</p>
-      </div>
+      </div> */}
+      {event.habits.map((event, i) => {
+            return <div className="flex flex-row p-2">
+            <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
+            <p className="">{event.description}</p>
+          </div>;
+        })}
+      {event.metrics.map((event, i) => {
+            return <div className="flex p-2">
+            <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
+            <p className="">{event.prompt}</p>
+          </div>;
+        })}
     </div>
-  </div>
+  // </div>
 );
 
 const HabitAdded = ({ event }: { event: HabitAddedEvent }) => (
