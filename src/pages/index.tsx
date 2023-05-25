@@ -130,7 +130,7 @@ function Hero() {
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <AuthShowcase></AuthShowcase>
-              <a href="#" className="text-sm font-semibold leading-6 text-gray-900">Learn more <span aria-hidden="true">→</span></a>
+              <a href="https://www.youtube.com/watch?v=ja0sEM5C8yc" className="text-sm font-semibold leading-6 text-gray-900">Learn more <span aria-hidden="true">→</span></a>
             </div>
           </div>
         </div>

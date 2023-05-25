@@ -52,7 +52,7 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
           selected={date}
           onChange={(date) => date instanceof Date && setDate(date)}
           maxDate={maxDate}
-          className="text-center"
+          className="text-center w-60"
           dateFormat="EEEE, MMMM dd, yyyy"
         />
 
