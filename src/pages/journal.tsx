@@ -2,10 +2,9 @@ import { useState } from "react";
 import TimePicker from "../components/time-picker";
 
 import { RxGear } from "react-icons/rx";
-import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
+import { TbSquareRoundedLetterH } from "react-icons/tb";
 
-import { ScoringFormat } from "@prisma/client";
-import { FrequencyHorizon, Metric } from "@prisma/client";
+import { FrequencyHorizon, Metric, ScoringFormat } from "@prisma/client";
 import classNames from "classnames";
 
 import { api } from "../utils/api";
@@ -18,7 +17,9 @@ import { AiFillCaretDown, AiFillCaretRight } from "react-icons/ai";
 import { RxExternalLink } from "react-icons/rx";
 import { CreateMenu } from "../components/createMenu";
 import { HabitSheet } from "../components/overview/habit-panel";
+import { textcolor } from "../components/overview/lib";
 import { Button } from "../components/ui/button";
+import { MetricIcon } from "../components/ui/icons";
 import { Loader } from "../components/ui/loader";
 import {
   Tooltip,
@@ -27,7 +28,6 @@ import {
   TooltipTrigger,
 } from "../components/ui/tooltip";
 import type { ExpandedHabit, ExpandedMetric } from "../server/queries";
-import { textcolor } from "../components/overview/lib";
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -57,7 +57,7 @@ function TypeIcon({ type }: { type: "Habit" | "Metric" }) {
         {type == "Habit" ? (
           <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
         ) : (
-          <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
+          <MetricIcon />
         )}
       </div>
     </td>
@@ -266,7 +266,8 @@ const Row = ({
         )}
       </td>
       <td className="pl-2">
-        <div className={classNames("w-full text-center text-sm", textcolor(score))}
+        <div
+          className={classNames("w-full text-center text-sm", textcolor(score))}
         >
           {scoringUnit == ScoringFormat.Normalized
             ? min(1, score).toFixed(2)
@@ -310,7 +311,7 @@ const Metric = ({ id, prompt, score: serverScore }: SubjectiveProps) => {
   return (
     <div className="mb-1 py-1">
       <span className="flex flex-row items-center justify-center gap-2">
-        <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
+        <MetricIcon />
         <p>{prompt}</p>
       </span>
       <MetricButtonRow id={id} score={serverScore}></MetricButtonRow>

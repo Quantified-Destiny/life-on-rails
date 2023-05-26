@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import type { FrequencyHorizon, Goal } from "@prisma/client";
-import { ScoringFormat} from "@prisma/client";
+import { ScoringFormat } from "@prisma/client";
 import { cva } from "class-variance-authority";
 import classNames from "classnames";
 import { useCombobox } from "downshift";
@@ -21,10 +21,10 @@ import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";
 import { TagList } from "./tags";
 import { CornerDownRight } from "lucide-react";
-import { TbSquareRoundedLetterH } from "react-icons/tb";
+import { HabitIcon } from "../ui/icons";
 
 function min(a: number, b: number) {
-  return (a<b ? a : b);
+  return a < b ? a : b;
 }
 
 function getGoalsFilter(
@@ -105,7 +105,9 @@ export function HabitHeaderLine({
                 textcolor(score)
               )}
             >
-               {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
+              {scoringUnit == ScoringFormat.Normalized
+                ? min(1, score).toFixed(2)
+                : (min(1, score) * 100).toFixed(2) + "%"}
             </span>
             <HabitSheet habitId={id} scoringUnit={scoringUnit}>
               {/* <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon> */}
@@ -152,7 +154,7 @@ export function HabitHeaderLineGrid({
   score,
   completions,
   linked,
-  scoringUnit
+  scoringUnit,
 }: {
   id: string;
   weight: number | undefined;
@@ -165,17 +167,7 @@ export function HabitHeaderLineGrid({
   scoringUnit: ScoringFormat;
 }) {
   const context = api.useContext();
-  const mutation = api.habits.editHabit.useMutation({
-    onSuccess: () => {
-      void context.goals.getAllGoals.invalidate();
-    },
-  });
-  const editFrequency = api.habits.editFrequency.useMutation({
-    onSuccess: () => {
-      void context.goals.getAllGoals.invalidate();
-    },
-  });
-  const editFrequencyHorizon = api.habits.editFrequencyHorizon.useMutation({
+  const editHabit = api.habits.editHabit.useMutation({
     onSuccess: () => {
       void context.goals.getAllGoals.invalidate();
     },
@@ -187,11 +179,10 @@ export function HabitHeaderLineGrid({
         {linked && (
           <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
         )}
-        <TbSquareRoundedLetterH className="text-2xl text-blue-500"></TbSquareRoundedLetterH>
+        <HabitIcon />
         <EditableField
           initialText={description}
-          commit={(text) => mutation.mutate({ habitId: id, description: text })}
-          className="font-semibold"
+          commit={(text) => editHabit.mutate({ habitId: id, description: text })}
         ></EditableField>
       </div>
 
@@ -228,7 +219,9 @@ export function HabitHeaderLineGrid({
             textcolor(score)
           )}
         >
-          {scoringUnit == ScoringFormat.Normalized ? min(1, score).toFixed(2): (min(1, score) * 100).toFixed(2) + "%"}
+          {scoringUnit == ScoringFormat.Normalized
+            ? min(1, score).toFixed(2)
+            : (min(1, score) * 100).toFixed(2) + "%"}
         </span>
         <HabitSheet habitId={id} scoringUnit={scoringUnit}>
           <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>

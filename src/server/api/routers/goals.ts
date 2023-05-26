@@ -118,7 +118,6 @@ export const goalsRouter = createTRPCRouter({
       metrics: metrics.filter(
         (m) => m.linkedHabits.length == 0 && m.goals.length == 0
       ),
-      goalsMap: goalsMap,
     };
   }),
 
@@ -205,30 +204,6 @@ export const goalsRouter = createTRPCRouter({
       return goal;
     }),
 
-  getMetricGoalWeight: protectedProcedure
-    .input(z.object({ goalId: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const goals: { metricId: string; weight: number }[] =
-        await ctx.prisma.metricMeasuresGoal.findMany({
-          where: {
-            goalId: input.goalId,
-          },
-          select: {
-            metricId: true,
-            weight: true,
-          },
-        });
-
-      const MetricGoalWeightMap = new Map();
-      goals.map((g) => {
-        MetricGoalWeightMap.set(g.metricId, g.weight);
-      });
-
-      return {
-        MetricGoalWeightMap: MetricGoalWeightMap,
-      };
-    }),
-
   updateHabitWeight: protectedProcedure
     .input(
       z.object({
@@ -243,6 +218,28 @@ export const goalsRouter = createTRPCRouter({
           goalId_habitId: {
             goalId: input.goalId,
             habitId: input.habitId,
+          },
+        },
+        data: {
+          weight: input.weight,
+        },
+      });
+    }),
+
+  updateMetricWeight: protectedProcedure
+    .input(
+      z.object({
+        goalId: z.string(),
+        metricId: z.string(),
+        weight: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.metricMeasuresGoal.update({
+        where: {
+          goalId_metricId: {
+            goalId: input.goalId,
+            metricId: input.metricId,
           },
         },
         data: {
@@ -273,28 +270,6 @@ export const goalsRouter = createTRPCRouter({
         },
         where: {
           id: input.goalId,
-        },
-      });
-    }),
-
-  updateMetricWeight: protectedProcedure
-    .input(
-      z.object({
-        goalId: z.string(),
-        metricId: z.string(),
-        weight: z.number(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.metricMeasuresGoal.update({
-        where: {
-          goalId_metricId: {
-            goalId: input.goalId,
-            metricId: input.metricId,
-          },
-        },
-        data: {
-          weight: input.weight,
         },
       });
     }),

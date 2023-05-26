@@ -18,6 +18,7 @@ import {
   useAppState as useAppState,
   State,
 } from "../components/layout/overviewState";
+import { TooltipProvider } from "../components/ui/tooltip";
 
 const Modals = () => {
   const store = useAppState();
@@ -52,12 +53,14 @@ const MyApp: AppType<{ session: Session | null }> = ({
     );
 
   return (
-    <SessionProvider session={session}>
-      <Modals></Modals>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </SessionProvider>
+    <TooltipProvider>
+      <SessionProvider session={session}>
+        <Modals></Modals>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </SessionProvider>
+    </TooltipProvider>
   );
 };
 

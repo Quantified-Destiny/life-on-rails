@@ -1,6 +1,6 @@
 import type { Metric } from "@prisma/client";
-import { TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
 import { Dialog, DialogContent } from "../components/ui/dialog";
+import { HabitIcon, MetricIcon } from "../components/ui/icons";
 import { Slider } from "../components/ui/slider";
 
 function MetricModal({
@@ -17,7 +17,7 @@ function MetricModal({
       <DialogContent>
         <div className="mx-auto mt-10 w-10/12">
           <div className="flex items-center gap-5 bg-gray-100 px-4 py-7 md:px-8 md:py-4">
-            <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
+            <HabitIcon/>
             <p className="text-base font-semibold">Go jogging for an hour.</p>
           </div>
           <div className="px-4 pb-7 pt-6 md:px-10 md:pb-4 md:pt-12">
@@ -27,7 +27,7 @@ function MetricModal({
 
             <form className="mt-11">
               <div className="flex items-center">
-                <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
+                <MetricIcon/>
                 <p className="w-1/2 px-3 py-3 text-sm leading-none text-gray-800 focus:outline-none ">
                   How was your jog?
                 </p>
@@ -41,7 +41,7 @@ function MetricModal({
                 ></Slider>
               </div>
               <div className="flex items-center">
-                <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
+                <MetricIcon/>
                 <p className=" w-1/2 px-3  py-3 text-sm leading-none text-gray-800 focus:outline-none ">
                   How long was your jog How long was your jog ?
                 </p>

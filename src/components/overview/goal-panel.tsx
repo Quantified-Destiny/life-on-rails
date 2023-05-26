@@ -5,7 +5,6 @@ import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { TbSquareRoundedLetterH } from "react-icons/tb";
 import type { ExpandedHabit, ExpandedMetric } from "../../server/queries";
 import { api } from "../../utils/api";
 import {
@@ -36,6 +35,7 @@ import {
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
 import { TbSquareRoundedLetterM } from "react-icons/tb";
+import { HabitIcon } from "../ui/icons";
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -358,7 +358,7 @@ function ScoringSection({
               }}
             >
               <span className="flex flex-row items-center justify-center gap-2">
-                <TbSquareRoundedLetterH className="h-6 w-6"></TbSquareRoundedLetterH>
+                <HabitIcon/>
                 {habit.description}
               </span>
               <TooltipTrigger asChild>

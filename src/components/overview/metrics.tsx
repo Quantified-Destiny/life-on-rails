@@ -7,6 +7,7 @@ import { CornerDownRight } from "lucide-react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { TbSquareRoundedLetterM } from "react-icons/tb";
 import { ScoringFormat } from "@prisma/client";
+import { MetricIcon } from "../ui/icons";
 function min(a: number, b: number) {
   return a < b ? a : b;
 }
@@ -49,13 +50,12 @@ export function LinkedMetric({
           <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
         )}
         <div className="flex flex-row items-center gap-2">
-          <TbSquareRoundedLetterM className="stroke-purple-500 text-2xl"></TbSquareRoundedLetterM>
+          <MetricIcon />
           <EditableField
             initialText={prompt}
             commit={(text) => {
               mutation.mutate({ metricId: id, prompt: text });
             }}
-            className="font-semibold"
           ></EditableField>
         </div>
       </div>

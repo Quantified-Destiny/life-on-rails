@@ -1,7 +1,7 @@
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import type { Metric } from "@prisma/client";
 import { ScoringFormat } from "@prisma/client";
-import { TbSquareRoundedLetterG } from "react-icons/tb";
+import classNames from "classnames";
 import { EditableField } from "../../components/inlineEdit";
 import { HabitCard } from "../../components/overview/habits";
 import type {
@@ -10,10 +10,10 @@ import type {
   ExpandedMetric,
 } from "../../server/queries";
 import { api } from "../../utils/api";
+import { GoalIcon } from "../ui/icons";
 import { GoalSheet } from "./goal-panel";
-import { LinkedMetric } from "./metrics";
-import classNames from "classnames";
 import { textcolor } from "./lib";
+import { LinkedMetric } from "./metrics";
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -45,7 +45,7 @@ export function GoalCard({
   return (
     <div className="contents" onClick={console.log}>
       <div className="col-span-1 flex w-auto flex-row items-center gap-2">
-        <TbSquareRoundedLetterG className="text-2xl text-yellow-500"></TbSquareRoundedLetterG>
+        <GoalIcon />
         <EditableField
           initialText={name}
           commit={(name) => editGoal.mutate({ goalId: id, name })}

@@ -14,6 +14,7 @@ import type {
   TimelineEvent,
 } from "../server/api/types";
 import { TimelineEventType } from "../server/api/types";
+import { HabitIcon, MetricIcon } from "../components/ui/icons";
 
 const GoalArchived = ({ event }: { event: GoalArchivedEvent }) => (
   <div>
@@ -73,19 +74,23 @@ const GoalAdded = ({ event }: { event: GoalAddedEvent }) => (
           <p className="">This is a linked Metric</p>
         </div>
       </div> */}
-      {event.habits.map((event, i) => {
-            return <div className="flex flex-row p-2">
-            <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
-            <p className="">{event.description}</p>
-          </div>;
-        })}
-      {event.metrics.map((event, i) => {
-            return <div className="flex p-2">
-            <TbSquareRoundedLetterM className="text-xl text-purple-500"></TbSquareRoundedLetterM>
-            <p className="">{event.prompt}</p>
-          </div>;
-        })}
-    </div>
+    {event.habits.map((event, i) => {
+      return (
+        <div key={i} className="flex flex-row p-2">
+          <HabitIcon />
+          <p className="">{event.description}</p>
+        </div>
+      );
+    })}
+    {event.metrics.map((event, i) => {
+      return (
+        <div key={i} className="flex p-2">
+          <MetricIcon/>
+          <p className="">{event.prompt}</p>
+        </div>
+      );
+    })}
+  </div>
   // </div>
 );
 
@@ -98,7 +103,7 @@ const HabitAdded = ({ event }: { event: HabitAddedEvent }) => (
     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
       You created{" "}
       <div className="inline-block">
-        <TbSquareRoundedLetterH className="mb-1 inline text-2xl text-blue-500"></TbSquareRoundedLetterH>
+        <HabitIcon />
         <h3 className="inline">{event.habit.description}</h3>
       </div>
       .
@@ -114,7 +119,7 @@ const HabitArchived = ({ event }: { event: HabitArchivedEvent }) => (
     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
       You archived{" "}
       <div className="inline-block">
-        <TbSquareRoundedLetterH className="mb-1 inline text-2xl text-blue-500"></TbSquareRoundedLetterH>
+        <HabitIcon />
         <h3 className="inline">{event.habit.description}</h3>
       </div>
       .

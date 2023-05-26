@@ -25,12 +25,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
+import { GoalSheet } from "./goal-panel";
 import {
   CreateMetricLinkedToHabit,
   HabitHeaderLine,
   LinkHabit,
 } from "./habits";
-import { GoalSheet } from "./goal-panel";
 
 function GoalsSection({
   habitId,
@@ -54,7 +54,7 @@ function GoalsSection({
   if (goalQuery.isLoading || goalMapQuery.isLoading) {
     return <p>LOADING</p>;
   }
-  const goalsMap = goalMapQuery.data.goalsMap;
+  const goals = goalMapQuery.data.goals;
 
   return (
     <>
@@ -87,7 +87,9 @@ function GoalsSection({
                 </Button>
                 <GoalSheet
                   goalId={goal.id}
-                  score={goalsMap.get(goal.id)?.goal.score ?? 0}
+                  score={
+                    goals.find((g) => g.goal.id === goal.id)?.goal.score ?? 0
+                  }
                   scoringUnit={scoringUnit}
                 >
                   <Button className="bg-gray-500">Manage</Button>

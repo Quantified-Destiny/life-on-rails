@@ -1,8 +1,14 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@radix-ui/react-accordion";
 import { Loader } from "lucide-react";
-import { TbSquareRoundedLetterG, TbSquareRoundedLetterH, TbSquareRoundedLetterM } from "react-icons/tb";
+import { TbSquareRoundedLetterM } from "react-icons/tb";
 import { api } from "../../utils/api";
 import { Button } from "../ui/button";
+import { GoalIcon, HabitIcon } from "../ui/icons";
 
 export function ArchivedItems() {
   const archivedItemsQuery = api.overview.getArchivedItems.useQuery();
@@ -50,7 +56,7 @@ export function ArchivedItems() {
               key={goal.id}
             >
               <div className="col-span-1 flex w-auto flex-row items-center gap-2">
-                <TbSquareRoundedLetterG className="text-2xl text-yellow-500"></TbSquareRoundedLetterG>
+                <GoalIcon />
                 {goal.name}
               </div>
               <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
@@ -69,7 +75,7 @@ export function ArchivedItems() {
               key={habit.id}
             >
               <div className="col-span-1 flex w-auto flex-row items-center gap-2">
-                <TbSquareRoundedLetterH className="text-2xl text-yellow-500"></TbSquareRoundedLetterH>
+                <HabitIcon />
                 {habit.description}
               </div>
               <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
