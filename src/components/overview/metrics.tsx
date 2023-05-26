@@ -1,13 +1,12 @@
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { ScoringFormat } from "@prisma/client";
 import classNames from "classnames";
+import { CornerDownRight } from "lucide-react";
 import { api } from "../../utils/api";
 import { Dropdown } from "../createMenu";
 import { EditableField } from "../inlineEdit";
-import { textcolor } from "./lib";
-import { CornerDownRight } from "lucide-react";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { TbSquareRoundedLetterM } from "react-icons/tb";
-import { ScoringFormat } from "@prisma/client";
 import { MetricIcon } from "../ui/icons";
+import { textcolor } from "./lib";
 function min(a: number, b: number) {
   return a < b ? a : b;
 }

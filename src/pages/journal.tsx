@@ -2,7 +2,6 @@ import { useState } from "react";
 import TimePicker from "../components/time-picker";
 
 import { RxGear } from "react-icons/rx";
-import { TbSquareRoundedLetterH } from "react-icons/tb";
 
 import { FrequencyHorizon, Metric, ScoringFormat } from "@prisma/client";
 import classNames from "classnames";
@@ -19,7 +18,7 @@ import { CreateMenu } from "../components/createMenu";
 import { HabitSheet } from "../components/overview/habit-panel";
 import { textcolor } from "../components/overview/lib";
 import { Button } from "../components/ui/button";
-import { MetricIcon } from "../components/ui/icons";
+import { MetricIcon, HabitIcon } from "../components/ui/icons";
 import { Loader } from "../components/ui/loader";
 import {
   Tooltip,
@@ -54,11 +53,7 @@ function TypeIcon({ type }: { type: "Habit" | "Metric" }) {
   return (
     <td className="">
       <div className="flex flex-row items-center justify-center">
-        {type == "Habit" ? (
-          <TbSquareRoundedLetterH className="text-xl text-blue-500"></TbSquareRoundedLetterH>
-        ) : (
-          <MetricIcon />
-        )}
+        {type == "Habit" ? <HabitIcon /> : <MetricIcon />}
       </div>
     </td>
   );
