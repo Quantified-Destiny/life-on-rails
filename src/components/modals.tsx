@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "../utils/api";
 
+
 function Modal({
   close,
   children,
@@ -84,9 +85,6 @@ export function CreateGoalModal({ close }: { close: () => void }) {
                   {...register("name")}
                 />
               </div>
-              <div>
-                <p>Link Existing Habit or Metric</p>
-              </div>
               <button
                 type="submit"
                 className="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -120,7 +118,7 @@ export function CreateHabitModal({ close }: { close: () => void }) {
       description: data.description,
     });
   };
-
+  
   return (
     <Modal close={close}>
       <div className="relative max-h-full w-full max-w-md">
@@ -156,22 +154,6 @@ export function CreateHabitModal({ close }: { close: () => void }) {
                   required
                   {...register("description")}
                 />
-              </div>
-              <div>
-                <p>Select Horizon (week or day)</p>
-                <p>Select Frequency i.e. 3, choose 3 days below</p>
-                <div className="flex flex-row justify-between">
-                  <p>S</p>
-                  <p>M</p>
-                  <p>T</p>
-                  <p>W</p>
-                  <p>Th</p>
-                  <p>F</p>
-                  <p>S</p>
-                </div>
-                <p>Link an existing metric or create a new one</p>
-                <hr />
-                <p>Link to existing Goal</p>
               </div>
               <button
                 type="submit"
@@ -242,11 +224,6 @@ export function CreateMetricModal({ close }: { close: () => void }) {
                   required
                   {...register("prompt")}
                 />
-              </div>
-              <div>
-                <p>Link an existing habit</p>
-                <hr />
-                <p>Link to existing Goal</p>
               </div>
               <button
                 type="submit"
