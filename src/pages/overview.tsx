@@ -20,6 +20,7 @@ import {
   PopoverTrigger,
 } from "../components/ui/popover";
 import { api } from "../utils/api";
+import {templates, TemplatesPage} from "../pages/templates";
 
 function Header({
   filters,
@@ -74,6 +75,12 @@ function OverviewPage() {
   const data = filteredData(goalsQuery.data, filters);
   const user = profileQuery.data;
   console.log(data);
+  if (goalsQuery.data == undefined) {
+    return (
+      <TemplatesPage></TemplatesPage>
+    );
+  }
+
   return (
     <div className="container max-w-4xl">
       <div className="mb-10 scrollbar-none">
