@@ -38,7 +38,7 @@ export const options = {
     },
     title: {
       display: true,
-      text: 'Average Habit Completion Ratio (last 7 days)',
+      text: 'Number of Habit Completions (last 7 days)',
     },
   },
 };
