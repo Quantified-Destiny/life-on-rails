@@ -91,7 +91,7 @@ export const metricsRouter = createTRPCRouter({
     .input(
       z.object({
         metricId: z.string(),
-        score: z.number(),
+        score: z.number().refine((val) => val >= 0 && val <= 1),
         date: z.date(),
       })
     )
