@@ -114,6 +114,7 @@ export const goalsRouter = createTRPCRouter({
 
     return {
       goals: goalsData,
+      goalsMap: goalsMap,
       habits: habits.filter((h) => h.goals.length == 0),
       metrics: metrics.filter(
         (m) => m.linkedHabits.length == 0 && m.goals.length == 0

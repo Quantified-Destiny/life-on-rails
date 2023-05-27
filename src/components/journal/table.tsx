@@ -1,10 +1,6 @@
 import type { ScoringFormat } from "@prisma/client";
-import { useState } from "react";
 import type { ExpandedHabit, ExpandedMetric } from "../../server/queries";
-import { api } from "../../utils/api";
-import { HabitRows, MetricRows, Row } from "./row";
-import { MetricPanel } from "./panel";
-import { Actions } from "./elements";
+import { HabitRows, MetricRows } from "./row";
 
 export function JournalTable({
   habits,
