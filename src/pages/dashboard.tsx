@@ -38,28 +38,28 @@ export const options = {
     },
     title: {
       display: true,
-      text: 'Number of Completions',
+      text: 'Average Habit Completion Ratio (last 7 days)',
     },
   },
 };
 
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+const labels = [-7, -6, -5, -4, -3, -2, -1, 0];
 
 export const data = {
   labels,
   datasets: [
     {
       label: 'Habit Completions',
-      data: [0, 1, 2, 3, 4, 5, 8],
+      data: [0.1, 0.3, 0.5, 0.3, 0.2, 0, 0, 0, 0],
       borderColor: 'rgb(255, 99, 132)',
       backgroundColor: 'rgba(255, 99, 132, 0.5)',
     },
-    {
-      label: 'Metric Completions',
-      data: [3, 1, 5, 1, 5, 3, 2],
-      borderColor: 'rgb(53, 162, 235)',
-      backgroundColor: 'rgba(53, 162, 235, 0.5)',
-    },
+    // {
+    //   label: 'Metric Completions',
+    //   data: [3, 1, 5, 1, 5, 3, 2],
+    //   borderColor: 'rgb(53, 162, 235)',
+    //   backgroundColor: 'rgba(53, 162, 235, 0.5)',
+    // },
   ],
 };
 
@@ -88,6 +88,7 @@ function StatsCardRow({
   // if (goalsQuery.isError || metricsQuery.isError) return <p>Query error</p>;
   // const goalData = goalsQuery.data;
   // const metricData = metricsQuery.data;
+
 
   let redGoal = 0;
   let yellowGoal = 0;
@@ -170,10 +171,12 @@ function StatsCardRow({
   return (
     <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+      {JSON.stringify(habits)}
       <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
           <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
             Goals
           </div>
+          
           <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
           <PieChart
               style={{

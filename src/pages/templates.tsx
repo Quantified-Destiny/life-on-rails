@@ -28,7 +28,7 @@ const templates = [
     key: "peace",
     title: "Peace",
     image: "/illustrations/mindfulness.svg",
-    description: "Make your life calmer and more mindful with these habits.",
+    description: "Make your life calmer and more mindful with these habits and goals.",
   },
 ];
 
@@ -101,11 +101,11 @@ const TemplatesPage = () => {
               This will create multiple goals, habits, and metrics. This
               operation is irreversible.
             </div>
-            <div className="mt-2 whitespace-nowrap align-baseline font-light text-gray-300">
+            <div className="mt-2 whitespace-nowrap align-baseline font-light text-gray-500">
               <InfoIcon className="inline"></InfoIcon> You can delete these
               items from the `All Items` page at any time.
             </div>{" "}
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-end gap-x-2">
               <Button variant="ghost" onClick={closeModal}>
                 Cancel
               </Button>
