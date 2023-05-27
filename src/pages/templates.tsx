@@ -9,7 +9,7 @@ import {
 import Image from "next/image";
 import { Button } from "../components/ui/button";
 import { api } from "../utils/api";
-const templates = [
+export const templates = [
   {
     key: "fitness",
     title: "Fitness",
@@ -32,7 +32,7 @@ const templates = [
   },
 ];
 
-const TemplatesPage = () => {
+export const TemplatesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Step 1: State variable for modal open/closed
   const [selectedTemplateKey, setSelectedTemplateKey] = useState(""); // New state variable for selected template key
 
