@@ -12,12 +12,6 @@ import { JournalTable } from "../components/journal/table";
 import { Loader } from "../components/ui/loader";
 import type { ExpandedHabit, ExpandedMetric } from "../server/queries";
 
-
-
-
-
-
-
 interface JournalProps {
   habits: ExpandedHabit[];
   date: Date;

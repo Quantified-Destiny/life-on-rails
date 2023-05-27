@@ -1,12 +1,12 @@
-import type { Metric , ScoringFormat } from "@prisma/client";
+import type { Metric, ScoringFormat } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@radix-ui/react-tooltip";
-import { CheckCircle, CircleDot, CircleIcon, Link } from "lucide-react";
+import { CheckCircle, CircleDot, CircleIcon } from "lucide-react";
 import { useState } from "react";
 import { RxExternalLink, RxGear } from "react-icons/rx";
 import { api } from "../../utils/api";
@@ -15,6 +15,7 @@ import { Button } from "../ui/button";
 import { HabitIcon, MetricIcon } from "../ui/icons";
 import type { Completion } from "./row";
 import { CompletionStatus } from "./table";
+import Link from "next/link";
 
 export function MetricButtonRow({
   id,
@@ -236,12 +237,10 @@ export function Actions({
   return (
     <div className="relative flex flex-row items-baseline gap-3 px-2 py-1">
       <HabitSheet habitId={id} scoringUnit={scoringUnit}>
-        <RxGear className=" cursor-pointer rounded-lg text-xl text-gray-500 hover:bg-gray-300 focus:outline-none focus:ring-1"></RxGear>
+        <RxGear className="cursor-pointer rounded-lg text-xl text-gray-500 hover:bg-gray-300 focus:outline-none focus:ring-1"></RxGear>
       </HabitSheet>
       <Link href={`/habit/${id}`}>
-        <button className="text-xl text-gray-500 hover:bg-gray-300">
-          <RxExternalLink></RxExternalLink>
-        </button>
+        <RxExternalLink className="cursor-pointer rounded-lg text-xl text-gray-500 hover:bg-gray-300 focus:outline-none focus:ring-1"></RxExternalLink>
       </Link>
     </div>
   );

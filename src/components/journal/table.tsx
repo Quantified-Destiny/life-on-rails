@@ -2,7 +2,7 @@ import type { ScoringFormat } from "@prisma/client";
 import { useState } from "react";
 import type { ExpandedHabit, ExpandedMetric } from "../../server/queries";
 import { api } from "../../utils/api";
-import { MetricRows, Row } from "./row";
+import { HabitRows, MetricRows, Row } from "./row";
 import { MetricPanel } from "./panel";
 import { Actions } from "./elements";
 
@@ -53,65 +53,8 @@ export function JournalTable({
     </>
   );
 }
-
 export enum CompletionStatus {
   INCOMPLETE,
   PARTIAL,
   COMPLETED,
-}
-
-function HabitRows({
-  habit,
-  date,
-  scoringUnit,
-}: {
-  habit: ExpandedHabit;
-  date: Date;
-  scoringUnit: ScoringFormat;
-}) {
-  const context = api.useContext();
-  const createCompletion = api.journal.complete.useMutation({
-    onSuccess() {
-      void context.habits.getHabits.invalidate();
-    },
-  });
-
-  const [panelOpen, setPanelOpen] = useState<boolean>(false);
-
-  habit.metrics;
-  return (
-    <>
-      <Row
-        type="Habit"
-        description={habit.description}
-        key={habit.id}
-        tags={habit.tags}
-        date={date}
-        metrics={habit.metrics}
-        score={habit.score}
-        actions={<Actions id={habit.id} scoringUnit={scoringUnit}></Actions>}
-        panel={{
-          open: panelOpen,
-          togglePanel: setPanelOpen,
-        }}
-        completion={{
-          status:
-            habit.completions >= habit.frequency
-              ? CompletionStatus.COMPLETED
-              : CompletionStatus.INCOMPLETE,
-          schedule: {
-            current: habit.completions,
-            frequency: habit.frequency,
-            frequencyHorizon: habit.frequencyHorizon,
-          },
-          action: () => {
-            createCompletion.mutate({ date: date, habitId: habit.id });
-            setPanelOpen(true);
-          },
-        }}
-        scoringUnit={scoringUnit}
-      ></Row>
-      {panelOpen && <MetricPanel metrics={habit.metrics}></MetricPanel>}
-    </>
-  );
 }
