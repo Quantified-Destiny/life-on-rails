@@ -171,7 +171,6 @@ function StatsCardRow({
   return (
     <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
-      {JSON.stringify(habits)}
       <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
           <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
             Goals
