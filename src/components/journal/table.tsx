@@ -49,8 +49,3 @@ export function JournalTable({
     </>
   );
 }
-export enum CompletionStatus {
-  INCOMPLETE,
-  PARTIAL,
-  COMPLETED,
-}

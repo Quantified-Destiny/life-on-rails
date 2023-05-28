@@ -5,39 +5,24 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@radix-ui/react-tooltip";
-import { CheckCircle, CircleDot, CircleIcon } from "lucide-react";
-import { useState } from "react";
+} from "../ui/tooltip";
+import { CircleDot, CircleIcon, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { RxExternalLink, RxGear } from "react-icons/rx";
-import { api } from "../../utils/api";
 import { HabitSheet } from "../overview/habit-panel";
 import { Button } from "../ui/button";
 import { HabitIcon, MetricIcon } from "../ui/icons";
+import { CompletionStatus } from "./row";
 import type { Completion } from "./row";
-import { CompletionStatus } from "./table";
-import Link from "next/link";
 
 export function MetricButtonRow({
-  id,
-  score: serverScore,
+  score,
+  setScore,
 }: {
   id: string;
   score: number | undefined;
+  setScore: (score: number) => void;
 }) {
-  const setScoreMutation = api.metrics.setScore.useMutation();
-  const [score, setScoreState] = useState<undefined | number>(
-    (serverScore ?? 0) * 5
-  );
-
-  const setScore = (score: number) => {
-    setScoreState(score);
-    setScoreMutation.mutate({
-      metricId: id,
-      score: score / 5,
-      date: new Date(),
-    });
-  };
-
   return (
     <div className="flex flex-row flex-nowrap gap-2 p-2">
       <Button
@@ -77,16 +62,21 @@ interface MetricProps {
   id: string;
   prompt: string;
   score: number | undefined;
+  setScore: (score: number) => void;
 }
 
-export const MetricUI = ({ id, prompt, score: serverScore }: MetricProps) => {
+export const MetricUI = ({ id, prompt, score, setScore }: MetricProps) => {
   return (
     <div className="mb-1 py-1">
       <span className="flex flex-row items-center justify-center gap-2">
         <MetricIcon />
         <p>{prompt}</p>
       </span>
-      <MetricButtonRow id={id} score={serverScore}></MetricButtonRow>
+      <MetricButtonRow
+        id={id}
+        score={score}
+        setScore={setScore}
+      ></MetricButtonRow>
     </div>
   );
 };
@@ -130,7 +120,9 @@ export function MetricsTooltip({ metrics }: { metrics?: Metric[] }) {
               </svg>
             </TooltipTrigger>
             <TooltipContent>
-              {metrics.map((m) => m.prompt).join(", ")}
+              <span className="bg-gray-400">
+                {metrics.map((m) => m.prompt).join(", ")}
+              </span>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -181,7 +173,9 @@ export function TagsTooltip({ tags }: { tags: string[] }) {
               )}
             </div>
           </TooltipTrigger>
-          <TooltipContent>{tags.join(", ")}</TooltipContent>
+          <span className="bg-gray-400">
+            <TooltipContent>{tags.join(", ")}</TooltipContent>
+          </span>
         </Tooltip>
       </TooltipProvider>
     </>
@@ -194,14 +188,36 @@ export function Status({
   completion: Completion;
 }) {
   switch (status) {
-    case CompletionStatus.COMPLETED:
-      return <CheckCircle></CheckCircle>;
-    case CompletionStatus.INCOMPLETE:
+    case CompletionStatus.LOADING:
       return (
-        <CircleIcon onClick={action} className="cursor-pointer"></CircleIcon>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Loader2 className="animate-spin stroke-gray-500"></Loader2>;
+          </TooltipTrigger>
+          <TooltipContent>Loading</TooltipContent>
+        </Tooltip>
       );
     case CompletionStatus.PARTIAL:
-      return <CircleDot></CircleDot>;
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <CircleDot onClick={action} className="cursor-pointer"></CircleDot>
+          </TooltipTrigger>
+          <TooltipContent>Partially completed.</TooltipContent>
+        </Tooltip>
+      );
+    default:
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <CircleIcon
+              onClick={action}
+              className="cursor-pointer"
+            ></CircleIcon>
+          </TooltipTrigger>
+          <TooltipContent>Click to complete this habit</TooltipContent>
+        </Tooltip>
+      );
   }
 }
 

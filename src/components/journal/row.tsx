@@ -1,4 +1,4 @@
-import type { Metric , FrequencyHorizon} from "@prisma/client";
+import type { Metric, FrequencyHorizon } from "@prisma/client";
 import { ScoringFormat } from "@prisma/client";
 import classNames from "classnames";
 import { AiFillCaretDown, AiFillCaretRight } from "react-icons/ai";
@@ -13,10 +13,15 @@ import {
   TagsTooltip,
   TypeIcon,
 } from "./elements";
-import { Memo, MetricPanel } from "./panel";
-import { CompletionStatus } from "./table";
-import { useState } from "react";
+import { Memo, HabitPanel } from "./panel";
+import { useCallback, useState } from "react";
 import { api } from "../../utils/api";
+
+export enum CompletionStatus {
+  LOADING,
+  INCOMPLETE,
+  PARTIAL,
+}
 
 export interface Completion {
   status: CompletionStatus;
@@ -102,11 +107,7 @@ export const Row = ({
         <div className="flex items-center pl-2">
           <p
             className={classNames(
-              "mr-2 text-base font-medium leading-none text-gray-700",
-              {
-                "line-through":
-                  completion?.status === CompletionStatus.COMPLETED,
-              }
+              "mr-2 text-base font-medium leading-none text-gray-700"
             )}
           >
             {description}
@@ -161,6 +162,7 @@ export function MetricRows({
                 <MetricButtonRow
                   id={metric.id}
                   score={metric.value}
+                  setScore={console.log}
                 ></MetricButtonRow>
               </div>
               <div className="">
@@ -183,6 +185,28 @@ export function HabitRows({
   date: Date;
   scoringUnit: ScoringFormat;
 }) {
+  if (habit.metrics.length > 0) {
+    return (
+      <HabitWithLinkedMetrics
+        habit={habit}
+        date={date}
+        scoringUnit={scoringUnit}
+      />
+    );
+  } else {
+    return <SimpleHabit habit={habit} date={date} scoringUnit={scoringUnit} />;
+  }
+}
+
+function SimpleHabit({
+  habit,
+  date,
+  scoringUnit,
+}: {
+  habit: ExpandedHabit;
+  date: Date;
+  scoringUnit: ScoringFormat;
+}) {
   const context = api.useContext();
   const createCompletion = api.journal.complete.useMutation({
     onSuccess() {
@@ -190,9 +214,23 @@ export function HabitRows({
     },
   });
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [panelOpen, setPanelOpen] = useState<boolean>(false);
 
+  const reset = useCallback(() => {
+    setPanelOpen(false);
+  }, []);
+
   habit.metrics;
+
+  let status: CompletionStatus;
+
+  if (loading) {
+    status = CompletionStatus.LOADING;
+  } else {
+    status = CompletionStatus.INCOMPLETE;
+  }
+
   return (
     <>
       <Row
@@ -209,23 +247,104 @@ export function HabitRows({
           togglePanel: setPanelOpen,
         }}
         completion={{
-          status:
-            habit.completions >= habit.frequency
-              ? CompletionStatus.COMPLETED
-              : CompletionStatus.INCOMPLETE,
+          status,
           schedule: {
             current: habit.completions,
             frequency: habit.frequency,
             frequencyHorizon: habit.frequencyHorizon,
           },
           action: () => {
-            createCompletion.mutate({ date: date, habitId: habit.id });
-            setPanelOpen(true);
+            setLoading(true);
+            createCompletion
+              .mutateAsync({ date: date, habitId: habit.id })
+              .then((_) => setLoading(false))
+              .catch((_) => reset());
           },
         }}
         scoringUnit={scoringUnit}
       ></Row>
-      {panelOpen && <MetricPanel metrics={habit.metrics}></MetricPanel>}
+      {panelOpen && (
+        <HabitPanel
+          id={habit.id}
+          metrics={habit.metrics}
+          reset={reset}
+          setLoading={setLoading}
+        ></HabitPanel>
+      )}
+    </>
+  );
+}
+
+function HabitWithLinkedMetrics({
+  habit,
+  date,
+  scoringUnit,
+}: {
+  habit: ExpandedHabit;
+  date: Date;
+  scoringUnit: ScoringFormat;
+}) {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [partial, setPartial] = useState<boolean>(false);
+  const [panelOpen, setPanelOpen] = useState<boolean>(false);
+
+  const reset = useCallback(() => {
+    setPartial(false);
+    setPanelOpen(false);
+  }, []);
+
+  let status: CompletionStatus;
+
+  if (loading) {
+    status = CompletionStatus.LOADING;
+  } else if (partial) {
+    status = CompletionStatus.PARTIAL;
+  } else {
+    status = CompletionStatus.INCOMPLETE;
+  }
+
+  habit.metrics;
+  return (
+    <>
+      <Row
+        type="Habit"
+        description={habit.description}
+        key={habit.id}
+        tags={habit.tags}
+        date={date}
+        metrics={habit.metrics}
+        score={habit.score}
+        actions={<Actions id={habit.id} scoringUnit={scoringUnit}></Actions>}
+        panel={
+          partial
+            ? {
+                open: panelOpen,
+                togglePanel: setPanelOpen,
+              }
+            : undefined
+        }
+        completion={{
+          status,
+          schedule: {
+            current: habit.completions,
+            frequency: habit.frequency,
+            frequencyHorizon: habit.frequencyHorizon,
+          },
+          action: () => {
+            setPanelOpen(true);
+            setPartial(true);
+          },
+        }}
+        scoringUnit={scoringUnit}
+      ></Row>
+      {partial && panelOpen && (
+        <HabitPanel
+          id={habit.id}
+          metrics={habit.metrics}
+          reset={reset}
+          setLoading={setLoading}
+        ></HabitPanel>
+      )}
     </>
   );
 }
