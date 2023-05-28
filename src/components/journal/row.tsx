@@ -165,7 +165,15 @@ export function MetricRows({
                 <MetricButtonRow
                   id={metric.id}
                   value={metric.value}
-                  setValue={(value) => setScore.mutate({metricId: metric.id, memo: memo, date: new Date(), value: value, score: value/5})}
+                  setValue={(value) =>
+                    setScore.mutate({
+                      metricId: metric.id,
+                      memo: memo,
+                      date: new Date(),
+                      value: value,
+                      score: value / 5,
+                    })
+                  }
                 ></MetricButtonRow>
               </div>
               <div className="">
@@ -260,7 +268,7 @@ function SimpleHabit({
           action: () => {
             setLoading(true);
             createCompletion
-              .mutateAsync({ date: date, habitId: habit.id })
+              .mutateAsync({ date: date, habitId: habit.id, memo: memo })
               .then((_) => setLoading(false))
               .catch((_) => reset());
           },

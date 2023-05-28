@@ -107,6 +107,7 @@ export function HabitPanel({
                   createCompletion.mutate({
                     habitId: id,
                     date: now,
+                    memo: memo?.content,
                   });
                   reset();
                   setLoading(false);
