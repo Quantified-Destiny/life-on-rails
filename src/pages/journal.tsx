@@ -62,7 +62,7 @@ function Journal({
             <div className="items-center justify-between sm:flex">
               Pending Tasks
             </div>
-            <div className="mt-7 overflow-x-auto">
+            <div className="mt-7">
               <JournalTable
                 habits={habits}
                 metrics={metrics}

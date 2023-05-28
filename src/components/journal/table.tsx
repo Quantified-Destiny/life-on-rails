@@ -22,8 +22,7 @@ export function JournalTable({
             <td></td>
             <td></td>
             <td></td>
-            <td>Score</td>
-            <td>Name</td>
+            <td></td>
             <td></td>
           </tr>
         </thead>

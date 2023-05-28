@@ -120,9 +120,7 @@ export function MetricsTooltip({ metrics }: { metrics?: Metric[] }) {
               </svg>
             </TooltipTrigger>
             <TooltipContent>
-              <span className="bg-gray-400">
-                {metrics.map((m) => m.prompt).join(", ")}
-              </span>
+              <span>{metrics.map((m) => m.prompt).join(", ")}</span>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -183,16 +181,18 @@ export function TagsTooltip({ tags }: { tags: string[] }) {
 }
 
 export function Status({
-  completion: { status, action },
+  status,
+  action,
 }: {
-  completion: Completion;
+  status: CompletionStatus;
+  action?: () => void;
 }) {
   switch (status) {
     case CompletionStatus.LOADING:
       return (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Loader2 className="animate-spin stroke-gray-500"></Loader2>;
+            <Loader2 className="animate-spin stroke-gray-500"></Loader2>
           </TooltipTrigger>
           <TooltipContent>Loading</TooltipContent>
         </Tooltip>

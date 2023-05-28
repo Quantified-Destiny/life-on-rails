@@ -34,7 +34,6 @@ export interface Completion {
 }
 
 interface RowProps {
-  key: string;
   description: string;
   date: Date;
   completion?: Completion;
@@ -52,7 +51,6 @@ interface RowProps {
 
 export const Row = ({
   type,
-  key,
   description,
   score,
   completion,
@@ -66,7 +64,6 @@ export const Row = ({
     <tr
       tabIndex={0}
       className="h-12 rounded border border-gray-100 focus:outline-none"
-      key={key}
     >
       <td className="cursor-pointer text-center opacity-50">
         {panel && (
@@ -84,7 +81,7 @@ export const Row = ({
         )}
       </td>
       <TypeIcon type={type}></TypeIcon>
-      <td>{completion && <Status completion={completion}></Status>}</td>
+      <td>{completion && <Status status={completion.status} action={completion.action}></Status>}</td>
       <td>
         {completion?.schedule && (
           <Schedule
@@ -115,11 +112,8 @@ export const Row = ({
           {type === "Habit" && (
             <MetricsTooltip metrics={metrics}></MetricsTooltip>
           )}
+          <TagsTooltip tags={tags}></TagsTooltip>
         </div>
-      </td>
-
-      <td className="pl-2">
-        <TagsTooltip tags={tags}></TagsTooltip>
       </td>
       <td>{actions}</td>
     </tr>

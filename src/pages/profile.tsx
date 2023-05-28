@@ -1,7 +1,17 @@
+import type { ScoringFormat } from "@prisma/client";
 import { format } from "date-fns";
+import range from "lodash/range";
 import { RxRocket } from "react-icons/rx";
+import { HelpIcon } from "../components/ui/help-icon";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import { api } from "../utils/api";
-import { ScoringFormat } from "@prisma/client";
+import { ItemText } from "@radix-ui/react-select";
 
 const ProfilePage = () => {
   const context = api.useContext();
@@ -29,7 +39,6 @@ const ProfilePage = () => {
   const joinDate = format(profile.createdAt, "MM/dd/yyyy hh:mm a");
 
   // joinDate.toString();
-
   return (
     <>
       <div className="flex justify-center">
@@ -93,55 +102,77 @@ const ProfilePage = () => {
             <div className="px-4 pt-3 sm:px-6">
               <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Unit of Scoring
-                  </dt>
-                  <select
-                    id="scoring"
-                    className="mt-2 block w-1/2 rounded-lg border border-gray-300 bg-gray-50 px-2 py-0.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                    value={profile.scoringUnit}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      console.log(value);
+                  <div className="mb-4 flex flex-row items-center gap-2 text-sm font-medium text-gray-500">
+                    <span>Scoring Format</span>
+                    <HelpIcon>How scores should be formatted.</HelpIcon>
+                  </div>
+                  <Select
+                    onValueChange={(value) => {
                       updateScoringUnit.mutate({
                         scoringUnit: value as ScoringFormat,
                       });
                     }}
+                    defaultValue={profile.scoringUnit}
                   >
-                    <option value="Percentage">Percentage</option>
-                    <option value="Normalized">Normalized</option>
-                  </select>
+                    <SelectTrigger className="h-fit w-fit outline-none">
+                      <SelectValue/>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Percentage">
+                        <div className="px-4 py-2">
+                          <span className="text-xs uppercase text-gray-700">
+                            Percentage
+                          </span>
+                          <br></br>
+                          <span className="text-md text-black">
+                            Represent scores as percentages (0-100%)
+                          </span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Normalized">
+                        <div className="px-4 py-2">
+                          <span className="text-xs uppercase text-gray-700">
+                            Normalized
+                          </span>
+                          <br></br>
+                          <span className="text-md text-black">
+                            Normalize scores to a range of 0-1.
+                          </span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="sm:col-span-1">
-                  <dt className="text-sm font-medium text-gray-500">
-                    Scoring Time Horizon in Weeks
-                  </dt>
-                  <select
-                    id="scoring"
-                    className="mt-2 block w-1/2 rounded-lg border border-gray-300 bg-gray-50 px-2 py-0.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                    value={profile.scoringWeeks}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      console.log(value);
+                  <div className="mb-4 flex flex-row items-center gap-2 text-sm font-medium text-gray-500">
+                    <span>Scoring Time Horizon</span>
+                    <HelpIcon>
+                      The number of weeks used to calculate scores. <br /> A
+                      smaller number of weeks will bias the scores towards more
+                      recent data,
+                      <br /> while longer numbers will better reflect older
+                      trends.
+                    </HelpIcon>
+                  </div>
+                  <Select
+                    onValueChange={(value) => {
                       updateScoringWeeks.mutate({
                         scoringWeeks: parseInt(value),
                       });
-                      // setValue({ value })
                     }}
+                    defaultValue={profile.scoringWeeks.toString()}
                   >
-                    {/* onChange={(value: string) => updateScoringWeeks.mutate({ scoringWeeks: parseInt(value) })}> */}
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                  </select>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {range(2, 13).map((value) => (
+                        <SelectItem key={value} value={value.toString()}>
+                          <span className="font-semibold">{value}</span> weeks
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </dl>
             </div>
