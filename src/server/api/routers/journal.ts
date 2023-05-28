@@ -33,12 +33,19 @@ export const journalRouter = createTRPCRouter({
     }),
 
   complete: protectedProcedure
-    .input(z.object({ date: z.date(), habitId: z.string() }))
+    .input(
+      z.object({
+        date: z.date(),
+        habitId: z.string(),
+        memo: z.string().optional(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.habitCompletion.create({
         data: {
           date: input.date,
           habitId: input.habitId,
+          memo: input.memo,
         },
       });
     }),

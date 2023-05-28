@@ -139,6 +139,9 @@ export function MetricRows({
   date: Date;
   scoringUnit: ScoringFormat;
 }) {
+  const [memo, setMemo] = useState<string>("");
+  const setScore = api.metrics.setScore.useMutation();
+
   return (
     <>
       <Row
@@ -161,12 +164,12 @@ export function MetricRows({
               <div className="flex items-center">
                 <MetricButtonRow
                   id={metric.id}
-                  score={metric.value}
-                  setScore={console.log}
+                  value={metric.value}
+                  setValue={(value) => setScore.mutate({metricId: metric.id, memo: memo, date: new Date(), value: value, score: value/5})}
                 ></MetricButtonRow>
               </div>
               <div className="">
-                <Memo></Memo>
+                <Memo content={memo} update={setMemo}></Memo>
               </div>
             </div>
           </td>
@@ -216,6 +219,7 @@ function SimpleHabit({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [panelOpen, setPanelOpen] = useState<boolean>(false);
+  const [memo, setMemo] = useState<string>("");
 
   const reset = useCallback(() => {
     setPanelOpen(false);
@@ -269,6 +273,7 @@ function SimpleHabit({
           metrics={habit.metrics}
           reset={reset}
           setLoading={setLoading}
+          memo={{ content: memo, update: setMemo }}
         ></HabitPanel>
       )}
     </>

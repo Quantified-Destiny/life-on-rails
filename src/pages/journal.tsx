@@ -1,7 +1,6 @@
 import { useState } from "react";
 import TimePicker from "../components/time-picker";
 
-
 import type { ScoringFormat } from "@prisma/client";
 
 import { api } from "../utils/api";
@@ -33,7 +32,6 @@ interface JournalProps {
 //     }
 //     list.classList.toggle("hidden");
 // }
-
 
 function Journal({
   date,

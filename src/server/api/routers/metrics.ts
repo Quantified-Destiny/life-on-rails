@@ -86,11 +86,13 @@ export const metricsRouter = createTRPCRouter({
         },
       });
     }),
-    
+
   setScore: protectedProcedure
     .input(
       z.object({
         metricId: z.string(),
+        memo: z.string().optional(),
+        value: z.number(),
         score: z.number().refine((val) => val >= 0 && val <= 1),
         date: z.date(),
       })
@@ -106,8 +108,9 @@ export const metricsRouter = createTRPCRouter({
         await ctx.prisma.metricAnswer.create({
           data: {
             metricId: input.metricId,
-            value: input.score,
+            value: input.value,
             score: input.score,
+            memo: input.memo,
           },
         });
       } else {
@@ -116,8 +119,9 @@ export const metricsRouter = createTRPCRouter({
             id: existing.id,
           },
           data: {
-            value: input.score,
+            value: input.value,
             score: input.score,
+            memo: input.memo,
           },
         });
       }

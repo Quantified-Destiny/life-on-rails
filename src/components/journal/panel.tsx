@@ -5,7 +5,13 @@ import { Button } from "../ui/button";
 import { MetricUI } from "./elements";
 import { api } from "../../utils/api";
 
-export function Memo() {
+export function Memo({
+  content,
+  update,
+}: {
+  content: string;
+  update: (content: string) => void;
+}) {
   const [active, setActive] = useState<boolean>(false);
 
   return !active ? (
@@ -19,7 +25,8 @@ export function Memo() {
     <textarea
       placeholder="Memo"
       className="h-14 w-full resize-none rounded border border-gray-200 py-3 pl-3 focus:h-20 focus:overflow-auto focus:outline-none"
-      defaultValue={""}
+      value={content}
+      onChange={(e) => update(e.target.value)}
       onKeyDown={(key) => {
         if (key.key === "Escape") {
           setActive(false);
@@ -35,12 +42,14 @@ export function HabitPanel({
   id,
   metrics,
   reset,
-  setLoading
+  setLoading,
+  memo,
 }: {
-  id: string,
+  id: string;
   metrics: ExpandedMetric[];
   reset: () => void;
-  setLoading: (loading: boolean) => void
+  setLoading: (loading: boolean) => void;
+  memo?: { content: string; update: (content: string) => void };
 }) {
   const context = api.useContext();
   const setScore = api.metrics.setScore.useMutation();
@@ -51,9 +60,9 @@ export function HabitPanel({
   });
 
   const initValue = [...Array(metrics.length).keys()].map((_) => undefined);
-  const [metricScores, setMetricScores] =
+  const [metricValues, setMetricScores] =
     useState<(number | undefined)[]>(initValue);
-  console.log(metricScores);
+  console.log(metricValues);
   return (
     <tr>
       <td colSpan={4} className="bg-gray-100/70"></td>
@@ -65,16 +74,16 @@ export function HabitPanel({
                 key={metric.id}
                 id={metric.id}
                 prompt={metric.prompt}
-                score={metricScores[i]}
-                setScore={(score) => {
-                  metricScores[i] = score;
-                  setMetricScores([...metricScores]);
+                value={metricValues[i]}
+                setValue={(value) => {
+                  metricValues[i] = value;
+                  setMetricScores([...metricValues]);
                 }}
               ></MetricUI>
             ))}
           </div>
           <div className="">
-            <Memo></Memo>
+            {memo && <Memo content={memo.content} update={memo.update}></Memo>}
           </div>
           {metrics.length > 0 && (
             <div className="items-right mt-2 flex justify-end gap-2">
@@ -83,7 +92,7 @@ export function HabitPanel({
               </Button>
               <Button
                 variant="outline"
-                disabled={metricScores.some((it) => it === undefined)}
+                disabled={metricValues.some((it) => it === undefined)}
                 onClick={() => {
                   setLoading(true);
                   const now = new Date();
@@ -91,12 +100,13 @@ export function HabitPanel({
                     setScore.mutate({
                       metricId: metric.id,
                       date: now,
-                      score: metricScores[i]!,
+                      score: metricValues[i]! / 5,
+                      value: metricValues[i]!,
                     });
                   });
                   createCompletion.mutate({
                     habitId: id,
-                    date: now
+                    date: now,
                   });
                   reset();
                   setLoading(false);

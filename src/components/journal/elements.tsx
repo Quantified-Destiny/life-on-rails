@@ -16,42 +16,42 @@ import { CompletionStatus } from "./row";
 import type { Completion } from "./row";
 
 export function MetricButtonRow({
-  score,
-  setScore,
+  value,
+  setValue,
 }: {
   id: string;
-  score: number | undefined;
-  setScore: (score: number) => void;
+  value: number | undefined;
+  setValue: (score: number) => void;
 }) {
   return (
     <div className="flex flex-row flex-nowrap gap-2 p-2">
       <Button
-        onClick={() => setScore(1)}
-        variant={score == 1 ? "default" : "outline"}
+        onClick={() => setValue(1)}
+        variant={value == 1 ? "default" : "outline"}
       >
         1
       </Button>
       <Button
-        onClick={() => setScore(2)}
-        variant={score == 2 ? "default" : "outline"}
+        onClick={() => setValue(2)}
+        variant={value == 2 ? "default" : "outline"}
       >
         2
       </Button>
       <Button
-        onClick={() => setScore(3)}
-        variant={score == 3 ? "default" : "outline"}
+        onClick={() => setValue(3)}
+        variant={value == 3 ? "default" : "outline"}
       >
         3
       </Button>
       <Button
-        onClick={() => setScore(4)}
-        variant={score == 4 ? "default" : "outline"}
+        onClick={() => setValue(4)}
+        variant={value == 4 ? "default" : "outline"}
       >
         4
       </Button>
       <Button
-        onClick={() => setScore(5)}
-        variant={score == 5 ? "default" : "outline"}
+        onClick={() => setValue(5)}
+        variant={value == 5 ? "default" : "outline"}
       >
         5
       </Button>
@@ -61,11 +61,11 @@ export function MetricButtonRow({
 interface MetricProps {
   id: string;
   prompt: string;
-  score: number | undefined;
-  setScore: (score: number) => void;
+  value: number | undefined;
+  setValue: (score: number) => void;
 }
 
-export const MetricUI = ({ id, prompt, score, setScore }: MetricProps) => {
+export const MetricUI = ({ id, prompt, value, setValue }: MetricProps) => {
   return (
     <div className="mb-1 py-1">
       <span className="flex flex-row items-center justify-center gap-2">
@@ -74,8 +74,8 @@ export const MetricUI = ({ id, prompt, score, setScore }: MetricProps) => {
       </span>
       <MetricButtonRow
         id={id}
-        score={score}
-        setScore={setScore}
+        value={value}
+        setValue={setValue}
       ></MetricButtonRow>
     </div>
   );
