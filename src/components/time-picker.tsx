@@ -54,7 +54,11 @@ const TimePicker = ({ date, setDate }: TimePickerProps) => {
           disabled={date >= maxDate}
         >
           <ChevronRight
-            className={date >= maxDate ? "fill-[#ccc]" : "fill-[#000]"}
+            className={
+              date >= maxDate
+                ? "cursor-not-allowed stroke-[#ccc]"
+                : "stroke-[#000]"
+            }
           ></ChevronRight>
         </button>
       </div>
