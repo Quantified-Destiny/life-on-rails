@@ -215,7 +215,7 @@ function SimpleHabit({
   const context = api.useContext();
   const createCompletion = api.journal.complete.useMutation({
     onSuccess() {
-      void context.habits.getHabits.invalidate();
+      void context.habits.invalidate();
     },
   });
 

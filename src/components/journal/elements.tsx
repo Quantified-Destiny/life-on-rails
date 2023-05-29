@@ -1,19 +1,18 @@
 import type { Metric, ScoringFormat } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
 import { CircleDot, CircleIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { RxExternalLink, RxGear } from "react-icons/rx";
 import { HabitSheet } from "../overview/habit-panel";
 import { Button } from "../ui/button";
 import { HabitIcon, MetricIcon } from "../ui/icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { CompletionStatus } from "./row";
-import type { Completion } from "./row";
 
 export function MetricButtonRow({
   value,

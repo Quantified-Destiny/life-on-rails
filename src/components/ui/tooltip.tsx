@@ -4,6 +4,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as React from "react";
 
 import { cn } from "../../lib/utils";
+import { ReactNode } from "react";
 
 const TooltipProvider = TooltipPrimitive.Provider;
 
@@ -26,5 +27,18 @@ const TooltipContent = React.forwardRef<
   />
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
+
+export const SimpleTooltip = ({
+  content,
+  children,
+}: {
+  content: string;
+  children: ReactNode;
+}) => (
+  <Tooltip>
+    <TooltipTrigger>{children}</TooltipTrigger>
+    <TooltipContent>{content}</TooltipContent>
+  </Tooltip>
+);
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };

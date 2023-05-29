@@ -53,7 +53,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     );
 
   return (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={400} skipDelayDuration={400}>
       <SessionProvider session={session}>
         <Modals></Modals>
         <Layout>

@@ -1,9 +1,17 @@
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, XCircle } from "lucide-react";
 import { useState } from "react";
 import type { ExpandedMetric } from "../../server/queries";
 import { Button } from "../ui/button";
 import { MetricUI } from "./elements";
 import { api } from "../../utils/api";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
+import { Loader } from "../ui/loader";
+import { SimpleTooltip, Tooltip } from "../ui/tooltip";
 
 export function Memo({
   content,
@@ -38,6 +46,73 @@ export function Memo({
     />
   );
 }
+
+function RecentCompletions({ id }: { id: string }) {
+  const completions = api.habits.getCompletions.useQuery({
+    habitId: id,
+    timeHorizon: 2,
+  });
+
+  return (
+    <div className="mx-auto w-3/4 p-2 shadow-sm">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Recent completions</AccordionTrigger>
+          <AccordionContent>
+            {completions.isLoading || completions.isError ? (
+              <Loader></Loader>
+            ) : (
+              <CompletionsList habitId={id}></CompletionsList>
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  );
+}
+
+function CompletionsList({ habitId }: { habitId: string }) {
+  const completionsQuery = api.habits.getCompletions.useQuery({
+    habitId: habitId,
+    timeHorizon: 2,
+  });
+  const context = api.useContext();
+  const deleteCompletion = api.habits.deleteCompletion.useMutation({
+    onSuccess() {
+      void context.habits.invalidate();
+    },
+  });
+  return (
+    <div className="pt-10">
+      <ol className="pt-1 dark:border-gray-700">
+        {completionsQuery.isFetching && <Loader></Loader>}
+        {completionsQuery.data?.map((it) => (
+          <li className="mb-2" key={it.id}>
+            <div className="flex items-center justify-between gap-10 rounded-lg border border-gray-300 bg-white p-2 shadow-sm">
+              <div className="mb-1 text-xs font-normal text-gray-400">
+                {it.date.toLocaleString()}
+              </div>
+              <SimpleTooltip content="Delete this completion">
+                <XCircle
+                  className="cursor-pointer opacity-50 hover:bg-red-100"
+                  onClick={() =>
+                    deleteCompletion.mutate({ completionId: it.id })
+                  }
+                ></XCircle>
+              </SimpleTooltip>
+            </div>
+            {it.memo && (
+              <div className="mx-2 rounded-b-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs font-normal italic text-gray-500 dark:border-gray-500 dark:bg-gray-600 dark:text-gray-300">
+                {it.memo}
+              </div>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 export function HabitPanel({
   id,
   metrics,
@@ -55,7 +130,7 @@ export function HabitPanel({
   const setScore = api.metrics.setScore.useMutation();
   const createCompletion = api.journal.complete.useMutation({
     onSuccess() {
-      void context.habits.getHabits.invalidate();
+      void context.habits.invalidate();
     },
   });
 
@@ -65,8 +140,9 @@ export function HabitPanel({
   console.log(metricValues);
   return (
     <tr>
-      <td colSpan={4} className="bg-gray-100/70"></td>
-      <td colSpan={5} className="rounded border border-gray-100">
+      <td colSpan={1} className="bg-gray-100/70"></td>
+      <td colSpan={10} className="rounded border border-gray-100">
+        <RecentCompletions id={id} />
         <div className="px-4 pb-7 pt-3 md:px-10 md:pb-4">
           <div className="flex items-center">
             {metrics.map((metric, i) => (
