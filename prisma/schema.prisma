@@ -140,7 +140,7 @@ model HabitMeasuresGoal {
   habitId String
   weight  Int    @default(1)
 
-  goal  Goal  @relation(fields: [goalId], references: [id])
+  goal  Goal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
   @@unique([goalId, habitId])
@@ -181,13 +181,13 @@ model Metric {
   createdAt  DateTime             @default(now())
   updatedAt  DateTime             @updatedAt
   ownerId    String
-  owner      User                 @relation(fields: [ownerId], references: [id])
+  owner      User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   goals      MetricMeasuresGoal[]
   formatId   String
   archived   Boolean              @default(false)
   archivedAt DateTime             @default(now())
 
-  format           AnswerFormat   @relation(fields: [formatId], references: [id])
+  format           AnswerFormat   @relation(fields: [formatId], references: [id], onDelete: Cascade)
   metricAnswers    MetricAnswer[]
   completionMetric LinkedMetric[]
   tags             MetricTag[]

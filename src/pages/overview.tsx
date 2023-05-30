@@ -19,8 +19,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../components/ui/popover";
-import { api } from "../utils/api";
-import {templates, TemplatesPage} from "../pages/templates";
+import { RouterOutputs, api } from "../utils/api";
+import { templates, TemplatesList, TemplatesPage } from "../pages/templates";
+import { ScoringFormat } from "@prisma/client";
 
 function Header({
   filters,
@@ -65,6 +66,64 @@ function Header({
   );
 }
 
+function isEmpty(
+  data: Omit<RouterOutputs["goals"]["getAllGoals"], "goalsMap">
+) {
+  return (
+    data.goals.length == 0 &&
+    data.habits.length == 0 &&
+    data.metrics.length == 0
+  );
+}
+
+function OverviewContent(
+  props: { scoringUnit: ScoringFormat } & Omit<
+    RouterOutputs["goals"]["getAllGoals"],
+    "goalsMap"
+  >
+) {
+  return (
+    <div className="mx-auto mt-3 grid grid-cols-2 items-center gap-2 p-6 ">
+      {props.goals.map((goal) => (
+        <GoalCard
+          {...goal.goal}
+          habits={goal.habits}
+          metrics={goal.metrics}
+          key={goal.goal.id}
+          scoringUnit={props.scoringUnit}
+        ></GoalCard>
+      ))}
+      {/* Habit Card with Progress Bar */}
+      <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
+        Unlinked Items
+        <hr />
+      </h1>
+      {props.habits.map((habit) => (
+        <HabitCard
+          {...habit}
+          weight={0.5}
+          key={habit.id}
+          scoringUnit={props.scoringUnit}
+        ></HabitCard>
+      ))}
+      {props.metrics.map((metric) => {
+        return (
+          <LinkedMetric
+            {...metric}
+            weight={0.5}
+            key={metric.id}
+            offset={0}
+            scoringUnit={props.scoringUnit}
+          ></LinkedMetric>
+        );
+      })}
+      <div className="w-full">
+        <ArchivedItems></ArchivedItems>
+      </div>
+    </div>
+  );
+}
+
 function OverviewPage() {
   const [filters, setFilters] = useState<Filters>();
   const goalsQuery = api.goals.getAllGoals.useQuery();
@@ -74,55 +133,27 @@ function OverviewPage() {
 
   const data = filteredData(goalsQuery.data, filters);
   const user = profileQuery.data;
-  console.log(data);
-  if (goalsQuery.data == undefined) {
-    return (
-      <TemplatesPage></TemplatesPage>
-    );
-  }
 
   return (
     <div className="container max-w-4xl">
       <div className="mb-10 scrollbar-none">
         <Header filters={filters} setFilters={setFilters}></Header>
-        <div className="mx-auto mt-3 grid grid-cols-2 items-center gap-2 p-6 ">
-          {data.goals.map((goal) => (
-            <GoalCard
-              {...goal.goal}
-              habits={goal.habits}
-              metrics={goal.metrics}
-              key={goal.goal.id}
-              scoringUnit={user.scoringUnit}
-            ></GoalCard>
-          ))}
-          {/* Habit Card with Progress Bar */}
-          <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
-            Unlinked Items
-            <hr />
-          </h1>
-          {data.habits.map((habit) => (
-            <HabitCard
-              {...habit}
-              weight={0.5}
-              key={habit.id}
-              scoringUnit={user.scoringUnit}
-            ></HabitCard>
-          ))}
-          {data.metrics.map((metric) => {
-            return (
-              <LinkedMetric
-                {...metric}
-                weight={0.5}
-                key={metric.id}
-                offset={0}
-                scoringUnit={user.scoringUnit}
-              ></LinkedMetric>
-            );
-          })}
-        </div>
-      </div>
-      <div className="w-full">
-        <ArchivedItems></ArchivedItems>
+        {isEmpty(data) ? (
+          <>
+            <span className="text-md w-full text-center">
+              You have no items! If you're overwhelmed, try starting with one of
+              these templates.
+            </span>
+            <TemplatesList />
+          </>
+        ) : (
+          <OverviewContent
+            goals={data.goals}
+            metrics={data.metrics}
+            habits={data.habits}
+            scoringUnit={user.scoringUnit}
+          ></OverviewContent>
+        )}
       </div>
     </div>
   );

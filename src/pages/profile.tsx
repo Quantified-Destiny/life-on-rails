@@ -12,6 +12,12 @@ import {
 } from "../components/ui/select";
 import { api } from "../utils/api";
 import { ItemText } from "@radix-ui/react-select";
+import { Button } from "../components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "../components/ui/dialog";
+import { InfoIcon, Loader2 } from "lucide-react";
+import router from "next/router";
+import { AiOutlineCheck } from "react-icons/ai";
+import { useState } from "react";
 
 const ProfilePage = () => {
   const context = api.useContext();
@@ -115,7 +121,7 @@ const ProfilePage = () => {
                     defaultValue={profile.scoringUnit}
                   >
                     <SelectTrigger className="h-fit w-fit outline-none">
-                      <SelectValue/>
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Percentage">
@@ -174,12 +180,75 @@ const ProfilePage = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="sm:col-span-1">
+                  <div className="mb-4 flex flex-row items-center gap-2 text-sm font-medium text-gray-500">
+                    <Dialog>
+                      <DialogTrigger>
+                        <Button variant="destructive">Reset Account</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <ResetAccountModal />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
               </dl>
             </div>
           </div>
         </div>
       </div>
     </>
+  );
+};
+
+enum ModalState {
+  None,
+  Creating,
+  Done,
+}
+
+const actionButtonLabel = (state: ModalState) => {
+  switch (state) {
+    case ModalState.None:
+      return "Reset Account";
+    case ModalState.Creating:
+      return <Loader2 className="h-6 w-6 animate-spin" />;
+    case ModalState.Done:
+      return <AiOutlineCheck />;
+  }
+};
+
+const ResetAccountModal = () => {
+  const context = api.useContext();
+  const resetAccount = api.profile.resetAccount.useMutation({
+    onSettled() {
+      void context.invalidate();
+    },
+  });
+  const [state, setState] = useState<ModalState>(ModalState.None);
+
+  return (
+    <div className="rounded-lg bg-white p-5">
+      <div className="text-md mb-5 font-semibold">
+        You are about to reset all data on your account.
+      </div>
+      <div className="font-light text-gray-500">
+        This will delete all of your goals, habits, and metrics, and all
+        associated completions. This operation is irreversible.
+      </div>
+      <div className="mt-4 flex justify-end gap-x-2">
+        <Button
+          variant="default"
+          onClick={async () => {
+            setState(ModalState.Creating);
+            await resetAccount.mutateAsync();
+            setState(ModalState.Done);
+          }}
+        >
+          {actionButtonLabel(state)}
+        </Button>
+      </div>
+    </div>
   );
 };
 

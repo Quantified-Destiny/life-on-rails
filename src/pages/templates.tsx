@@ -101,16 +101,11 @@ const TemplateModal = ({
   );
 };
 
-export const TemplatesPage = () => {
+export const TemplatesList = () => {
   const [templateKey, setTemplateKey] = useState<string | undefined>(undefined); // New state variable for selected template key
 
   return (
-    <div className="container mx-auto max-w-screen-lg px-4 py-8">
-      <h1 className="my-5 text-2xl font-bold">Templates</h1>
-      <p className="text-gray-600">
-        Feeling overwhelmed? These templates can get you started on just about
-        anything.
-      </p>
+    <>
       <div className="relative mt-10 flex flex-col items-center gap-y-5 rounded-xl">
         {templates.map((template) => {
           return (
@@ -146,6 +141,19 @@ export const TemplatesPage = () => {
           cancel={() => setTemplateKey(undefined)}
         ></TemplateModal>
       )}
+    </>
+  );
+};
+
+export const TemplatesPage = () => {
+  return (
+    <div className="container mx-auto max-w-screen-lg px-4 py-8">
+      <h1 className="my-5 text-2xl font-bold">Templates</h1>
+      <p className="text-gray-600">
+        Feeling overwhelmed? These templates can get you started on just about
+        anything.
+      </p>
+      <TemplatesList />
     </div>
   );
 };
