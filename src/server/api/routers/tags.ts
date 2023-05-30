@@ -83,8 +83,8 @@ export const taggingRouter = createTRPCRouter({
       });
     }),
 
-  getTags: protectedProcedure.query(({ ctx }) => {
-    return ctx.prisma.tag.findMany({
+  getTags: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.tag.findMany({
       where: {
         ownerId: ctx.session.user.id,
       },

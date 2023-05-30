@@ -60,7 +60,7 @@ export function ConfigureOverview({
             ))}
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
-                <Button variant="secondary">Add a tag</Button>
+                <Button variant="secondary">Filter by a tag</Button>
               </PopoverTrigger>
               <PopoverContent>
                 <Command>

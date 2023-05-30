@@ -81,7 +81,14 @@ export const Row = ({
         )}
       </td>
       <TypeIcon type={type}></TypeIcon>
-      <td>{completion && <Status status={completion.status} action={completion.action}></Status>}</td>
+      <td>
+        {completion && (
+          <Status
+            status={completion.status}
+            action={completion.action}
+          ></Status>
+        )}
+      </td>
       <td>
         {completion?.schedule && (
           <Schedule
@@ -294,6 +301,7 @@ function HabitWithLinkedMetrics({
   const [loading, setLoading] = useState<boolean>(false);
   const [partial, setPartial] = useState<boolean>(false);
   const [panelOpen, setPanelOpen] = useState<boolean>(false);
+  const [memo, setMemo] = useState<string>("");
 
   const reset = useCallback(() => {
     setPartial(false);
@@ -350,6 +358,7 @@ function HabitWithLinkedMetrics({
           metrics={habit.metrics}
           reset={reset}
           setLoading={setLoading}
+          memo={{ content: memo, update: setMemo }}
         ></HabitPanel>
       )}
     </>

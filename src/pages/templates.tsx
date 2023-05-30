@@ -86,6 +86,7 @@ const TemplateModal = ({
 
           <Button
             variant="default"
+            disabled={state === ModalState.Done}
             onClick={async () => {
               setState(ModalState.Creating);
               await createFromTemplate.mutateAsync({ key: templateKey });

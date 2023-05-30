@@ -12,6 +12,7 @@ import {
 } from "../ui/accordion";
 import { Loader } from "../ui/loader";
 import { SimpleTooltip } from "../ui/tooltip";
+import type { HabitCompletion } from "@prisma/client";
 
 export function Memo({
   content,
@@ -62,7 +63,7 @@ function RecentCompletions({ id }: { id: string }) {
             {completions.isLoading || completions.isError ? (
               <Loader></Loader>
             ) : (
-              <CompletionsList habitId={id}></CompletionsList>
+              <CompletionsList completions={completions.data}></CompletionsList>
             )}
           </AccordionContent>
         </AccordionItem>
@@ -71,22 +72,22 @@ function RecentCompletions({ id }: { id: string }) {
   );
 }
 
-function CompletionsList({ habitId }: { habitId: string }) {
-  const completionsQuery = api.habits.getCompletions.useQuery({
-    habitId: habitId,
-    timeHorizon: 2,
-  });
+function CompletionsList({ completions }: { completions: HabitCompletion[] }) {
   const context = api.useContext();
   const deleteCompletion = api.habits.deleteCompletion.useMutation({
     onSuccess() {
       void context.habits.invalidate();
     },
   });
+
+  if (completions.length === 0) {
+    return <div className="text-center text-gray-400">No completions</div>;
+  }
+
   return (
     <div className="pt-10">
       <ol className="pt-1 dark:border-gray-700">
-        {completionsQuery.isFetching && <Loader></Loader>}
-        {completionsQuery.data?.map((it) => (
+        {completions.map((it) => (
           <li className="mb-2" key={it.id}>
             <div className="flex items-center justify-between gap-10 rounded-lg border border-gray-300 bg-white p-2 shadow-sm">
               <div className="mb-1 text-xs font-normal text-gray-400">

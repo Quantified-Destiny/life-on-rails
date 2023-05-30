@@ -70,32 +70,6 @@ function Journal({
                 scoringUnit={scoringUnit ?? "Normalized"}
               ></JournalTable>
             </div>
-
-            {/* <div className="delay-150 flex mt-7 flex-row justify-center transition">
-              <div className=" text-md mb-5 text-center">
-                <button
-                  className="rounded-full focus:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-800"
-                  onClick={() => setTgl(!Tgl)}
-                >
-                  <div className="rounded-full bg-indigo-100 px-4 py-1 text-indigo-700 transition delay-150">
-                    {Tgl ? (
-                      <p>Show Compeleted Items</p>
-                    ) : (
-                      <p>Hide Compeleted Items</p>
-                    )}
-                  </div>
-                </button>
-              </div>
-            </div>
-            {Tgl ? (
-              <></>
-            ) : (
-              <DataTable
-                habits={habits}
-                metrics={metrics}
-                date={date}
-              ></DataTable>
-            )} */}
           </div>
         </div>
       </div>
