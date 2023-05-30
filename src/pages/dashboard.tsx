@@ -1,12 +1,12 @@
 import { Loader } from "../components/ui/loader";
-import {
+import type {
   ExpandedHabit,
   GoalsReturnType,
   ExpandedMetric,
 } from "../server/queries";
 import { ScoringFormat } from "@prisma/client";
 import { api } from "../utils/api";
-import { PieChart, pieChartDefaultProps } from 'react-minimal-pie-chart';
+import { PieChart, pieChartDefaultProps } from "react-minimal-pie-chart";
 
 import {
   Chart as ChartJS,
@@ -17,8 +17,8 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
+} from "chart.js";
+import { Line } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -34,25 +34,25 @@ export const options = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'bottom' as const,
+      position: "bottom" as const,
     },
     title: {
       display: true,
-      text: 'Number of Habit Completions (last 7 days)',
+      text: "Number of Habit Completions (last 7 days)",
     },
   },
 };
 
 const labels = [-7, -6, -5, -4, -3, -2, -1, 0];
 
-export const data = {
+const data = (data: number[]) => ({
   labels,
   datasets: [
     {
-      label: 'Habit Completions',
-      data: [3, 6, 7, 1, 8, 3, 5, 10],
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      label: "Habit Completions",
+      data: data,
+      borderColor: "rgb(255, 99, 132)",
+      backgroundColor: "rgba(255, 99, 132, 0.5)",
     },
     // {
     //   label: 'Metric Completions',
@@ -61,12 +61,11 @@ export const data = {
     //   backgroundColor: 'rgba(53, 162, 235, 0.5)',
     // },
   ],
-};
+});
 
 // function App() {
 //   return <Line options={options} data={data} />;
 // }
-
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -150,47 +149,51 @@ function StatsCardRow({
   }
 
   const goalData = [
-    { title: 'Good', value: greenGoal, color: '#21C55D' },
-    { title: 'OK', value: yellowGoal, color: '#EAB305' },
-    { title: 'Bad', value: redGoal, color: '#EF4444' },
+    { title: "Good", value: greenGoal, color: "#21C55D" },
+    { title: "OK", value: yellowGoal, color: "#EAB305" },
+    { title: "Bad", value: redGoal, color: "#EF4444" },
   ];
 
   const habitData = [
-    { title: 'Good', value: greenHabit, color: '#21C55D' },
-    { title: 'OK', value: yellowHabit, color: '#EAB305' },
-    { title: 'Bad', value: redHabit, color: '#EF4444' },
+    { title: "Good", value: greenHabit, color: "#21C55D" },
+    { title: "OK", value: yellowHabit, color: "#EAB305" },
+    { title: "Bad", value: redHabit, color: "#EF4444" },
   ];
 
   const metricsData = [
-    { title: 'Good', value: greenMetric, color: '#21C55D' },
-    { title: 'OK', value: yellowMetric, color: '#EAB305' },
-    { title: 'Bad', value: redMetric, color: '#EF4444' },
+    { title: "Good", value: greenMetric, color: "#21C55D" },
+    { title: "OK", value: yellowMetric, color: "#EAB305" },
+    { title: "Bad", value: redMetric, color: "#EF4444" },
   ];
+
+  const aquery = api.habits.getCompletionsSubDays.useQuery();
 
   return (
     <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
-      <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
+        <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
           <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
             Goals
           </div>
-          
+
           <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
-          <PieChart
+            <PieChart
               style={{
-                fontSize: '8px',
+                fontSize: "8px",
               }}
               data={goalData}
               radius={pieChartDefaultProps.radius - 6}
               lineWidth={60}
               // segmentsStyle={{ transition: 'stroke .3s', cursor: 'pointer' }}
               animate
-              label={({ dataEntry }) => (dataEntry.value === 0 ? "" : Math.round(dataEntry.value))}
+              label={({ dataEntry }) =>
+                dataEntry.value === 0 ? "" : Math.round(dataEntry.value)
+              }
               labelPosition={100 - 60 / 2}
               labelStyle={{
-                fill: '#fff',
+                fill: "#fff",
                 opacity: 1,
-                pointerEvents: 'none',
+                pointerEvents: "none",
               }}
             />
             {/* <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
@@ -210,21 +213,23 @@ function StatsCardRow({
             Habits
           </div>
           <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2  border-indigo-800 p-1 text-center">
-          <PieChart
+            <PieChart
               style={{
-                fontSize: '8px',
+                fontSize: "8px",
               }}
               data={habitData}
               radius={pieChartDefaultProps.radius - 6}
               lineWidth={60}
               // segmentsStyle={{ transition: 'stroke .3s', cursor: 'pointer' }}
               animate
-              label={({ dataEntry }) => (dataEntry.value === 0 ? "" : Math.round(dataEntry.value))}
+              label={({ dataEntry }) =>
+                dataEntry.value === 0 ? "" : Math.round(dataEntry.value)
+              }
               labelPosition={100 - 60 / 2}
               labelStyle={{
-                fill: '#fff',
+                fill: "#fff",
                 opacity: 1,
-                pointerEvents: 'none',
+                pointerEvents: "none",
               }}
             />
             {/* <span className="m-1 flex-1 rounded-sm bg-green-500 p-4 font-semibold text-white">
@@ -253,28 +258,30 @@ function StatsCardRow({
               {redMetric}
             </span>
           </div> */}
-          <div className="flex w-full flex-row content-stretch justify-stretch p-1 text-center rounded-b-xl border-2 border-indigo-800">
+          <div className="flex w-full flex-row content-stretch justify-stretch rounded-b-xl border-2 border-indigo-800 p-1 text-center">
             <PieChart
               style={{
-                fontSize: '8px',
+                fontSize: "8px",
               }}
               data={metricsData}
               radius={pieChartDefaultProps.radius - 6}
               lineWidth={60}
               // segmentsStyle={{ transition: 'stroke .3s', cursor: 'pointer' }}
               animate
-              label={({ dataEntry }) => (dataEntry.value === 0 ? "" : Math.round(dataEntry.value))}
+              label={({ dataEntry }) =>
+                dataEntry.value === 0 ? "" : Math.round(dataEntry.value)
+              }
               labelPosition={100 - 60 / 2}
               labelStyle={{
-                fill: '#fff',
+                fill: "#fff",
                 opacity: 1,
-                pointerEvents: 'none',
+                pointerEvents: "none",
               }}
             />
           </div>
         </div>
         {/* https://react-chartjs-2.js.org/examples/line-chart/ */}
-        <Line options={options} data={data} />
+        <Line options={options} data={data(aquery.data ?? [])} />
       </div>
     </div>
   );
@@ -635,8 +642,6 @@ function MetricsTable({
 
 const today = new Date();
 export function Home() {
-  
-  const aquery = api.habits.getCompletionsSubDays.useQuery();
   const goalsQuery = api.goals.getAllGoals.useQuery();
   const habitsQuery = api.habits.getHabits.useQuery({ date: today });
   const metricsQuery = api.goals.getAllMetrics.useQuery();
@@ -660,7 +665,6 @@ export function Home() {
   return (
     <div className="">
       <div className="m-auto h-full max-w-3xl pt-2">
-        {/* {JSON.stringify(aquery)} */}
         <StatsCardRow
           goals={goalsQuery.data.goals}
           habits={goalsQuery.data.habits}

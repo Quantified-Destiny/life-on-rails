@@ -71,14 +71,14 @@ export const habitsRouter = createTRPCRouter({
       return completions;
     }),
 
-    getCompletionsSubDays: protectedProcedure.query(async ({ ctx }) => {
-      const [habits, _habitsMap] = await getHabitCompletionSubDays({
-        prisma: ctx.prisma,
-        userId: ctx.session.user.id,
-        days: 7, //hard coded 7 days
-      });
-      return habits;
-    }),
+  getCompletionsSubDays: protectedProcedure.query(async ({ ctx }) => {
+    const habits = await getHabitCompletionSubDays({
+      prisma: ctx.prisma,
+      userId: ctx.session.user.id,
+      days: 7, //hard coded 7 days
+    });
+    return habits;
+  }),
 
   getCompletionsOnDay: protectedProcedure
     .input(z.object({ habitId: z.string(), date: z.date() }))

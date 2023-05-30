@@ -11,7 +11,7 @@ import type {
   Tag,
 } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
-import { isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
+import { endOfDay, isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
 import { cache } from "./api/cache";
 import type { prisma as prismaClient } from "./db";
@@ -42,17 +42,16 @@ export async function getHabitCompletionSubDays({
   userId: string;
   days: number;
 }): Promise<number[]> {
-
   const currentDate = new Date();
   const completionCounts: number[] = [];
 
-  for (let i = 1; i <= days; i++) {
+  for (let i = days; i >= 0; i--) {
     const targetDate = subDays(currentDate, i);
 
     const completions = await prisma.habitCompletion.count({
       where: {
         Habit: { ownerId: userId },
-        date: targetDate,
+        date: { gt: startOfDay(targetDate), lt: endOfDay(targetDate) },
       },
     });
 
@@ -61,7 +60,6 @@ export async function getHabitCompletionSubDays({
 
   return completionCounts;
 }
-
 
 export async function getHabitsWithMetricsMap({
   prisma,
