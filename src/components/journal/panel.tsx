@@ -11,7 +11,7 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import { Loader } from "../ui/loader";
-import { SimpleTooltip, Tooltip } from "../ui/tooltip";
+import { SimpleTooltip } from "../ui/tooltip";
 
 export function Memo({
   content,
