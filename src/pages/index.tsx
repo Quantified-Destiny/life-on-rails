@@ -194,7 +194,7 @@ function Features() {
             </div>
           </div>
           <img
-            src="https://tailwindui.com/img/component-images/dark-project-app-screenshot.png"
+            src="img/journal.png"
             alt="Product screenshot"
             className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
             width={2432}
@@ -446,8 +446,8 @@ function CTA() {
           </div>
           <div className="relative mt-16 h-80 lg:mt-8">
             <img
-              className="absolute left-0 top-0 w-[57rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10"
-              src="https://tailwindui.com/img/component-images/dark-project-app-screenshot.png"
+              className="absolute left-0 top-0 w-[34rem] max-w-none rounded-md bg-white/5 ring-1 ring-white/10"
+              src="img/overview.png"
               alt="App screenshot"
               width={1824}
               height={1080}

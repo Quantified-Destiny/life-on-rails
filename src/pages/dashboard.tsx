@@ -50,7 +50,7 @@ export const data = {
   datasets: [
     {
       label: 'Habit Completions',
-      data: [0.1, 0.3, 0.5, 0.3, 0.2, 0, 0, 0, 0],
+      data: [3, 6, 7, 1, 8, 3, 5, 10],
       borderColor: 'rgb(255, 99, 132)',
       backgroundColor: 'rgba(255, 99, 132, 0.5)',
     },
@@ -660,7 +660,7 @@ export function Home() {
   return (
     <div className="">
       <div className="m-auto h-full max-w-3xl pt-2">
-        {JSON.stringify(aquery)}
+        {/* {JSON.stringify(aquery)} */}
         <StatsCardRow
           goals={goalsQuery.data.goals}
           habits={goalsQuery.data.habits}
