@@ -19,6 +19,7 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import { ActionButton, Button } from "../ui/button";
+import { HabitIcon, MetricIcon } from "../ui/icons";
 import { Label } from "../ui/label";
 import {
   Sheet,
@@ -34,8 +35,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
-import { TbSquareRoundedLetterM } from "react-icons/tb";
-import { HabitIcon } from "../ui/icons";
+import { HelpIcon } from "../ui/help-icon";
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -311,6 +311,59 @@ function HistorySection({ habitId }: { habitId: string }) {
   );
 }
 
+function WeightBar({
+  children,
+  weight,
+  totalWeight,
+  color,
+  updateWeight,
+}: {
+  children: ReactNode;
+  weight: number;
+  totalWeight: number;
+  color: number;
+  updateWeight: (weight: number) => void;
+}) {
+  return (
+    <Tooltip delayDuration={0}>
+      <div
+        className="inline-flex h-full flex-col items-center gap-3 text-center"
+        style={{
+          width: `${(weight / totalWeight) * 100}%`,
+        }}
+      >
+        <span className="flex flex-row items-center justify-center gap-2 overflow-ellipsis">
+          {children}
+        </span>
+        <TooltipTrigger asChild>
+          <div
+            className="h-5 w-full animate-[scale] animate-in animate-out hover:scale-110 hover:scale-y-150"
+            style={{
+              backgroundColor: `hsl(0deg 0% ${40 + ((color * 15) % 60)}%)`,
+            }}
+          ></div>
+        </TooltipTrigger>
+        <p> Weight: {weight}</p>
+        <span>
+          <Button
+            variant="ghost"
+            disabled={weight <= 1}
+            onClick={() => updateWeight(weight - 1)}
+          >
+            <ArrowDownIcon></ArrowDownIcon>
+          </Button>
+          <Button variant="ghost" onClick={() => updateWeight(weight + 1)}>
+            <ArrowUpIcon></ArrowUpIcon>
+          </Button>
+        </span>
+      </div>
+      <TooltipContent>
+        {((weight / totalWeight) * 100).toFixed(2)}%
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 function ScoringSection({
   goalId,
   habits,
@@ -349,133 +402,41 @@ function ScoringSection({
     <TooltipProvider>
       <div className="relative w-full">
         {habits.map((habit, i) => (
-          <Tooltip key={habit.id} delayDuration={0}>
-            <div
-              key={habit.id}
-              className="inline-flex h-full flex-col items-center gap-3 text-center"
-              style={{
-                width: `${(habit.weight / totalWeight) * 100}%`,
-              }}
-            >
-              <span className="flex flex-row items-center justify-center gap-2">
-                <HabitIcon />
-                {habit.description}
-              </span>
-              <TooltipTrigger asChild>
-                <div
-                  className="h-5 w-full animate-[scale] animate-in animate-out hover:scale-110 hover:scale-y-150"
-                  style={{
-                    backgroundColor: `hsl(0deg 0% ${40 + ((i * 15) % 60)}%)`,
-                  }}
-                ></div>
-              </TooltipTrigger>
-              <p> Weight: {habit.weight}</p>
-              <span>
-                <Button
-                  variant="ghost"
-                  disabled={habit.weight <= 1}
-                  onClick={() =>
-                    updateHabitWeight.mutate({
-                      goalId: goalId,
-                      habitId: habit.id,
-                      weight: habit.weight - 1,
-                    })
-                  }
-                >
-                  <ArrowDownIcon></ArrowDownIcon>
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    updateHabitWeight.mutate({
-                      goalId: goalId,
-                      habitId: habit.id,
-                      weight: habit.weight + 1,
-                    })
-                  }
-                >
-                  <ArrowUpIcon></ArrowUpIcon>
-                </Button>
-              </span>
-            </div>
-            <TooltipContent>
-              {((habit.weight / totalWeight) * 100).toFixed(2)}%
-            </TooltipContent>
-          </Tooltip>
+          <WeightBar
+            key={habit.id}
+            weight={habit.weight}
+            totalWeight={totalWeight}
+            color={i}
+            updateWeight={(weight) =>
+              updateHabitWeight.mutate({
+                goalId: goalId,
+                habitId: habit.id,
+                weight: weight,
+              })
+            }
+          >
+            <HabitIcon />
+            {habit.description}
+          </WeightBar>
         ))}
         {metrics.map((metric, i) => (
-          <Tooltip key={metric.id} delayDuration={0}>
-            <div
-              key={metric.id}
-              className="inline-flex h-full flex-col items-center gap-3 text-center"
-              style={{
-                width: `${(metric.weight / totalWeight) * 100}%`,
-              }}
-            >
-              <span className="flex flex-row items-baseline justify-center gap-2">
-                <TbSquareRoundedLetterM></TbSquareRoundedLetterM>
-                {metric.prompt}
-              </span>
-              <TooltipTrigger asChild>
-                <div
-                  className="h-5 w-full animate-[scale] animate-in animate-out hover:scale-110 hover:scale-y-150"
-                  style={{
-                    backgroundColor: `hsl(0deg 0% ${40 + ((i * 15) % 60)}%)`,
-                  }}
-                ></div>
-              </TooltipTrigger>
-              <p> Weight: {metric.weight}</p>
-              <span>
-                <Button
-                  variant="ghost"
-                  disabled={metric.weight <= 1}
-                  onClick={() =>
-                    updateMetricWeight.mutate({
-                      goalId: goalId,
-                      metricId: metric.id,
-                      weight: metric.weight - 1,
-                    })
-                  }
-                >
-                  <ArrowDownIcon></ArrowDownIcon>
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    updateMetricWeight.mutate({
-                      goalId: goalId,
-                      metricId: metric.id,
-                      weight: metric.weight + 1,
-                    })
-                  }
-                >
-                  <ArrowUpIcon></ArrowUpIcon>
-                </Button>
-              </span>
-            </div>
-            <TooltipContent>
-              {((metric.weight / totalWeight) * 100).toFixed(2)}%
-            </TooltipContent>
-          </Tooltip>
+          <WeightBar
+            key={metric.id}
+            weight={metric.weight}
+            totalWeight={totalWeight}
+            color={i + 10}
+            updateWeight={(weight) =>
+              updateMetricWeight.mutate({
+                goalId: goalId,
+                metricId: metric.id,
+                weight: weight,
+              })
+            }
+          >
+            <MetricIcon></MetricIcon>
+            {metric.prompt}
+          </WeightBar>
         ))}
-        {/* {metrics.map((metric, i) => (
-          <Tooltip key={metric.id} delayDuration={0}>
-            <TooltipTrigger asChild>
-              <div
-                key={metric.id}
-                className="inline-block h-full bg-gray-200"
-                style={{
-                  width: `${(metric.weight / totalWeight) * 100}%`,
-                  backgroundColor: `hsl(0deg 0% ${50 + ((i * 15) % 50)}%)`,
-                }}
-              ></div>
-            </TooltipTrigger>
-            <TooltipContent>
-              {metric.prompt} -{" "}
-              {((metric.weight / totalWeight) * 100).toFixed(2)}%
-            </TooltipContent>
-          </Tooltip>
-        ))} */}
       </div>
     </TooltipProvider>
   );
@@ -566,7 +527,15 @@ function GoalPanel({
           type="multiple"
         >
           <AccordionItem value="scoring">
-            <AccordionTrigger>Scoring</AccordionTrigger>
+            <AccordionTrigger>
+              <span className="flex flex-row items-center justify-between gap-2">
+                Scoring
+                <HelpIcon>
+                  Goal scores are calculated from a weighted average of the
+                  scores of linked metrics and habits. Weights are unitless.
+                </HelpIcon>
+              </span>
+            </AccordionTrigger>
             <AccordionContent>
               <ScoringSection
                 goalId={goalId}
@@ -611,9 +580,12 @@ function GoalPanel({
           >
             <Label>Archive</Label>
           </Button>
-          
-          <ActionButton variant="destructive" idle="Delete" action={() => deleteGoal.mutateAsync({ id: goalId })}></ActionButton>
 
+          <ActionButton
+            variant="destructive"
+            idle="Delete"
+            action={() => deleteGoal.mutateAsync({ id: goalId })}
+          ></ActionButton>
         </div>
       </div>
     </div>

@@ -7,8 +7,6 @@ export const HelpIcon = ({ children }: { children: ReactNode }) => (
     <TooltipTrigger>
       <AiFillQuestionCircle className="h-6 w-6" />
     </TooltipTrigger>
-    <TooltipContent>
-      {children}
-    </TooltipContent>
+    <TooltipContent className="w-60" side="right">{children}</TooltipContent>
   </Tooltip>
 );
