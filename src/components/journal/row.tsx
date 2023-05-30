@@ -141,7 +141,12 @@ export function MetricRows({
   scoringUnit: ScoringFormat;
 }) {
   const [memo, setMemo] = useState<string>("");
-  const setScore = api.metrics.setScore.useMutation();
+  const context = api.useContext();
+  const setScore = api.metrics.setScore.useMutation({
+    onSettled() {
+      void context.metrics.invalidate();
+    },
+  });
 
   return (
     <>
