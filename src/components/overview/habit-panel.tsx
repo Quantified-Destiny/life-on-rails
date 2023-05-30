@@ -16,7 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { Button } from "../ui/button";
+import { ActionButton, Button } from "../ui/button";
 import { Label } from "../ui/label";
 import {
   Sheet,
@@ -452,12 +452,11 @@ function HabitPanel({
           >
             <Label>Archive</Label>
           </Button>
-          <Button
+          <ActionButton
             variant="destructive"
-            onClick={() => deleteHabit.mutate({ habitId })}
-          >
-            <Label>Delete</Label>
-          </Button>
+            idle="Delete"
+            action={() => deleteHabit.mutateAsync({ habitId })}
+          ></ActionButton>
         </div>
       </div>
     </div>

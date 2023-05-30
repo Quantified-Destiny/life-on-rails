@@ -177,12 +177,14 @@ export function HabitHeaderLineGrid({
     <>
       <div className={classNames("flex flex-row items-center gap-2")}>
         {linked && (
-          <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
+          <CornerDownRight className="ml-4 h-6 w-6 stroke-black"></CornerDownRight>
         )}
         <HabitIcon />
         <EditableField
           initialText={description}
-          commit={(text) => editHabit.mutate({ habitId: id, description: text })}
+          commit={(text) =>
+            editHabit.mutate({ habitId: id, description: text })
+          }
         ></EditableField>
       </div>
 
