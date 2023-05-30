@@ -1,7 +1,12 @@
 import type { ScoringFormat } from "@prisma/client";
 import { format } from "date-fns";
 import range from "lodash/range";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { AiOutlineCheck } from "react-icons/ai";
 import { RxRocket } from "react-icons/rx";
+import { Button } from "../components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "../components/ui/dialog";
 import { HelpIcon } from "../components/ui/help-icon";
 import {
   Select,
@@ -11,13 +16,6 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { api } from "../utils/api";
-import { ItemText } from "@radix-ui/react-select";
-import { Button } from "../components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "../components/ui/dialog";
-import { InfoIcon, Loader2 } from "lucide-react";
-import router from "next/router";
-import { AiOutlineCheck } from "react-icons/ai";
-import { useState } from "react";
 
 const ProfilePage = () => {
   const context = api.useContext();

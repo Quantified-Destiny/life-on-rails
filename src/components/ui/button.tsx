@@ -1,8 +1,10 @@
-import * as React from "react"
-import type { VariantProps} from "class-variance-authority";
-import { cva } from "class-variance-authority"
+import * as React from "react";
+import type { VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
-import { cn } from "../../lib/utils"
+import { cn } from "../../lib/utils";
+import { Loader2 } from "lucide-react";
+import { AiOutlineCheck } from "react-icons/ai";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
@@ -30,7 +32,7 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-)
+);
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -44,9 +46,49 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       />
-    )
+    );
   }
-)
-Button.displayName = "Button"
+);
+Button.displayName = "Button";
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
+
+enum ActionState {
+  Idle,
+  Progress,
+  Done,
+}
+
+export function ActionButton<T>({
+  idle,
+  action,
+  onComplete,
+  variant = "default",
+}: {
+  idle: string;
+  action: () => Promise<T>;
+  onComplete?: () => void;
+} & ButtonProps) {
+  const [state, setState] = React.useState(ActionState.Idle);
+  return (
+    <Button
+      variant={variant}
+      onClick={async () => {
+        setState(ActionState.Progress);
+        await action();
+        setState(ActionState.Done);
+        if (onComplete) {
+          onComplete();
+        }
+      }}
+    >
+      {state == ActionState.Idle ? (
+        <span>{idle}</span>
+      ) : state == ActionState.Progress ? (
+        <Loader2 className="h-6 w-6 animate-spin" />
+      ) : (
+        <AiOutlineCheck className="h-6 w-6" />
+      )}
+    </Button>
+  );
+}

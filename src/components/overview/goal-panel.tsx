@@ -18,7 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { Button } from "../ui/button";
+import { ActionButton, Button } from "../ui/button";
 import { Label } from "../ui/label";
 import {
   Sheet,
@@ -358,7 +358,7 @@ function ScoringSection({
               }}
             >
               <span className="flex flex-row items-center justify-center gap-2">
-                <HabitIcon/>
+                <HabitIcon />
                 {habit.description}
               </span>
               <TooltipTrigger asChild>
@@ -611,12 +611,9 @@ function GoalPanel({
           >
             <Label>Archive</Label>
           </Button>
-          <Button
-            variant="destructive"
-            onClick={() => deleteGoal.mutate({ id: goalId })}
-          >
-            <Label>Delete</Label>
-          </Button>
+          
+          <ActionButton variant="destructive" idle="Delete" action={() => deleteGoal.mutateAsync({ id: goalId })}></ActionButton>
+
         </div>
       </div>
     </div>

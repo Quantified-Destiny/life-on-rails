@@ -78,54 +78,58 @@ export const templateRouter = createTRPCRouter({
             ownerId: ctx.session.user.id,
           },
         });
-        void ctx.prisma.habitMeasuresGoal.create({
+        await ctx.prisma.habitMeasuresGoal.create({
           data: {
             goalId: goal.id,
             habitId: createdHabit.id,
           },
         });
 
-        habit.linkedmetrics.map(async (linkedmetric) => {
+        await Promise.all(
+          habit.linkedmetrics.map(async (linkedmetric) => {
+            const format = await ctx.prisma.answerFormat.create({
+              data: { format: "FIVE_POINT" },
+            });
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const createdMetric: Metric = await ctx.prisma.metric.create({
+              data: {
+                prompt: linkedmetric.name,
+                ownerId: ctx.session.user.id,
+                formatId: format.id,
+              },
+            });
+            return ctx.prisma.linkedMetric.create({
+              data: {
+                metricId: createdMetric.id,
+                habitId: createdHabit.id,
+              },
+            });
+          })
+        );
+      }); // end habits
+
+      await Promise.all(
+        createMeta.metrics.map(async (metric) => {
           const format = await ctx.prisma.answerFormat.create({
             data: { format: "FIVE_POINT" },
           });
-
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const createdMetric: Metric = await ctx.prisma.metric.create({
+          const m: Metric = await ctx.prisma.metric.create({
             data: {
-              prompt: linkedmetric.name,
+              prompt: metric.prompt,
               ownerId: ctx.session.user.id,
               formatId: format.id,
             },
           });
-          return ctx.prisma.linkedMetric.create({
+
+          return ctx.prisma.metricMeasuresGoal.create({
             data: {
-              metricId: createdMetric.id,
-              habitId: createdHabit.id,
+              metricId: m.id,
+              goalId: goal.id,
             },
           });
-        });
-      }); // end habits
-
-      createMeta.metrics.map(async (metric) => {
-        const format = await ctx.prisma.answerFormat.create({
-          data: { format: "FIVE_POINT" },
-        });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const m: Metric = await ctx.prisma.metric.create({
-          data: {
-            prompt: metric.prompt,
-            ownerId: ctx.session.user.id,
-            formatId: format.id,
-          },
-        });
-
-        return ctx.prisma.metricMeasuresGoal.create({
-          data: {
-            metricId: m.id,
-            goalId: goal.id,
-          },
-        });
-      });
+        })
+      );
     }),
 });

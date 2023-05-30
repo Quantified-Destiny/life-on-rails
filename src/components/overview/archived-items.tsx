@@ -45,6 +45,11 @@ export function ArchivedItems() {
       </Accordion>
     );
   const { goals, habits, metrics } = archivedItemsQuery.data;
+
+  if (goals.length === 0 && habits.length === 0 && metrics.length === 0) {
+    return <span className="text-gray-400">No archived items</span>;
+  }
+
   return (
     <Accordion type="single" collapsible>
       <AccordionItem value="archived">

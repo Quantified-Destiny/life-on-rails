@@ -62,6 +62,7 @@ export const profileRouter = createTRPCRouter({
       deleteGoals(ctx.prisma, ctx.session.user.id),
       deleteHabits(ctx.prisma, ctx.session.user.id),
       deleteMetrics(ctx.prisma, ctx.session.user.id),
+      deleteTags(ctx.prisma, ctx.session.user.id),
     ]);
   }),
 });
@@ -98,5 +99,17 @@ async function deleteMetrics(prisma: typeof prismaClient, userId: string) {
 
   return Promise.all(
     metrics.map((it) => prisma.metric.delete({ where: { id: it.id } }))
+  );
+}
+async function deleteTags(prisma: typeof prismaClient, userId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const tag = await prisma.tag.findMany({
+    where: {
+      ownerId: userId,
+    },
+  });
+
+  return Promise.all(
+    tag.map((it) => prisma.tag.delete({ where: { id: it.id } }))
   );
 }

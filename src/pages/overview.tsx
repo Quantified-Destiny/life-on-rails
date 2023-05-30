@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import type { ScoringFormat } from "@prisma/client";
 import { SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -19,9 +20,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../components/ui/popover";
-import { RouterOutputs, api } from "../utils/api";
-import { templates, TemplatesList, TemplatesPage } from "../pages/templates";
-import { ScoringFormat } from "@prisma/client";
+import { TemplatesList } from "../pages/templates";
+import type { RouterOutputs } from "../utils/api";
+import { api } from "../utils/api";
+import { HelpIcon } from "../components/ui/help-icon";
 
 function Header({
   filters,
@@ -34,9 +36,19 @@ function Header({
     <>
       <div className="mb-2 flex w-full items-center justify-between">
         <div>
-          <h1 className="ml-2 text-xl font-semibold uppercase text-gray-800">
-            Overview
-          </h1>
+          <span className="flex flex-row items-center gap-2">
+            <h1 className="ml-2 text-xl font-semibold uppercase text-gray-800">
+              Overview
+            </h1>
+            <HelpIcon>
+              <p className="mb-2 px-2 text-xs italic text-slate-500">
+                All scores are based off the preference in your{" "}
+                <Link href="/profile" className="underline">
+                  user settings.
+                </Link>
+              </p>
+            </HelpIcon>
+          </span>
         </div>
         <div className="flex">
           <CreateMenu></CreateMenu>
@@ -55,13 +67,6 @@ function Header({
           </button>
         </div>
       </div>
-      <p className="mb-2 px-2 text-xs italic text-slate-500">
-        All scores are based off the preference in your{" "}
-        <Link href="/profile" className="underline">
-          user settings
-        </Link>
-        .
-      </p>
     </>
   );
 }
@@ -117,9 +122,6 @@ function OverviewContent(
           ></LinkedMetric>
         );
       })}
-      <div className="w-full">
-        <ArchivedItems></ArchivedItems>
-      </div>
     </div>
   );
 }
@@ -154,6 +156,9 @@ function OverviewPage() {
             scoringUnit={user.scoringUnit}
           ></OverviewContent>
         )}
+      </div>
+      <div className="w-full">
+        <ArchivedItems></ArchivedItems>
       </div>
     </div>
   );
