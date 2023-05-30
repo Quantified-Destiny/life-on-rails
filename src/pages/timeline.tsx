@@ -85,7 +85,7 @@ const GoalAdded = ({ event }: { event: GoalAddedEvent }) => (
     {event.metrics.map((event, i) => {
       return (
         <div key={i} className="flex p-2">
-          <MetricIcon/>
+          <MetricIcon />
           <p className="">{event.prompt}</p>
         </div>
       );
@@ -109,7 +109,7 @@ const HabitAdded = ({ event }: { event: HabitAddedEvent }) => (
       .
     </h3>
     <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
-      You completed this habit 53 times.
+      You completed this habit {(Math.random() * 30).toFixed(0)} times.
     </p>
   </div>
 );
