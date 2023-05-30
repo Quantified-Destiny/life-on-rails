@@ -33,34 +33,34 @@ export interface ExpandedHabit extends Habit {
 }
 
 // get habit completions from a user for x amount of days ago
+export async function getHabitCompletionSubDays({
+  prisma,
+  userId,
+  days,
+}: {
+  prisma: typeof prismaClient;
+  userId: string;
+  days: number;
+}): Promise<number[]> {
 
-// export async function getHabitCompletionSubDays({
-//   prisma,
-//   metricsMap,
-//   userId,
-//   scoringWeeks,
-//   goalIds,
-//   date = new Date(),
-// }: {
-//   prisma: typeof prismaClient;
-//   metricsMap: Map<string, ExpandedMetric>;
-//   userId: string;
-//   scoringWeeks: number;
-//   goalIds?: string[];
-//   date?: Date;
-// }): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> 
+  const currentDate = new Date();
+  const completionCounts: number[] = [];
 
-//   const habitCompletions = await prisma.habitCompletion.groupBy({
-//     by: ["habitId", date]
-//     _count: {
-//       _all: true,
-//     },
-//     where: {
-//       Habit: { ownerId: userId },
-//       date: { gt: subDays(new Date(), 7) },
-//     },
-//   }
-//   );
+  for (let i = 1; i <= days; i++) {
+    const targetDate = subDays(currentDate, i);
+
+    const completions = await prisma.habitCompletion.count({
+      where: {
+        Habit: { ownerId: userId },
+        date: targetDate,
+      },
+    });
+
+    completionCounts.push(completions);
+  }
+
+  return completionCounts;
+}
 
 
 export async function getHabitsWithMetricsMap({

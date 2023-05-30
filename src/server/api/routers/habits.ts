@@ -5,6 +5,7 @@ import { FrequencyHorizon } from "@prisma/client";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import {
   getHabitsWithMetricsMap,
+  getHabitCompletionSubDays,
   getMetrics,
   getScoringWeeks,
 } from "../../queries";
@@ -68,6 +69,15 @@ export const habitsRouter = createTRPCRouter({
         },
       });
       return completions;
+    }),
+
+    getCompletionsSubDays: protectedProcedure.query(async ({ ctx }) => {
+      const [habits, _habitsMap] = await getHabitCompletionSubDays({
+        prisma: ctx.prisma,
+        userId: ctx.session.user.id,
+        days: 7, //hard coded 7 days
+      });
+      return habits;
     }),
 
   getCompletionsOnDay: protectedProcedure

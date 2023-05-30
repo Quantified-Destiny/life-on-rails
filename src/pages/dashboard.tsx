@@ -1,5 +1,5 @@
 import { Loader } from "../components/ui/loader";
-import type {
+import {
   ExpandedHabit,
   GoalsReturnType,
   ExpandedMetric,
@@ -88,7 +88,6 @@ function StatsCardRow({
   // if (goalsQuery.isError || metricsQuery.isError) return <p>Query error</p>;
   // const goalData = goalsQuery.data;
   // const metricData = metricsQuery.data;
-
 
   let redGoal = 0;
   let yellowGoal = 0;
@@ -636,6 +635,8 @@ function MetricsTable({
 
 const today = new Date();
 export function Home() {
+  
+  const aquery = api.habits.getCompletionsSubDays.useQuery();
   const goalsQuery = api.goals.getAllGoals.useQuery();
   const habitsQuery = api.habits.getHabits.useQuery({ date: today });
   const metricsQuery = api.goals.getAllMetrics.useQuery();
@@ -659,6 +660,7 @@ export function Home() {
   return (
     <div className="">
       <div className="m-auto h-full max-w-3xl pt-2">
+        {JSON.stringify(aquery)}
         <StatsCardRow
           goals={goalsQuery.data.goals}
           habits={goalsQuery.data.habits}
