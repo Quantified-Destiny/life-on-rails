@@ -63,6 +63,10 @@ function ScorePill({
   );
 }
 
+function min(a: number, b: number) {
+  return a < b ? a : b;
+}
+
 function ActivityTable({
   date,
   completions,
@@ -328,7 +332,7 @@ function _HabitsPage({ id }: { id: string }) {
                       Current Score
                     </h5>
                     <span className="text-blueGray-700 text-xl font-semibold">
-                      {(habitData.data?.score * 100).toFixed(2)}%
+                      {min(100, (habitData.data?.score * 100)).toFixed(2)}%
                     </span>
                   </div>
                   <div className="relative w-auto flex-initial pl-4">
