@@ -36,6 +36,7 @@ import {
 } from "../ui/tooltip";
 import { GoalTagList } from "./tags";
 import { HelpIcon } from "../ui/help-icon";
+import { useDebouncedState } from "./lib";
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -332,7 +333,7 @@ function WeightBar({
           width: `${(weight / totalWeight) * 100}%`,
         }}
       >
-        <span className="flex flex-row items-center justify-center gap-2 overflow-ellipsis">
+        <span className="flex flex-row items-center justify-center gap-2 whitespace-nowrap overflow-x-hidden">
           {children}
         </span>
         <TooltipTrigger asChild>
@@ -384,9 +385,41 @@ function ScoringSection({
       void context.goals.getWeights.invalidate();
     },
   });
+
+  const initialHabitWeights = habits.map((it) => it.weight);
+  const initialMetricWeights = metrics.map((it) => it.weight);
+
+  const syncHabitWeights = (weights: number[], oldWeights: number[]) => {
+    weights.forEach((w, i) => {
+      if (w != oldWeights[i])
+        updateHabitWeight.mutate({
+          goalId: goalId,
+          habitId: habits[i]!.id,
+          weight: w,
+        });
+    });
+  };
+  const syncMetricWeights = (weights: number[], oldWeights: number[]) => {
+    weights.forEach((w, i) => {
+      if (w != oldWeights[i])
+        updateMetricWeight.mutate({
+          goalId: goalId,
+          metricId: metrics[i]!.id,
+          weight: w,
+        });
+    });
+  };
+
+  const { state: habitWeights, setState: setHabitWeights } = 
+  useDebouncedState(initialHabitWeights,500,    syncHabitWeights
+  );
+
+  const { state: metricWeights, setState: setMetricWeights } =
+    useDebouncedState(initialMetricWeights, 500, syncMetricWeights);
+
   const totalWeight =
-    habits.reduce((acc, cur) => acc + cur.weight, 0) +
-    metrics.reduce((acc, cur) => acc + cur.weight, 0);
+    habitWeights.reduce((acc, cur) => acc + cur, 0) +
+    metricWeights.reduce((acc, cur) => acc + cur, 0);
 
   if (totalWeight == 0) {
     return (
@@ -404,16 +437,13 @@ function ScoringSection({
         {habits.map((habit, i) => (
           <WeightBar
             key={habit.id}
-            weight={habit.weight}
+            weight={habitWeights[i]!}
             totalWeight={totalWeight}
             color={i}
-            updateWeight={(weight) =>
-              updateHabitWeight.mutate({
-                goalId: goalId,
-                habitId: habit.id,
-                weight: weight,
-              })
-            }
+            updateWeight={(weight) => {
+              habitWeights[i] = weight;
+              setHabitWeights([...habitWeights]);
+            }}
           >
             <HabitIcon />
             {habit.description}
@@ -425,12 +455,11 @@ function ScoringSection({
             weight={metric.weight}
             totalWeight={totalWeight}
             color={i + 10}
-            updateWeight={(weight) =>
-              updateMetricWeight.mutate({
-                goalId: goalId,
-                metricId: metric.id,
-                weight: weight,
-              })
+            updateWeight={(weight) => {
+              metricWeights[i] = weight;
+              setMetricWeights([...metricWeights]);
+             
+             } 
             }
           >
             <MetricIcon></MetricIcon>
