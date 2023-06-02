@@ -26,7 +26,7 @@ function Hero() {
         <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">TP6</span>
+              <span className="sr-only">Hybrid Studios</span>
               <img
                 className="h-8 w-auto"
                 src="/lor-logo-new.png"
@@ -567,7 +567,7 @@ function Footer() {
           </a>
         </div>
         <p className="mt-8 text-base leading-6 text-center text-gray-400">
-          © 2023 TP6, Inc. All rights reserved.
+          © 2023 Hybrid Studios, Inc. All rights reserved.
         </p>
       </div>
     </section>
