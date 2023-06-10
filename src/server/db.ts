@@ -18,3 +18,13 @@ export const prisma =
 if (env.NODE_ENV !== "production") {
   global.prisma = prisma;
 }
+
+import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { connect } from "@planetscale/database";
+
+export const db = drizzle(
+  connect({
+    url: env.DATABASE_URL,
+  }),
+  { logger: env.NODE_ENV === "development" }
+);
