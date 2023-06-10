@@ -21,10 +21,11 @@ if (env.NODE_ENV !== "production") {
 
 import { drizzle } from "drizzle-orm/planetscale-serverless";
 import { connect } from "@planetscale/database";
+import * as schema from "../schema";
 
 export const db = drizzle(
   connect({
     url: env.DATABASE_URL,
   }),
-  { logger: env.NODE_ENV === "development" }
+  { logger: true, schema: schema }
 );

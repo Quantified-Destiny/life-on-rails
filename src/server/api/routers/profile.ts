@@ -2,27 +2,19 @@ import type { Metric } from "@prisma/client";
 import { z } from "zod";
 import type { prisma as prismaClient } from "../../db";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { eq } from "drizzle-orm";
+import { user } from "../../../schema";
 
 export const profileRouter = createTRPCRouter({
   getProfile: protectedProcedure.query(async ({ ctx }) => {
-    const data = await ctx.prisma.user.findFirstOrThrow({
-      where: {
-        id: ctx.session.user.id,
-      },
-      select: {
-        name: true,
-        email: true,
-        image: true,
-        scoringWeeks: true,
-        scoringUnit: true,
-        accounts: {
-          select: {
-            provider: true,
-          },
-        },
-        createdAt: true,
+    const d = await ctx.db.query.user.findFirst({
+      where: eq(user.id, ctx.session.user.id),
+      with: {
+        accounts: true,
       },
     });
+    const data = d!;
+    console.log(d);
 
     return {
       name: data.name,
@@ -31,7 +23,7 @@ export const profileRouter = createTRPCRouter({
       scoringWeeks: data.scoringWeeks,
       scoringUnit: data.scoringUnit,
       providers: data.accounts.map((it) => it.provider),
-      createdAt: data.createdAt,
+      createdAt: new Date(data.createdAt),
     };
   }),
 
