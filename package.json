@@ -11,6 +11,7 @@
     "sync-db": "env-cmd drizzle-kit push:mysql"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.20.0",
     "@fontsource/raleway": "^4.5.12",
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.17",
@@ -38,6 +39,8 @@
     "@trpc/react-query": "^10.8.1",
     "@trpc/server": "^10.8.1",
     "@uiw/react-heat-map": "^2.0.5",
+    "chalk": "^5.2.0",
+    "chalk-template": "^1.1.0",
     "chart.js": "^4.3.0",
     "class-variance-authority": "^0.6.0",
     "classnames": "^2.3.2",

@@ -250,24 +250,6 @@ export const metricTag = mysqlTable(
   }
 );
 
-export const session = mysqlTable(
-  "Session",
-  {
-    id: varchar("id", { length: 191 }).primaryKey().notNull(),
-    sessionToken: varchar("sessionToken", { length: 191 }).notNull(),
-    userId: varchar("userId", { length: 191 }).notNull(),
-    expires: datetime("expires", { mode: "string", fsp: 3 }).notNull(),
-  },
-  (table) => {
-    return {
-      sessionTokenKey: uniqueIndex("Session_sessionToken_key").on(
-        table.sessionToken
-      ),
-      userIdIdx: index("Session_userId_idx").on(table.userId),
-    };
-  }
-);
-
 export const tag = mysqlTable(
   "Tag",
   {
@@ -351,6 +333,24 @@ export const account = mysqlTable(
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, { fields: [account.userId], references: [user.id] }),
 }));
+
+export const session = mysqlTable(
+  "Session",
+  {
+    id: varchar("id", { length: 191 }).primaryKey().notNull(),
+    sessionToken: varchar("sessionToken", { length: 191 }).notNull(),
+    userId: varchar("userId", { length: 191 }).notNull(),
+    expires: datetime("expires", { mode: "string", fsp: 3 }).notNull(),
+  },
+  (table) => {
+    return {
+      sessionTokenKey: uniqueIndex("Session_sessionToken_key").on(
+        table.sessionToken
+      ),
+      userIdIdx: index("Session_userId_idx").on(table.userId),
+    };
+  }
+);
 
 export const verificationToken = mysqlTable(
   "VerificationToken",

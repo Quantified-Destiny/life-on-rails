@@ -5,6 +5,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
 import "../styles/globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const TopNav = () => {
   return (
@@ -38,23 +39,25 @@ const TopNav = () => {
 
 function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <title>Life on Rails</title>
-      </head>
-      <body className="relative">
-        <div className="flex flex-col">
-          <TopNav></TopNav>
-          <main
-            className={classNames(
-              "container prose prose-slate mx-auto mb-20 mt-10 h-full w-full overflow-scroll bg-white pt-5 scrollbar-none"
-            )}
-          >
-            {children}
-          </main>
-        </div>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <head>
+          <title>Life on Rails</title>
+        </head>
+        <body className="relative">
+          <div className="flex flex-col">
+            <TopNav></TopNav>
+            <main
+              className={classNames(
+                "container prose prose-slate mx-auto mb-20 mt-10 h-full w-full overflow-scroll bg-white pt-5 scrollbar-none"
+              )}
+            >
+              {children}
+            </main>
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
 export default RootLayout;

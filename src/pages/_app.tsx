@@ -19,6 +19,7 @@ import {
   State,
 } from "../components/layout/overviewState";
 import { TooltipProvider } from "../components/ui/tooltip";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const Modals = () => {
   const store = useAppState();
@@ -53,14 +54,16 @@ const MyApp: AppType<{ session: Session | null }> = ({
     );
 
   return (
-    <TooltipProvider delayDuration={400} skipDelayDuration={400}>
-      <SessionProvider session={session}>
-        <Modals></Modals>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </SessionProvider>
-    </TooltipProvider>
+    <ClerkProvider {...pageProps}>
+      <TooltipProvider delayDuration={400} skipDelayDuration={400}>
+        <SessionProvider session={session}>
+          <Modals></Modals>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </SessionProvider>
+      </TooltipProvider>
+    </ClerkProvider>
   );
 };
 

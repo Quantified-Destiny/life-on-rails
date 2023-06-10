@@ -24,6 +24,7 @@ import classNames from "classnames";
 import type { LucideIcon } from "lucide-react";
 import { useSidebarStore } from "./state";
 import Head from "next/head";
+import { UserButton } from "@clerk/nextjs";
 
 interface MenuItem {
   name: string;
@@ -128,9 +129,7 @@ function Sidebar(props: {
         className={`mt-2 flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm	text-white hover:bg-white hover:bg-opacity-10`}
       >
         <div>
-          {React.createElement(LogOut, {
-            size: 20,
-          })}
+          <UserButton afterSignOutUrl="/" />
         </div>
         <span
           className={`${!props.open ? `hidden` : ""} origin-left duration-200`}

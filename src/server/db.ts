@@ -19,13 +19,23 @@ if (env.NODE_ENV !== "production") {
   global.prisma = prisma;
 }
 
-import { drizzle } from "drizzle-orm/planetscale-serverless";
 import { connect } from "@planetscale/database";
+import chalkTemplate from "chalk-template";
+import type { Logger } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/planetscale-serverless";
 import * as schema from "../schema";
+
+class MyLogger implements Logger {
+  logQuery(query: string, params: unknown[]): void {
+    const placeholders = params.map(() => "?").join(",");
+
+    console.log(chalkTemplate`{bold.red drizzle.query} ${query} (${placeholders})`);
+  }
+}
 
 export const db = drizzle(
   connect({
     url: env.DATABASE_URL,
   }),
-  { logger: true, schema: schema }
+  { logger: new MyLogger(), schema: schema }
 );
