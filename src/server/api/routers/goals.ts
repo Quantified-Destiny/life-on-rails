@@ -71,6 +71,7 @@ export const goalsRouter = createTRPCRouter({
 
       const [metrics, _map] = await getMetrics({
         prisma: ctx.prisma,
+        db: ctx.db,
         userId: ctx.session.user.id,
         scoringWeeks: scoringWeeks,
         goalIds: [goal.id],
@@ -93,12 +94,14 @@ export const goalsRouter = createTRPCRouter({
     const scoringWeeks = 2;
     const [metrics, metricsMap] = await getMetrics({
       prisma: ctx.prisma,
+      db: ctx.db,
       userId: ctx.session.user.id,
       scoringWeeks,
     });
 
     const [habits, habitsMap] = await getHabitsWithMetricsMap({
       prisma: ctx.prisma,
+      db: ctx.db,
       metricsMap,
       userId: ctx.session.user.id,
       scoringWeeks,
@@ -127,6 +130,7 @@ export const goalsRouter = createTRPCRouter({
 
     const [metrics, metricsMap] = await getMetrics({
       prisma: ctx.prisma,
+      db: ctx.db,
       userId: ctx.session.user.id,
       scoringWeeks,
     });

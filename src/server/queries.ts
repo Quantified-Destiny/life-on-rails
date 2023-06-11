@@ -13,8 +13,16 @@ import type {
 import { FrequencyHorizon } from "@prisma/client";
 import { endOfDay, isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
-import { eq } from "drizzle-orm";
-import { preferences } from "../schema";
+import type { SQL } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
+import {
+  goal,
+  habit,
+  linkedMetric,
+  metric,
+  metricMeasuresGoal,
+  preferences,
+} from "../schema";
 import { getOrCompute } from "./api/cache";
 import { type DB, type prisma as prismaClient } from "./db";
 
@@ -65,6 +73,7 @@ export async function getHabitCompletionSubDays({
 
 export async function getHabitsWithMetricsMap({
   prisma,
+  db,
   metricsMap,
   userId,
   scoringWeeks,
@@ -72,6 +81,7 @@ export async function getHabitsWithMetricsMap({
   date = new Date(),
 }: {
   prisma: typeof prismaClient;
+  db: DB;
   metricsMap: Map<string, ExpandedMetric>;
   userId: string;
   scoringWeeks: number;
@@ -286,6 +296,7 @@ export interface ExpandedMetric extends Metric {
 
 export async function getMetrics({
   prisma,
+  db,
   userId,
   scoringWeeks,
   goalIds,
@@ -293,6 +304,7 @@ export async function getMetrics({
   date = new Date(),
 }: {
   prisma: typeof prismaClient;
+  db: DB;
   userId: string;
   scoringWeeks: number;
   goalIds?: string[];
@@ -305,6 +317,30 @@ export async function getMetrics({
       ? { some: { habitId: { in: habitIds } } }
       : undefined,
   };
+
+  const conditions: SQL<any>[] = [eq(metric.ownerId, userId)];
+
+  if (goalIds) {
+    const metricsLinkedToGivenGoals = db
+      .select({ data: metricMeasuresGoal.metricId })
+      .from(metricMeasuresGoal)
+      .innerJoin(goal, eq(goal.id, metricMeasuresGoal.goalId))
+      .where(inArray(goal.id, goalIds));
+    conditions.push(inArray(metric.id, metricsLinkedToGivenGoals));
+  }
+  if (habitIds) {
+    const metricsLinkedToGivenHabits = db
+      .select({ data: linkedMetric.metricId })
+      .from(linkedMetric)
+      .innerJoin(habit, eq(habit.id, linkedMetric.habitId))
+      .where(inArray(habit.id, habitIds));
+    conditions.push(inArray(metric.id, metricsLinkedToGivenHabits));
+  }
+
+  const m = await db.query.metric.findMany({
+    where: and(...conditions),
+  });
+  console.log(m);
 
   type MetricsType = (Metric & {
     completionMetric: LinkedMetric[];

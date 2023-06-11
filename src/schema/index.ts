@@ -11,7 +11,6 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/mysql-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const answerFormat = mysqlTable("AnswerFormat", {
   id: varchar("id", { length: 191 }).primaryKey().notNull(),
@@ -110,8 +109,12 @@ export const habitMeasuresGoal = mysqlTable(
   "HabitMeasuresGoal",
   {
     id: varchar("id", { length: 191 }).primaryKey().notNull(),
-    goalId: varchar("goalId", { length: 191 }).notNull(),
-    habitId: varchar("habitId", { length: 191 }).notNull(),
+    goalId: varchar("goalId", { length: 191 })
+      .notNull()
+      .references(() => goal.id),
+    habitId: varchar("habitId", { length: 191 })
+      .notNull()
+      .references(() => habit.id),
     weight: int("weight").default(1).notNull(),
   },
   (table) => {
@@ -152,8 +155,12 @@ export const linkedMetric = mysqlTable(
     date: datetime("date", { mode: "string", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    habitId: varchar("habitId", { length: 191 }).notNull(),
-    metricId: varchar("metricId", { length: 191 }).notNull(),
+    habitId: varchar("habitId", { length: 191 })
+      .notNull()
+      .references(() => habit.id),
+    metricId: varchar("metricId", { length: 191 })
+      .notNull()
+      .references(() => metric.id),
   },
   (table) => {
     return {
@@ -162,6 +169,12 @@ export const linkedMetric = mysqlTable(
     };
   }
 );
+export const linkedMetricRelations = relations(linkedMetric, ({ one }) => ({
+  answers: one(metric, {
+    fields: [linkedMetric.metricId],
+    references: [metric.id],
+  }),
+}));
 
 export const metric = mysqlTable(
   "Metric",
@@ -187,6 +200,12 @@ export const metric = mysqlTable(
   }
 );
 
+export const metricRelations = relations(metric, ({ many }) => ({
+  answers: many(metricAnswer),
+  goals: many(metricMeasuresGoal),
+  habits: many(linkedMetric),
+}));
+
 export const metricAnswer = mysqlTable(
   "MetricAnswer",
   {
@@ -196,7 +215,9 @@ export const metricAnswer = mysqlTable(
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
     updatedAt: datetime("updatedAt", { mode: "string", fsp: 3 }).notNull(),
-    metricId: varchar("metricId", { length: 191 }).notNull(),
+    metricId: varchar("metricId", { length: 191 })
+      .notNull()
+      .references(() => metric.id),
     habitCompletionId: varchar("habitCompletionId", { length: 191 }),
     memo: varchar("memo", { length: 191 }),
     score: double("score").notNull(),
@@ -211,12 +232,26 @@ export const metricAnswer = mysqlTable(
   }
 );
 
+export const meticAnswerRelations = relations(
+  metricAnswer,
+  ({ one }) => ({
+    answers: one(metric, {
+      fields: [metricAnswer.metricId],
+      references: [metric.id],
+    }),
+  })
+);
+
 export const metricMeasuresGoal = mysqlTable(
   "MetricMeasuresGoal",
   {
     id: varchar("id", { length: 191 }).primaryKey().notNull(),
-    goalId: varchar("goalId", { length: 191 }).notNull(),
-    metricId: varchar("metricId", { length: 191 }).notNull(),
+    goalId: varchar("goalId", { length: 191 })
+      .notNull()
+      .references(() => goal.id),
+    metricId: varchar("metricId", { length: 191 })
+      .notNull()
+      .references(() => metric.id),
     weight: int("weight").default(1).notNull(),
   },
   (table) => {

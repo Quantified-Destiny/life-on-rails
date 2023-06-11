@@ -117,7 +117,7 @@ export const TemplatesList = () => {
               onClick={() => setTemplateKey(template.key)}
             >
               <div className="relative flex h-full flex-row items-center">
-                <div className="flex h-[156px] w-[156px] flex-col items-center justify-center bg-gray-200 text-white">
+                <div className="flex h-[156px] w-[156px] flex-col flex-none items-center justify-center bg-gray-200 text-white">
                   <Image
                     width="120"
                     height="120"

@@ -43,4 +43,6 @@ export const db = drizzle(
   { logger: new MyLogger(), schema: schema }
 );
 
-export type DB = PlanetScaleDatabase<typeof schema>;
+type Schema = typeof schema;
+
+export type DB = PlanetScaleDatabase<Schema>;

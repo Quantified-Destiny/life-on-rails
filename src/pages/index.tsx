@@ -54,8 +54,8 @@ function Hero() {
             ))}
           </div>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            <Link href="/login" className="text-sm font-semibold leading-6 text-gray-900">
-              Log in <span aria-hidden="true">&rarr;</span>
+            <Link href="/journal" className="text-sm font-semibold leading-6 text-gray-900">
+              Go to app <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
         </nav>
@@ -195,7 +195,7 @@ function Features() {
             </div>
           </div>
           <Image
-            src="img/journal.png"
+            src="/img/journal.png"
             alt="Product screenshot"
             className="w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
             width={2432}

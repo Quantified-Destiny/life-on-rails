@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form";
 import { api } from "../utils/api";
 
 import { State, useAppState } from "../components/layout/appState";
+import { Card, CardHeader } from "./ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Card, CardHeader, CardTitle } from "./ui/card";
 
 function Modal({
   close,
@@ -101,6 +101,36 @@ export function CreateGoalModal({ close }: { close: () => void }) {
     </Modal>
   );
 }
+
+function CreateCard({
+  onClick,
+  color,
+  heroText,
+  description,
+}: {
+  onClick: () => void;
+  color: string;
+  heroText: string;
+  description: string;
+}) {
+  return (
+    <Card
+      className="h-[156px] w-full cursor-pointer hover:shadow-md flex flex-row"
+      onClick={onClick}
+    >
+        <div
+          className={`${color} flex h-[156px] w-[156px] flex-col items-center justify-center text-white flex-none`}
+          style={{width:"156px", height: "156px"}}
+        >
+          {heroText}
+        </div>
+        <CardHeader className="space-y-3">
+          <p className="text-md text-gray-500">{description}</p>
+        </CardHeader>
+    </Card>
+  );
+}
+
 export function CreateModal({ close }: { close: () => void }) {
   const store = useAppState();
   const openCreateGoalModal = useAppState((store) => store.openCreateGoalModal);
@@ -116,53 +146,25 @@ export function CreateModal({ close }: { close: () => void }) {
       <DialogHeader>
         <DialogTitle>Create an item</DialogTitle>
       </DialogHeader>
-      <DialogContent className="w-fit">
-        <Card
-          className="h-[156px] w-full cursor-pointer hover:shadow-md"
+      <DialogContent className="w-fit pt-10">
+        <CreateCard
           onClick={openCreateGoalModal}
-        >
-          <div className="relative flex h-[156px] flex-row items-center">
-            <div className="flex h-full w-28 flex-col items-center justify-center bg-green-200 text-white">
-              Goal
-            </div>
-            <CardHeader className="space-y-3">
-              <p className="text-md text-gray-500">
-                Goals are the highest-level item that connect everything else
-                together.
-              </p>
-            </CardHeader>
-          </div>
-        </Card>
-        <Card
-          className="h-[156px] w-full cursor-pointer hover:shadow-md"
+          color="bg-green-200"
+          heroText="Goal"
+          description="Connect items together towards one shared goal"
+        ></CreateCard>
+        <CreateCard
           onClick={openCreateHabitModal}
-        >
-          <div className="relative flex h-full flex-row items-center">
-            <div className="flex h-[156px] w-28 flex-col items-center justify-center bg-blue-200 text-white">
-              Habit
-            </div>
-            <CardHeader className="space-y-3">
-              <p className="text-md text-gray-500">
-                Habits are the cornerstone of progress.
-              </p>
-            </CardHeader>
-          </div>
-        </Card>
-        <Card
-          className="h-[156px] w-full cursor-pointer hover:shadow-md"
+          color="bg-blue-200"
+          heroText="Habit"
+          description="Build a habit"
+        ></CreateCard>
+        <CreateCard
           onClick={openCreateMetricModal}
-        >
-          <div className="relative flex h-full flex-row items-center">
-            <div className="flex h-[156px] w-28 flex-col items-center justify-center bg-red-200 text-white">
-              Metric
-            </div>
-            <CardHeader className="space-y-3">
-              <p className="text-md text-gray-500">
-                Metrics are how you track the progress of your goals and habits.
-              </p>
-            </CardHeader>
-          </div>
-        </Card>
+          color="bg-red-200"
+          heroText="Metric"
+          description="Define custom tracking and scoring for your habits and goals"
+        ></CreateCard>
       </DialogContent>
     </Dialog>
   );

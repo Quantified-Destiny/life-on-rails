@@ -7,7 +7,7 @@ import {
   getHabitCompletionSubDays,
   getHabitsWithMetricsMap,
   getMetrics,
-  getPreferences
+  getPreferences,
 } from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -232,6 +232,7 @@ export const habitsRouter = createTRPCRouter({
 
       const [_, metricsMap] = await getMetrics({
         prisma: ctx.prisma,
+        db: ctx.db,
         userId: ctx.session.user.id,
         scoringWeeks,
         date: input.date,
@@ -239,6 +240,7 @@ export const habitsRouter = createTRPCRouter({
 
       const [habits, _habitsMap] = await getHabitsWithMetricsMap({
         prisma: ctx.prisma,
+        db: ctx.db,
         metricsMap,
         userId: ctx.session.user.id,
         scoringWeeks,
@@ -282,12 +284,14 @@ export const habitsRouter = createTRPCRouter({
       //TODO fix this
       const [_, metricsMap] = await getMetrics({
         prisma: ctx.prisma,
+        db: ctx.db,
         userId: ctx.session.user.id,
         scoringWeeks,
       });
 
       const [habits, _habitsMap] = await getHabitsWithMetricsMap({
         prisma: ctx.prisma,
+        db: ctx.db,
         metricsMap,
         userId: ctx.session.user.id,
         scoringWeeks,
