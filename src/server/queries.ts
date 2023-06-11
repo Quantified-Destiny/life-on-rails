@@ -15,7 +15,7 @@ import { endOfDay, isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
 import { eq } from "drizzle-orm";
 import { preferences } from "../schema";
-import { cache } from "./api/cache";
+import { getOrCompute } from "./api/cache";
 import { type DB, type prisma as prismaClient } from "./db";
 
 function avg(arr: number[]) {
@@ -448,15 +448,13 @@ export async function getPreferences(
   db: DB,
   userId: string
 ): Promise<typeof preferences._.model.select> {
-  //if (!cache.has(userId)) {
-  await db.insert(preferences).ignore().values({ userId });
+  return getOrCompute(userId, async () => {
+    await db.insert(preferences).ignore().values({ userId });
 
-  const p = await db
-    .select()
-    .from(preferences)
-    .where(eq(preferences.userId, userId));
-  //   cache.set(userId, p);
-  // }
-  // return cache.get(userId)!;
-  return p[0]!;
+    const p = await db
+      .select()
+      .from(preferences)
+      .where(eq(preferences.userId, userId));
+    return p[0]!;
+  });
 }

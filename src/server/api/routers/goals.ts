@@ -8,7 +8,6 @@ import {
   getHabitsWithMetricsMap,
   getMetrics,
   getPreferences,
-  getScoringWeeks,
 } from "../../queries";
 
 export const goalsRouter = createTRPCRouter({
