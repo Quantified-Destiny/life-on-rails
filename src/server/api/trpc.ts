@@ -17,14 +17,13 @@
  *
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type Session } from "next-auth";
 
 import { getServerAuthSession } from "../auth";
 import { db, prisma } from "../db";
 
-type CreateContextOptions = {
-  session: Session | null;
-};
+interface Session {
+  user: { id: string } | undefined;
+}
 
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use
@@ -35,11 +34,11 @@ type CreateContextOptions = {
  * - trpc's `createSSGHelpers` where we don't have req/res
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
+const createInnerTRPCContext = (session: Session) => {
   return {
-    session: opts.session,
+    session,
     prisma,
-    db
+    db,
   };
 };
 
@@ -48,15 +47,13 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  * process every request that goes through your tRPC endpoint
  * @link https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
+export const createTRPCContext = (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
 
   // Get the session from the server using the unstable_getServerSession wrapper function
-  const session = await getServerAuthSession({ req, res });
+  const session = getServerAuthSession({ req, res });
 
-  return createInnerTRPCContext({
-    session,
-  });
+  return createInnerTRPCContext(session);
 };
 
 /**
@@ -105,6 +102,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
   return next({
     ctx: {
       // infers the `session` as non-nullable

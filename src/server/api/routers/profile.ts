@@ -1,27 +1,30 @@
-import type { Metric } from "@prisma/client";
+import { clerkClient } from "@clerk/nextjs";
+import { ScoringFormat, type Metric } from "@prisma/client";
 import { z } from "zod";
 import type { prisma as prismaClient } from "../../db";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { eq } from "drizzle-orm";
-import { user } from "../../../schema";
 
 export const profileRouter = createTRPCRouter({
   getProfile: protectedProcedure.query(async ({ ctx }) => {
-    const d = await ctx.db.query.user.findFirst({
-      where: eq(user.id, ctx.session.user.id),
-      with: {
-        accounts: true,
-      },
-    });
-    const data = d!;
+    const userId = ctx.session.user.id;
+
+    const user = await clerkClient.users.getUser(userId);
+
+    // const d = await ctx.db.query.user.findFirst({
+    //   where: eq(user.id, ctx.session.user.id),
+    //   with: {
+    //     accounts: true,
+    //   },
+    // });
+    const data = user;
 
     return {
-      name: data.name,
-      email: data.email,
-      image: data.image,
-      scoringWeeks: data.scoringWeeks,
-      scoringUnit: data.scoringUnit,
-      providers: data.accounts.map((it) => it.provider),
+      name: `${data.firstName || ""} ${data.lastName || ""}`,
+      email: data.emailAddresses[0],
+      image: data.imageUrl,
+      scoringWeeks: 4,
+      scoringUnit: ScoringFormat.Percentage,
+      providers: [],
       createdAt: new Date(data.createdAt),
     };
   }),

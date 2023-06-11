@@ -294,6 +294,17 @@ export const user = mysqlTable(
   }
 );
 
+export const ScoringFormat = mysqlEnum("scoringUnit", [
+  "Percentage",
+  "Normalized",
+]);
+
+export const preferences = mysqlTable("Preferences", {
+  userId: varchar("userId", { length: 191 }).primaryKey().notNull(),
+  scoringWeeks: int("scoringWeeks").default(2).notNull(),
+  scoringUnit: ScoringFormat.default("Normalized").notNull(),
+});
+
 export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
 }));

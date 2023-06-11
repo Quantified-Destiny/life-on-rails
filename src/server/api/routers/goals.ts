@@ -86,12 +86,13 @@ export const goalsRouter = createTRPCRouter({
     }),
 
   getAllGoals: protectedProcedure.query(async ({ ctx }) => {
-    const scoringWeeks = (
-      await ctx.prisma.user.findUniqueOrThrow({
-        where: { id: ctx.session.user.id },
-        select: { scoringWeeks: true },
-      })
-    ).scoringWeeks;
+    // const scoringWeeks = (
+    //   await ctx.prisma.user.findUniqueOrThrow({
+    //     where: { id: ctx.session.user.id },
+    //     select: { scoringWeeks: true },
+    //   })
+    // ).scoringWeeks;
+    const scoringWeeks = 2;
     const [metrics, metricsMap] = await getMetrics({
       prisma: ctx.prisma,
       userId: ctx.session.user.id,

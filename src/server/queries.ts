@@ -444,6 +444,8 @@ export async function getScoringWeeks(
   prisma: typeof prismaClient,
   userId: string
 ): Promise<number> {
+  return 2;
+
   if (!cache.has(userId)) {
     const weeks = (
       await prisma.user.findUniqueOrThrow({

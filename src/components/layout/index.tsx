@@ -122,21 +122,14 @@ function Sidebar(props: {
         </span>
       </Link>
 
-      <Link
-        href="/"
-        onClick={sessionData ? handleSignOut : undefined}
-        key="logout"
-        className={`mt-2 flex cursor-pointer items-end gap-x-4 rounded-md p-2 text-sm	text-white hover:bg-white hover:bg-opacity-10`}
+      <div>
+        <UserButton afterSignOutUrl="/" />
+      </div>
+      <span
+        className={`${!props.open ? `hidden` : ""} origin-left duration-200`}
       >
-        <div>
-          <UserButton afterSignOutUrl="/" />
-        </div>
-        <span
-          className={`${!props.open ? `hidden` : ""} origin-left duration-200`}
-        >
-          Log Out
-        </span>
-      </Link>
+        Log Out
+      </span>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { getServerAuthSession } from "../server/auth";
 import { BsDiscord } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerAuthSession(context);
+  const session = getServerAuthSession(context);
 
   // If the user is already logged in, redirect.
   // Note: Make sure not to redirect to the same page

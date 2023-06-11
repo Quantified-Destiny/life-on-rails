@@ -1,7 +1,6 @@
 import { type GetServerSidePropsContext } from "next";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "../pages/api/auth/[...nextauth]";
+import { getAuth } from "@clerk/nextjs/server";
 
 /**
  * Wrapper for unstable_getServerSession, used in trpc createContext and the
@@ -13,9 +12,10 @@ import { authOptions } from "../pages/api/auth/[...nextauth]";
  * @see https://next-auth.js.org/configuration/nextjs
  */
 
-export const getServerAuthSession = async (ctx: {
+export const getServerAuthSession = (ctx: {
   req: GetServerSidePropsContext["req"];
   res: GetServerSidePropsContext["res"];
 }) => {
-  return await getServerSession(ctx.req, ctx.res, authOptions);
+  const { userId } = getAuth(ctx.req);
+  return { user: (userId ? {id: userId} : undefined) };
 };
