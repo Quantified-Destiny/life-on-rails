@@ -2,22 +2,22 @@
 import { z } from "zod";
 
 import type { Metric } from "@prisma/client";
+import { endOfDay, startOfDay } from "date-fns";
+import { getMetrics, getPreferences } from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { startOfDay, endOfDay } from "date-fns";
-import { getMetrics, getScoringWeeks } from "../../queries";
 
 export const metricsRouter = createTRPCRouter({
   getMetrics: protectedProcedure
     .input(z.object({ date: z.date() }))
     .query(async ({ input, ctx }) => {
-      const scoringWeeks = await getScoringWeeks(
-        ctx.prisma,
+      const preferences = await getPreferences(
+        ctx.db,
         ctx.session.user.id
       );
       const [metrics, _map] = await getMetrics({
         prisma: ctx.prisma,
         userId: ctx.session.user.id,
-        scoringWeeks,
+        scoringWeeks: preferences.scoringWeeks,
         date: input.date,
       });
       return metrics;

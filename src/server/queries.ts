@@ -13,8 +13,10 @@ import type {
 import { FrequencyHorizon } from "@prisma/client";
 import { endOfDay, isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
+import { eq } from "drizzle-orm";
+import { preferences } from "../schema";
 import { cache } from "./api/cache";
-import type { prisma as prismaClient } from "./db";
+import { type DB, type prisma as prismaClient } from "./db";
 
 function avg(arr: number[]) {
   return arr.length == 0 ? 0 : arr.reduce((a, b) => a + b) / arr.length;
@@ -330,6 +332,8 @@ export async function getMetrics({
   });
 
   const metricIds = metrics.map((m) => m.id);
+  console.log(date);
+  console.log(scoringWeeks);
 
   const metricAnswers = await prisma.metricAnswer.groupBy({
     by: ["metricId"],
@@ -440,21 +444,19 @@ export async function getGoals(
   return [goalsData, goalsMap];
 }
 
-export async function getScoringWeeks(
-  prisma: typeof prismaClient,
+export async function getPreferences(
+  db: DB,
   userId: string
-): Promise<number> {
-  return 2;
+): Promise<typeof preferences._.model.select> {
+  //if (!cache.has(userId)) {
+  await db.insert(preferences).ignore().values({ userId });
 
-  if (!cache.has(userId)) {
-    const weeks = (
-      await prisma.user.findUniqueOrThrow({
-        where: { id: userId },
-        select: { scoringWeeks: true },
-      })
-    ).scoringWeeks;
-    cache.set(userId, weeks);
-  }
-
-  return cache.get(userId)!;
+  const p = await db
+    .select()
+    .from(preferences)
+    .where(eq(preferences.userId, userId));
+  //   cache.set(userId, p);
+  // }
+  // return cache.get(userId)!;
+  return p[0]!;
 }

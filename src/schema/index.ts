@@ -1,18 +1,17 @@
-import {
-  mysqlTable,
-  mysqlSchema,
-  AnyMySqlColumn,
-  uniqueIndex,
-  index,
-  varchar,
-  text,
-  int,
-  datetime,
-  mysqlEnum,
-  double,
-  tinyint,
-} from "drizzle-orm/mysql-core";
 import { relations, sql } from "drizzle-orm";
+import {
+  datetime,
+  double,
+  index,
+  int,
+  mysqlEnum,
+  mysqlTable,
+  text,
+  tinyint,
+  uniqueIndex,
+  varchar,
+} from "drizzle-orm/mysql-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const answerFormat = mysqlTable("AnswerFormat", {
   id: varchar("id", { length: 191 }).primaryKey().notNull(),

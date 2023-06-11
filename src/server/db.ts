@@ -21,7 +21,8 @@ if (env.NODE_ENV !== "production") {
 
 import { connect } from "@planetscale/database";
 import chalkTemplate from "chalk-template";
-import type { Logger } from "drizzle-orm";
+import { type Logger } from "drizzle-orm";
+import type { PlanetScaleDatabase } from "drizzle-orm/planetscale-serverless";
 import { drizzle } from "drizzle-orm/planetscale-serverless";
 import * as schema from "../schema";
 
@@ -29,7 +30,9 @@ class MyLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
     const placeholders = params.map(() => "?").join(",");
 
-    console.log(chalkTemplate`{bold.red drizzle.query} ${query} (${placeholders})`);
+    console.log(
+      chalkTemplate`{bold.red drizzle.query} ${query} (${placeholders})`
+    );
   }
 }
 
@@ -39,3 +42,5 @@ export const db = drizzle(
   }),
   { logger: new MyLogger(), schema: schema }
 );
+
+export type DB = PlanetScaleDatabase<typeof schema>;

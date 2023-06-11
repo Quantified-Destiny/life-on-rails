@@ -7,6 +7,7 @@ import {
   getHabits,
   getHabitsWithMetricsMap,
   getMetrics,
+  getPreferences,
   getScoringWeeks,
 } from "../../queries";
 
@@ -52,10 +53,8 @@ export const goalsRouter = createTRPCRouter({
   getGoal: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const scoringWeeks = await getScoringWeeks(
-        ctx.prisma,
-        ctx.session.user.id
-      );
+      const preferences = await getPreferences(ctx.db, ctx.session.user.id);
+      const scoringWeeks = preferences.scoringWeeks;
 
       const goal: Goal = await ctx.prisma.goal.findFirstOrThrow({
         where: {
@@ -124,7 +123,8 @@ export const goalsRouter = createTRPCRouter({
   }),
 
   getAllMetrics: protectedProcedure.query(async ({ ctx }) => {
-    const scoringWeeks = await getScoringWeeks(ctx.prisma, ctx.session.user.id);
+    const preferences = await getPreferences(ctx.db, ctx.session.user.id);
+    const scoringWeeks = preferences.scoringWeeks;
 
     const [metrics, metricsMap] = await getMetrics({
       prisma: ctx.prisma,
