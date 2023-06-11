@@ -3,12 +3,16 @@ import { create } from "zustand";
 export enum State {
   None,
   CreateLinkedHabit,
+  Create,
   CreateGoal,
   CreateHabit,
   CreateMetric,
   HabitPanel,
 }
 
+interface Create {
+  state: State.Create;
+}
 interface CreateGoal {
   state: State.CreateGoal;
 }
@@ -23,8 +27,15 @@ interface HabitPanel {
   habitId: string;
 }
 
-interface AppState   {
-  modal: CreateGoal | CreateHabit | CreateMetric | HabitPanel | undefined;
+interface AppState {
+  modal:
+    | Create
+    | CreateGoal
+    | CreateHabit
+    | CreateMetric
+    | HabitPanel
+    | undefined;
+  openCreateModal: () => void;
   openCreateGoalModal: () => void;
   openCreateHabitModal: () => void;
   openCreateMetricModal: () => void;
@@ -34,6 +45,11 @@ interface AppState   {
 
 export const useAppState = create<AppState>()((set) => ({
   modal: undefined,
+  openCreateModal() {
+    set(() => ({
+      modal: { state: State.Create },
+    }));
+  },
   openCreateGoalModal() {
     set(() => ({
       modal: { state: State.CreateGoal },

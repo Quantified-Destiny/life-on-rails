@@ -4,6 +4,9 @@ import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "../utils/api";
 
+import { State, useAppState } from "../components/layout/appState";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Card, CardHeader, CardTitle } from "./ui/card";
 
 function Modal({
   close,
@@ -98,6 +101,72 @@ export function CreateGoalModal({ close }: { close: () => void }) {
     </Modal>
   );
 }
+export function CreateModal({ close }: { close: () => void }) {
+  const store = useAppState();
+  const openCreateGoalModal = useAppState((store) => store.openCreateGoalModal);
+  const openCreateHabitModal = useAppState(
+    (store) => store.openCreateHabitModal
+  );
+  const openCreateMetricModal = useAppState(
+    (store) => store.openCreateMetricModal
+  );
+
+  return (
+    <Dialog open={store.modal?.state === State.Create} onOpenChange={close}>
+      <DialogHeader>
+        <DialogTitle>Create an item</DialogTitle>
+      </DialogHeader>
+      <DialogContent className="w-fit">
+        <Card
+          className="h-[156px] w-full cursor-pointer hover:shadow-md"
+          onClick={openCreateGoalModal}
+        >
+          <div className="relative flex h-[156px] flex-row items-center">
+            <div className="flex h-full w-28 flex-col items-center justify-center bg-green-200 text-white">
+              Goal
+            </div>
+            <CardHeader className="space-y-3">
+              <p className="text-md text-gray-500">
+                Goals are the highest-level item that connect everything else
+                together.
+              </p>
+            </CardHeader>
+          </div>
+        </Card>
+        <Card
+          className="h-[156px] w-full cursor-pointer hover:shadow-md"
+          onClick={openCreateHabitModal}
+        >
+          <div className="relative flex h-full flex-row items-center">
+            <div className="flex h-[156px] w-28 flex-col items-center justify-center bg-blue-200 text-white">
+              Habit
+            </div>
+            <CardHeader className="space-y-3">
+              <p className="text-md text-gray-500">
+                Habits are the cornerstone of progress.
+              </p>
+            </CardHeader>
+          </div>
+        </Card>
+        <Card
+          className="h-[156px] w-full cursor-pointer hover:shadow-md"
+          onClick={openCreateMetricModal}
+        >
+          <div className="relative flex h-full flex-row items-center">
+            <div className="flex h-[156px] w-28 flex-col items-center justify-center bg-red-200 text-white">
+              Metric
+            </div>
+            <CardHeader className="space-y-3">
+              <p className="text-md text-gray-500">
+                Metrics are how you track the progress of your goals and habits.
+              </p>
+            </CardHeader>
+          </div>
+        </Card>
+      </DialogContent>
+    </Dialog>
+  );
+}
 export function CreateHabitModal({ close }: { close: () => void }) {
   interface HabitCreate {
     description: string;
@@ -118,7 +187,7 @@ export function CreateHabitModal({ close }: { close: () => void }) {
       description: data.description,
     });
   };
-  
+
   return (
     <Modal close={close}>
       <div className="relative max-h-full w-full max-w-md">
@@ -238,3 +307,24 @@ export function CreateMetricModal({ close }: { close: () => void }) {
     </Modal>
   );
 }
+
+export const Modals = () => {
+  const store = useAppState();
+  const reset = store.reset;
+  return (
+    <>
+      {store.modal?.state === State.Create && (
+        <CreateModal close={reset}></CreateModal>
+      )}
+      {store.modal?.state === State.CreateGoal && (
+        <CreateGoalModal close={reset}></CreateGoalModal>
+      )}
+      {store.modal?.state === State.CreateHabit && (
+        <CreateHabitModal close={reset}></CreateHabitModal>
+      )}
+      {store.modal?.state === State.CreateMetric && (
+        <CreateMetricModal close={reset}></CreateMetricModal>
+      )}
+    </>
+  );
+};

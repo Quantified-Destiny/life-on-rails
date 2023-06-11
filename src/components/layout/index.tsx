@@ -1,6 +1,5 @@
 "use client";
 import { useIsFetching } from "@tanstack/react-query";
-import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -15,16 +14,14 @@ import {
   HelpCircle,
   History,
   LayoutDashboard,
-  LogOut,
   ToyBrick,
-  User,
 } from "lucide-react";
 
+import { UserButton } from "@clerk/nextjs";
 import classNames from "classnames";
 import type { LucideIcon } from "lucide-react";
-import { useSidebarStore } from "./state";
 import Head from "next/head";
-import { UserButton } from "@clerk/nextjs";
+import { useSidebarStore } from "./state";
 
 interface MenuItem {
   name: string;
@@ -40,13 +37,6 @@ function Sidebar(props: {
 }) {
   const router = useRouter();
   const path = router.asPath;
-  const { data: sessionData } = useSession();
-
-  const handleSignOut = async () => {
-    await router.push("/");
-    await signOut();
-  };
-
   return (
     <div
       className={`${
@@ -102,34 +92,13 @@ function Sidebar(props: {
       ))}
       <hr className="mx-2 my-8 h-px border-0 bg-gray-500 dark:bg-gray-700"></hr>
 
-      <Link
-        href="/profile"
-        key="profile"
-        className={classNames(
-          "mt-2 flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm text-white hover:bg-slate-200 hover:bg-opacity-10",
-          path.includes("profile") ? "bg-slate-200 bg-opacity-10" : ""
-        )}
-      >
-        <div>
-          {React.createElement(User, {
-            size: 20,
-          })}
-        </div>
-        <span
-          className={`${!props.open ? `hidden` : ""} origin-left duration-200`}
-        >
-          Profile
-        </span>
-      </Link>
-
-      <div>
-        <UserButton afterSignOutUrl="/" />
+      <div className="items-right mt-10 flex w-full gap-x-4">
+        <UserButton
+          afterSignOutUrl="/"
+          userProfileMode="navigation"
+          userProfileUrl="/profile"
+        />
       </div>
-      <span
-        className={`${!props.open ? `hidden` : ""} origin-left duration-200`}
-      >
-        Log Out
-      </span>
     </div>
   );
 }

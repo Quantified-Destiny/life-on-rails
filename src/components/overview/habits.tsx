@@ -15,7 +15,7 @@ import {
   EditableField,
   EditableNumberField,
 } from "../inlineEdit";
-import { useAppState } from "../layout/overviewState";
+import { useAppState } from "../layout/appState";
 import { HabitSheet } from "./habit-panel";
 import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";

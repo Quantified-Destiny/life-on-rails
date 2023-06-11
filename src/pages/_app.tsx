@@ -1,43 +1,20 @@
-import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import { type AppType } from "next/app";
 import { api } from "../utils/api";
 
-import "../styles/Calendar.css";
-import "../styles/globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
 import "@fontsource/raleway/400.css";
 import "@fontsource/raleway/600.css";
 import "@fontsource/raleway/800.css";
 import Layout from "../components/layout";
 import {
-  CreateGoalModal,
-  CreateHabitModal,
-  CreateMetricModal,
+  Modals
 } from "../components/modals";
-import {
-  useAppState as useAppState,
-  State,
-} from "../components/layout/overviewState";
 import { TooltipProvider } from "../components/ui/tooltip";
-import { ClerkProvider } from "@clerk/nextjs";
+import "../styles/Calendar.css";
+import "../styles/globals.css";
 
-const Modals = () => {
-  const store = useAppState();
-  const reset = store.reset;
-  return (
-    <>
-      {store.modal?.state === State.CreateGoal && (
-        <CreateGoalModal close={reset}></CreateGoalModal>
-      )}
-      {store.modal?.state === State.CreateHabit && (
-        <CreateHabitModal close={reset}></CreateHabitModal>
-      )}
-      {store.modal?.state === State.CreateMetric && (
-        <CreateMetricModal close={reset}></CreateMetricModal>
-      )}
-    </>
-  );
-};
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,

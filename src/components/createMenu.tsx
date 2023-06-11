@@ -1,4 +1,5 @@
-import { useAppState } from "./layout/overviewState";
+import { useAppState } from "./layout/appState";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,26 +91,11 @@ export function CreateMenu({
   className?: string;
   triggerIcon?: JSX.Element;
 }) {
-  const openCreateGoalModal = useAppState(
-    (store) => store.openCreateGoalModal
-  );
-  const openCreateHabitModal = useAppState(
-    (store) => store.openCreateHabitModal
-  );
-  const openCreateMetricModal = useAppState(
-    (store) => store.openCreateMetricModal
-  );
+  const openCreateModal = useAppState((store) => store.openCreateModal);
 
-  const options = [
-    { name: "New Goal", onClick: openCreateGoalModal },
-    { name: "New Habit", onClick: openCreateHabitModal },
-    { name: "New Metric", onClick: openCreateMetricModal },
-  ];
   return (
-    <Dropdown
-      options={options}
-      trigger={triggerIcon || <PlusIcon />}
-      className={className}
-    ></Dropdown>
+    <Button variant="ghost" className={className} onClick={openCreateModal}>
+      {triggerIcon || <PlusIcon />}
+    </Button>
   );
 }
