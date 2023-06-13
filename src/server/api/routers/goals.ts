@@ -1,7 +1,7 @@
 import type { Goal, Metric } from "@prisma/client";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { metric, metricMeasuresGoal } from "../../../schema";
+import { goal, metric, metricMeasuresGoal } from "../../../schema";
 import {
   getGoals,
   getHabits,
@@ -99,13 +99,8 @@ export const goalsRouter = createTRPCRouter({
     }),
 
   getAllGoals: protectedProcedure.query(async ({ ctx }) => {
-    // const scoringWeeks = (
-    //   await ctx.prisma.user.findUniqueOrThrow({
-    //     where: { id: ctx.session.user.id },
-    //     select: { scoringWeeks: true },
-    //   })
-    // ).scoringWeeks;
-    const scoringWeeks = 2;
+    const scoringWeeks = (await getPreferences(ctx.db, ctx.session.user.id))
+      .scoringWeeks;
     const [metrics, metricsMap] = await getMetrics({
       prisma: ctx.prisma,
       db: ctx.db,
@@ -177,22 +172,13 @@ export const goalsRouter = createTRPCRouter({
     }),
 
   getGoalOnly: protectedProcedure.query(async ({ ctx }) => {
-    const data = await ctx.prisma.goal.findMany({
-      where: {
-        ownerId: ctx.session.user.id,
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-    const goalData = data.map(({ id, name }) => ({
-      id,
-      name,
-    }));
+    const goals = await ctx.db
+      .select({ id: goal.id, name: goal.name })
+      .from(goal)
+      .where(eq(goal.ownerId, ctx.session.user.id));
 
     return {
-      goalData: goalData,
+      goalData: goals,
     };
   }),
 
@@ -211,16 +197,13 @@ export const goalsRouter = createTRPCRouter({
   getWeights: protectedProcedure
     .input(z.object({ goalId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const goal = await ctx.prisma.goal.findUnique({
-        where: {
-          id: input.goalId,
-        },
-        select: {
+      return await ctx.db.query.goal.findFirst({
+        where: eq(goal.id, input.goalId),
+        with: {
           habits: true,
           metrics: true,
         },
       });
-      return goal;
     }),
 
   updateHabitWeight: protectedProcedure
