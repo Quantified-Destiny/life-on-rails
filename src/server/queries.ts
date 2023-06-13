@@ -176,7 +176,6 @@ export async function getMetrics({
   habitIds,
   date = new Date(),
 }: {
-  prisma: typeof prismaClient;
   db: DB;
   userId: string;
   scoringWeeks: number;

@@ -231,7 +231,6 @@ export const habitsRouter = createTRPCRouter({
       const scoringWeeks = preferences.scoringWeeks;
 
       const [_, metricsMap] = await getMetrics({
-        prisma: ctx.prisma,
         db: ctx.db,
         userId: ctx.session.user.id,
         scoringWeeks,
@@ -283,7 +282,6 @@ export const habitsRouter = createTRPCRouter({
 
       //TODO fix this
       const [_, metricsMap] = await getMetrics({
-        prisma: ctx.prisma,
         db: ctx.db,
         userId: ctx.session.user.id,
         scoringWeeks,
