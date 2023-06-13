@@ -17,7 +17,6 @@
  *
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-
 import { getServerAuthSession } from "../auth";
 import { db, prisma } from "../db";
 
@@ -56,6 +55,13 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
   return createInnerTRPCContext(session);
 };
 
+export const createContext = (auth: AuthObject) => () => {
+  // Get the session from the server using the unstable_getServerSession wrapper function
+  const { userId } = auth;
+  const session =  { user: (userId ? {id: userId} : undefined) };
+  return createInnerTRPCContext(session);
+};
+
 /**
  * 2. INITIALIZATION
  *
@@ -64,6 +70,7 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import { AuthObject } from "@clerk/nextjs/dist/types/server";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

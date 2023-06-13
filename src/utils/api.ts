@@ -1,5 +1,5 @@
-"use client"
-/** 
+"use client";
+/**
  * This is the client-side entrypoint for your tRPC API.
  * It's used to create the `api` object which contains the Next.js App-wrapper
  * as well as your typesafe react-query hooks.
@@ -49,7 +49,10 @@ export const api = createTRPCNext<AppRouter>({
             (opts.direction === "down" && opts.result instanceof Error),
         }),
         httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
+          // use the handler defined in the pages file
+          //url: `${getBaseUrl()}/api/trpc`,
+          // use the handler defined in middleware
+          url: `${getBaseUrl()}/trpc`,
         }),
       ],
     };
