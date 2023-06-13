@@ -1,4 +1,5 @@
 import { goal, habit, metric } from "../../../schema";
+import { remapTypes } from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 import { eq } from "drizzle-orm";
@@ -10,9 +11,13 @@ export const overviewRouter = createTRPCRouter({
     const metrics = ctx.db.select().from(metric).where(eq(metric.archived, 1));
 
     return {
-      goals: await goals,
-      habits: await habits,
-      metrics: await metrics,
+      goals: (await goals).map(remapTypes),
+      habits: (await habits).map(remapTypes),
+      metrics: (await metrics).map((it) => ({
+        ...it,
+        createdAt: new Date(it.createdAt),
+        updatedAt: new Date(it.updatedAt),
+      })),
     };
   }),
 });

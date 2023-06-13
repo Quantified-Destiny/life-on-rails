@@ -163,9 +163,18 @@ function OverviewPage() {
         )}
       </div>
       <div className="w-full">
-        <ArchivedItems></ArchivedItems><HelpIcon>Archive items you no longer want to track. All of your archived items will show up here. You can unarchive them at any time.</HelpIcon>
+        <ArchivedItems></ArchivedItems>
+        <HelpIcon>
+          Archive items you no longer want to track. Archived items will no
+          longer affect any scores or show up on the dashboard. All of your
+          archived items will show up here. You can unarchive them at any time.
+        </HelpIcon>
       </div>
     </div>
   );
 }
 export default OverviewPage;
+
+export const config = {
+  runtime: "experimental-edge",
+};

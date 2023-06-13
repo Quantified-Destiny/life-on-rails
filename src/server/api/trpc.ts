@@ -68,9 +68,9 @@ export const createContext = (auth: AuthObject) => () => {
  * This is where the trpc api is initialized, connecting the context and
  * transformer
  */
+import type { AuthObject } from "@clerk/nextjs/dist/types/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { AuthObject } from "@clerk/nextjs/dist/types/server";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
