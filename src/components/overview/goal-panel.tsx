@@ -1,6 +1,5 @@
 import type { Habit } from "@prisma/client";
 import { ScoringFormat } from "@prisma/client";
-import { subYears } from "date-fns";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
@@ -19,6 +18,7 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import { ActionButton, Button } from "../ui/button";
+import { HelpIcon } from "../ui/help-icon";
 import { HabitIcon, MetricIcon } from "../ui/icons";
 import { Label } from "../ui/label";
 import {
@@ -34,9 +34,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { GoalTagList } from "./tags";
-import { HelpIcon } from "../ui/help-icon";
 import { useDebouncedState } from "./lib";
+import { GoalTagList } from "./tags";
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -268,50 +267,6 @@ function HabitsSection({
   );
 }
 
-const HeatMap = dynamic(() => import("@uiw/react-heat-map"), { ssr: false });
-
-const value = [
-  { date: "2023/01/11", count: 2, content: "" },
-  { date: "2023/01/12", count: 20, content: "" },
-  { date: "2023/01/13", count: 10, content: "" },
-  ...[...Array(17).keys()].map((_, idx) => ({
-    date: `2023/02/${idx + 10}`,
-    count: 10,
-    content: "",
-  })),
-  { date: "2023/04/11", count: 10, content: "" },
-  { date: "2023/05/01", count: 10, content: "" },
-  { date: "2023/05/02", count: 10, content: "" },
-  { date: "2023/05/04", count: 10, content: "" },
-];
-
-function HistorySection({ habitId }: { habitId: string }) {
-  const completionsQuery = api.habits.getCompletions.useQuery({
-    habitId: habitId,
-    timeHorizon: 365,
-  });
-  if (
-    completionsQuery.isLoading ||
-    completionsQuery.error ||
-    !completionsQuery.data
-  ) {
-    return <p>LOADING</p>;
-  }
-  const completions = completionsQuery.data;
-  return (
-    <div className="my-8 flex flex-col items-center justify-center">
-      <HeatMap
-        value={value}
-        space={100}
-        startDate={new Date(subYears(new Date(), 1))}
-        width={600}
-        legendCellSize={0}
-      />
-      {JSON.stringify(completions)}
-    </div>
-  );
-}
-
 function WeightBar({
   children,
   weight,
@@ -333,7 +288,7 @@ function WeightBar({
           width: `${(weight / totalWeight) * 100}%`,
         }}
       >
-        <span className="flex flex-row items-center justify-center gap-2 whitespace-nowrap overflow-x-hidden">
+        <span className="flex flex-row items-center justify-center gap-2 overflow-x-hidden whitespace-nowrap">
           {children}
         </span>
         <TooltipTrigger asChild>
@@ -410,8 +365,10 @@ function ScoringSection({
     });
   };
 
-  const { state: habitWeights, setState: setHabitWeights } = 
-  useDebouncedState(initialHabitWeights,500,    syncHabitWeights
+  const { state: habitWeights, setState: setHabitWeights } = useDebouncedState(
+    initialHabitWeights,
+    500,
+    syncHabitWeights
   );
 
   const { state: metricWeights, setState: setMetricWeights } =
@@ -458,9 +415,7 @@ function ScoringSection({
             updateWeight={(weight) => {
               metricWeights[i] = weight;
               setMetricWeights([...metricWeights]);
-             
-             } 
-            }
+            }}
           >
             <MetricIcon></MetricIcon>
             {metric.prompt}
