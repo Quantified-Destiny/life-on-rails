@@ -1,8 +1,9 @@
 import { z } from "zod";
 
-import type { LinkedMetric, Metric } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
 import { endOfDay, startOfDay, subDays } from "date-fns";
+import { and, eq, gt, lt } from "drizzle-orm";
+import { habitCompletion, linkedMetric, metric } from "../../../schema";
 import {
   getHabitCompletionSubDays,
   getHabits,
@@ -11,8 +12,6 @@ import {
   remapTypes,
 } from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { eq } from "drizzle-orm";
-import { metric } from "../../../schema";
 
 export const habitsRouter = createTRPCRouter({
   linkHabit: protectedProcedure
@@ -86,13 +85,16 @@ export const habitsRouter = createTRPCRouter({
   getCompletionsOnDay: protectedProcedure
     .input(z.object({ habitId: z.string(), date: z.date() }))
     .query(async ({ input, ctx }) => {
-      const completions = await ctx.prisma.habitCompletion.findMany({
-        where: {
-          habitId: input.habitId,
-          date: { gt: startOfDay(input.date), lt: endOfDay(input.date) },
-        },
-      });
-      return completions;
+      return await ctx.db
+        .select()
+        .from(habitCompletion)
+        .where(
+          and(
+            eq(habitCompletion.habitId, input.habitId),
+            gt(habitCompletion.date, startOfDay(input.date).toISOString()),
+            lt(habitCompletion.date, endOfDay(input.date).toISOString())
+          )
+        );
     }),
 
   deleteCompletion: protectedProcedure
@@ -108,11 +110,12 @@ export const habitsRouter = createTRPCRouter({
   getMetrics: protectedProcedure
     .input(z.object({ habitId: z.string() }))
     .query(async ({ input, ctx }) => {
-      return (
-        await ctx.db.query.metric.findMany({
-          where: eq(metric.ownerId, ctx.session.user.id),
-        })
-      ).map(remapTypes);
+      const d = await ctx.db
+        .select({ metric })
+        .from(metric)
+        .innerJoin(linkedMetric, eq(metric.id, linkedMetric.metricId))
+        .where(eq(linkedMetric.habitId, input.habitId));
+      return d.map((d) => remapTypes(d.metric));
     }),
 
   createHabit: protectedProcedure
