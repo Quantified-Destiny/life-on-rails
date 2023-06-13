@@ -83,7 +83,7 @@ export const goalsRouter = createTRPCRouter({
         goalIds: [goal.id],
       });
 
-      const habits = await getHabits({
+      const [habits, _map] = await getHabits({
         prisma: ctx.prisma,
         db: ctx.db,
         metricsMap,
