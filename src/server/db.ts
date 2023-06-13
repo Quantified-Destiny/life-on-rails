@@ -24,7 +24,8 @@ import chalkTemplate from "chalk-template";
 import { type Logger } from "drizzle-orm";
 import type { PlanetScaleDatabase } from "drizzle-orm/planetscale-serverless";
 import { drizzle } from "drizzle-orm/planetscale-serverless";
-import * as schema from "../schema";
+import type { Schema } from "../schema";
+import schema from "../schema";
 
 class MyLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
@@ -42,7 +43,5 @@ export const db = drizzle(
   }),
   { logger: new MyLogger(), schema: schema }
 );
-
-type Schema = typeof schema;
 
 export type DB = PlanetScaleDatabase<Schema>;
