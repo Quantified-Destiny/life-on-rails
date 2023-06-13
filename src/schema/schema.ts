@@ -92,6 +92,13 @@ export const habit = mysqlTable(
   }
 );
 
+export const habitRelations = relations(habit, ({ many }) => ({
+  goals: many(habitMeasuresGoal),
+  metrics: many(linkedMetric),
+  completions: many(habitCompletion),
+  tags: many(habitTag),
+}));
+
 export const habitCompletion = mysqlTable(
   "HabitCompletion",
   {
@@ -108,6 +115,16 @@ export const habitCompletion = mysqlTable(
       dateIdx: index("HabitCompletion_date_idx").on(table.date),
     };
   }
+);
+
+export const habitCompletionRelations = relations(
+  habitCompletion,
+  ({ one }) => ({
+    habit: one(habit, {
+      fields: [habitCompletion.habitId],
+      references: [habit.id],
+    }),
+  })
 );
 
 export const habitMeasuresGoal = mysqlTable(
@@ -163,6 +180,17 @@ export const habitTag = mysqlTable(
   }
 );
 
+export const habitTagRelations = relations(habitTag, ({ one }) => ({
+  habit: one(habit, {
+    fields: [habitTag.habitId],
+    references: [habit.id],
+  }),
+  tag: one(tag, {
+    fields: [habitTag.tagId],
+    references: [tag.id],
+  })
+}))
+
 export const linkedMetric = mysqlTable(
   "LinkedMetric",
   {
@@ -181,10 +209,11 @@ export const linkedMetric = mysqlTable(
   }
 );
 export const linkedMetricRelations = relations(linkedMetric, ({ one }) => ({
-  answers: one(metric, {
+  metric: one(metric, {
     fields: [linkedMetric.metricId],
     references: [metric.id],
   }),
+  habit: one(habit, { fields: [linkedMetric.habitId], references: [habit.id] }),
 }));
 
 export const metric = mysqlTable(
