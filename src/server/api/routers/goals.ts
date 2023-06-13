@@ -1,13 +1,14 @@
 import type { Goal, Metric } from "@prisma/client";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { goal, metric, metricMeasuresGoal } from "../../../schema";
 import {
-  getGoals,
-  getHabits,
-  getMetrics,
-  getPreferences,
-} from "../../queries";
+  goal,
+  goalTag,
+  metric,
+  metricMeasuresGoal,
+  tag,
+} from "../../../schema";
+import { getGoals, getHabits, getMetrics, getPreferences } from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const goalsRouter = createTRPCRouter({
@@ -25,15 +26,13 @@ export const goalsRouter = createTRPCRouter({
   getTags: protectedProcedure
     .input(z.object({ goalId: z.string() }))
     .query(async ({ input, ctx }) => {
-      return await ctx.prisma.tag.findMany({
-        where: {
-          goals: {
-            some: {
-              goalId: input.goalId,
-            },
-          },
-        },
-      });
+      return (
+        await ctx.db
+          .select({ tag: tag })
+          .from(tag)
+          .innerJoin(goalTag, eq(tag.id, goalTag.tagId))
+          .where(eq(goalTag.tagId, input.goalId))
+      ).map((it) => it.tag);
     }),
 
   getMetrics: protectedProcedure
@@ -75,7 +74,6 @@ export const goalsRouter = createTRPCRouter({
         },
       });
 
-      
       const [metrics, metricsMap] = await getMetrics({
         db: ctx.db,
         userId: ctx.session.user.id,

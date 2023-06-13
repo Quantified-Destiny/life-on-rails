@@ -94,8 +94,10 @@ export async function getHabits({
     with: {
       metrics: true,
       tags: { with: { tag: true } },
-      goals: { columns: {id: true}, where: eq(goal.archived, 0) },
-      completions: {where: gt(habitCompletion.date, subDays(date, 7).toISOString())},
+      goals: { columns: { goalId: true } },
+      completions: {
+        where: gt(habitCompletion.date, subDays(date, 7).toISOString()),
+      },
     },
   });
 
@@ -150,7 +152,7 @@ export async function getHabits({
     archivedAt: new Date(h.archivedAt),
     archived: h.archived == 1,
     score: habitScores.get(h.id) ?? 0,
-    goals: h.goals.map((it) => it.id),
+    goals: h.goals.map((it) => it.goalId),
     tags: h.tags.map((it) => it.tag.name),
     metrics: h.metrics.map((it) => metricsMap.get(it.metricId)!),
     completions:
@@ -281,6 +283,30 @@ export interface GoalsReturnType {
   habits: ExpandedHabit[];
 }
 
+interface RemappableTypes {
+  createdAt: string;
+  updatedAt: string;
+  archivedAt: string;
+  archived: number;
+}
+
+interface MappedTypes {
+  createdAt: Date;
+  updatedAt: Date;
+  archivedAt: Date;
+  archived: boolean;
+}
+
+function normalize<T extends RemappableTypes>(it: T): Omit<T, keyof RemappableTypes> & MappedTypes {
+  return {
+    ...it,
+    createdAt: new Date(it.createdAt),
+    updatedAt: new Date(it.updatedAt),
+    archivedAt: new Date(it.archivedAt),
+    archived: it.archived == 1,
+  };
+}
+
 export async function getGoals(
   prisma: typeof prismaClient,
   db: DB,
@@ -288,38 +314,16 @@ export async function getGoals(
   metricsMap: Map<string, ExpandedMetric>,
   habitsMap: Map<string, ExpandedHabit>
 ): Promise<[GoalsReturnType[], Map<string, GoalsReturnType>]> {
-
   const g = await db.query.goal.findMany({
     where: and(eq(goal.ownerId, userId), eq(goal.archived, 0)),
     with: {
       habits: true,
-      metrics: true
-    }
-  });
-
-
-  const goals = await prisma.goal.findMany({
-    where: {
-      ownerId: userId,
-      archived: false,
-    },
-    include: {
-      habits: {
-        include: {
-          habit: {
-            include: {
-              metrics: true,
-              goals: true,
-              tags: { include: { tag: true } },
-            },
-          },
-        },
-      },
-
       metrics: true,
-      tags: { include: { tag: true } },
+      tags: { with: { tag: true } },
     },
   });
+
+  const goals = g.map(normalize);
 
   const goalsData = goals.map((g) => {
     const m: number[] = g.metrics.map(

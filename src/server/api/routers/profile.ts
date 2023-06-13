@@ -1,6 +1,8 @@
 import { clerkClient } from "@clerk/nextjs";
-import { ScoringFormat, type Metric } from "@prisma/client";
+import { type Metric } from "@prisma/client";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { preferences } from "../../../schema";
 import type { prisma as prismaClient } from "../../db";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -18,12 +20,14 @@ export const profileRouter = createTRPCRouter({
     // });
     const data = user;
 
+    const p = (await ctx.db.select().from(preferences).where(eq(preferences.userId, ctx.session.user.id)))[0]!
+
     return {
       name: `${data.firstName || ""} ${data.lastName || ""}`,
       email: data.emailAddresses[0],
       image: data.imageUrl,
-      scoringWeeks: 4,
-      scoringUnit: ScoringFormat.Percentage,
+      scoringWeeks: p.scoringWeeks,
+      scoringUnit: p.scoringUnit,
       providers: [],
       createdAt: new Date(data.createdAt),
     };
