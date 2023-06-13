@@ -1,6 +1,5 @@
 //import { PrismaClient } from "@prisma/client";
-import { PrismaClient } from '@prisma/client/edge'
-
+import { PrismaClient } from "@prisma/client/edge";
 import { env } from "../env/server.mjs";
 
 declare global {
@@ -20,7 +19,7 @@ if (env.NODE_ENV !== "production") {
 }
 
 import { connect } from "@planetscale/database";
-import chalkTemplate from "chalk-template";
+// import chalkTemplate from "chalk-template";
 import { type Logger } from "drizzle-orm";
 import type { PlanetScaleDatabase } from "drizzle-orm/planetscale-serverless";
 import { drizzle } from "drizzle-orm/planetscale-serverless";
@@ -31,9 +30,10 @@ class MyLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
     const placeholders = params.map(() => "?").join(",");
 
-    console.log(
-      chalkTemplate`{bold.red drizzle.query} ${query} (${placeholders})`
-    );
+    // console.log(
+    //   chalkTemplate`{bold.red drizzle.query} ${query} (${placeholders})`
+    // );
+    console.log(`drizzle.query  ${query} (${placeholders})`);
   }
 }
 
