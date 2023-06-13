@@ -41,6 +41,11 @@ export const goal = mysqlTable(
   }
 );
 
+export const goalRelations = relations(goal, ({ many }) => ({
+  habits: many(habitMeasuresGoal),
+  metrics: many(metricMeasuresGoal),
+}));
+
 export const goalTag = mysqlTable(
   "GoalTag",
   {
@@ -123,6 +128,20 @@ export const habitMeasuresGoal = mysqlTable(
       habitIdIdx: index("HabitMeasuresGoal_habitId_idx").on(table.habitId),
     };
   }
+);
+
+export const habitMeasuresGoalRelations = relations(
+  habitMeasuresGoal,
+  ({ one }) => ({
+    goal: one(goal, {
+      fields: [habitMeasuresGoal.goalId],
+      references: [goal.id],
+    }),
+    habit: one(habit, {
+      fields: [habitMeasuresGoal.habitId],
+      references: [habit.id],
+    }),
+  })
 );
 
 export const habitTag = mysqlTable(
