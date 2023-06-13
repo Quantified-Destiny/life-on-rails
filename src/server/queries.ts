@@ -6,20 +6,19 @@ import type {
   LinkedMetric,
   Metric,
   MetricAnswer,
-  MetricMeasuresGoal,
-  MetricTag,
   Tag,
 } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
 import { endOfDay, isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
 
 import type { SQL } from "drizzle-orm";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import {
   goal,
   habit,
   linkedMetric,
   metric,
+  metricAnswer,
   metricMeasuresGoal,
   preferences,
 } from "../schema";
@@ -295,7 +294,6 @@ export interface ExpandedMetric extends Metric {
 }
 
 export async function getMetrics({
-  prisma,
   db,
   userId,
   scoringWeeks,
@@ -311,14 +309,7 @@ export async function getMetrics({
   habitIds?: string[];
   date?: Date;
 }): Promise<[ExpandedMetric[], Map<string, ExpandedMetric>]> {
-  const whereConditions = {
-    goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
-    completionMetric: habitIds
-      ? { some: { habitId: { in: habitIds } } }
-      : undefined,
-  };
-
-  const conditions: SQL<any>[] = [eq(metric.ownerId, userId)];
+  const conditions: SQL[] = [eq(metric.ownerId, userId)];
 
   if (goalIds) {
     const metricsLinkedToGivenGoals = db
@@ -337,67 +328,61 @@ export async function getMetrics({
     conditions.push(inArray(metric.id, metricsLinkedToGivenHabits));
   }
 
-  const m = await db.query.metric.findMany({
+  const metrics = await db.query.metric.findMany({
     where: and(...conditions),
-  });
-  console.log(m);
-
-  type MetricsType = (Metric & {
-    completionMetric: LinkedMetric[];
-    tags: (MetricTag & { tag: Tag })[];
-    goals: (MetricMeasuresGoal & { goal: Goal })[];
-    metricAnswers: MetricAnswer[];
-  })[];
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const metrics: MetricsType = await prisma.metric.findMany({
-    where: {
-      ownerId: userId,
-      ...whereConditions,
-    },
-    include: {
-      completionMetric: true,
-      metricAnswers: { where: { createdAt: { gt: startOfDay(date) } } },
+    with: {
+      habits: { columns: { habitId: true } },
+      goals: { with: { goal: true } },
       tags: {
-        include: { tag: true },
+        with: { tag: true },
       },
-      goals: {
-        include: { goal: true },
+      answers: {
+        where: sql`${metricAnswer.createdAt} > ${startOfDay(
+          date
+        ).toISOString()}`,
       },
     },
   });
 
   const metricIds = metrics.map((m) => m.id);
-  console.log(date);
-  console.log(scoringWeeks);
 
-  const metricAnswers = await prisma.metricAnswer.groupBy({
-    by: ["metricId"],
-    _sum: {
-      value: true,
-    },
-    where: {
-      metricId: { in: metricIds },
-      createdAt: { gt: subDays(date, 7 * scoringWeeks) },
-    },
-  });
+  const startDate = subDays(date, 7 * scoringWeeks).toISOString();
+  const metricAnswers = await db
+    .select({ metricId: metricAnswer.metricId, count: sql<number>`count(*)` })
+    .from(metricAnswer)
+    .where(
+      and(
+        gt(metricAnswer.createdAt, startDate),
+        inArray(metricAnswer.metricId, metricIds)
+      )
+    )
+    .groupBy(metricAnswer.metricId);
 
   const metricScores = new Map<string, number>(
     metricAnswers.map((a) => [
       a.metricId,
-      (a._sum.value ?? 0) / 5 / (7 * scoringWeeks),
+      (a.count ?? 0) / 5 / (7 * scoringWeeks),
     ])
   );
 
-  const expandedMetrics = metrics.map((m) => ({
+  const expandedMetrics: ExpandedMetric[] = metrics.map((m) => ({
     ...m,
-    linkedHabits: m.completionMetric.map((it) => it.habitId),
+    createdAt: new Date(m.createdAt),
+    archivedAt: new Date(m.archivedAt),
+    updatedAt: new Date(m.updatedAt),
+    archived: m.archived == 0,
+    linkedHabits: m.habits.map((it) => it.habitId),
     tags: m.tags.map((mt) => mt.tag),
-    goals: m.goals.map((g) => g.goal),
+    goals: m.goals.map((g) => ({
+      ...g.goal,
+      createdAt: new Date(g.goal.createdAt),
+      updatedAt: new Date(g.goal.updatedAt),
+      archivedAt: new Date(g.goal.archivedAt),
+      archived: g.goal.archived == 0,
+    })),
     score: metricScores.get(m.id) ?? 0,
-    value: m.metricAnswers[0]?.value ?? 0,
+    value: m.answers[0]?.value ?? 0,
   }));
-  console.log("ahodnlaskndanoiadshofihefl");
 
   const metricsMap = new Map<string, ExpandedMetric>();
   expandedMetrics.forEach((m) => {
