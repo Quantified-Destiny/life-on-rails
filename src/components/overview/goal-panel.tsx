@@ -1,7 +1,6 @@
 import type { Habit } from "@prisma/client";
 import { ScoringFormat } from "@prisma/client";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
-import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import type { ExpandedHabit, ExpandedMetric } from "../../server/queries";
