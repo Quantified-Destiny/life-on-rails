@@ -4,7 +4,7 @@ import "@fontsource/raleway/800.css";
 import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
-import "../styles/globals.css";
+import "../../../styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 
 const TopNav = () => {
