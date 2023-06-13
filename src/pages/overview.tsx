@@ -163,7 +163,7 @@ function OverviewPage() {
         )}
       </div>
       <div className="w-full">
-        <ArchivedItems></ArchivedItems>
+        <ArchivedItems></ArchivedItems><HelpIcon>Archive items you no longer want to track. All of your archived items will show up here. You can unarchive them at any time.</HelpIcon>
       </div>
     </div>
   );
