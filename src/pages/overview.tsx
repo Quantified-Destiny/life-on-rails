@@ -174,7 +174,3 @@ function OverviewPage() {
   );
 }
 export default OverviewPage;
-
-export const config = {
-  runtime: "experimental-edge",
-};
