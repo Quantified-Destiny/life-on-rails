@@ -1,26 +1,17 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider     = "mysql"
-  // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url          = env("DIRECT_URL")
-  // directUrl    = env("DIRECT_URL")
   relationMode = "prisma"
 }
 
 model Tag {
-  id      String @id @default(cuid())
+  id      String      @id @default(cuid())
   name    String
   ownerId String
-
   owner   User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   goals   GoalTag[]
   habits  HabitTag[]
@@ -56,47 +47,40 @@ model HabitTag {
 
 model MetricTag {
   id       String @id @default(cuid())
-  metricId String @map("metricTag")
+  metricId String
   tagId    String
   metric   Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
   tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
-  @@unique([tagId, metricId])
-  @@index([metricId])
+  @@unique([tagId, metricId], map: "MetricTag_tagId_metricTag_key")
+  @@index([metricId], map: "MetricTag_metricTag_idx")
   @@index([tagId])
 }
 
 model Goal {
-  id         String   @id @default(cuid())
+  id         String               @id @default(cuid())
   name       String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  archived   Boolean  @default(false)
-  archivedAt DateTime @default(now())
-
-  ownerId String
-  owner   User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  habits  HabitMeasuresGoal[]
-  metrics MetricMeasuresGoal[]
-  tags    GoalTag[]
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  ownerId    String
+  archived   Boolean              @default(false)
+  archivedAt DateTime             @default(now())
+  owner      User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  habits     HabitMeasuresGoal[]
+  metrics    MetricMeasuresGoal[]
+  tags       GoalTag[]
 
   @@index([ownerId])
 }
 
-enum FrequencyHorizon {
-  DAY
-  WEEK
-}
-
 model Habit {
   id               String              @id @default(cuid())
-  description      String
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
   ownerId          String
-  frequencyHorizon FrequencyHorizon    @default(DAY)
+  description      String
   frequency        Int                 @default(1)
-  // the weight for completions in calculating score. Should be 0-1
+  frequencyHorizon FrequencyHorizon    @default(DAY)
   completionWeight Float               @default(1)
   archived         Boolean             @default(false)
   archivedAt       DateTime            @default(now())
@@ -109,13 +93,12 @@ model Habit {
   @@index([ownerId])
 }
 
-// links a habit to post-completion metrics
 model LinkedMetric {
   id       String   @id @default(cuid())
   date     DateTime @default(now())
   habitId  String
-  habit    Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
   metricId String
+  habit    Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
   metric   Metric   @relation(fields: [metricId], references: [id], onDelete: Cascade)
 
   @@index([habitId])
@@ -124,11 +107,11 @@ model LinkedMetric {
 
 model HabitCompletion {
   id            String         @id @default(cuid())
-  date          DateTime       @default(now())
   habitId       String
+  date          DateTime       @default(now())
+  memo          String?
   Habit         Habit          @relation(fields: [habitId], references: [id], onDelete: Cascade)
   linkedAnswers MetricAnswer[]
-  memo          String?
 
   @@index([date])
   @@index([habitId])
@@ -139,9 +122,8 @@ model HabitMeasuresGoal {
   goalId  String
   habitId String
   weight  Int    @default(1)
-
-  goal  Goal  @relation(fields: [goalId], references: [id], onDelete: Cascade)
-  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  goal    Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  habit   Habit  @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
   @@unique([goalId, habitId])
   @@index([goalId])
@@ -153,18 +135,12 @@ model MetricMeasuresGoal {
   goalId   String
   metricId String
   weight   Int    @default(1)
-
-  goal   Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
-  metric Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
+  goal     Goal   @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  metric   Metric @relation(fields: [metricId], references: [id], onDelete: Cascade)
 
   @@unique([goalId, metricId])
   @@index([goalId])
   @@index([metricId])
-}
-
-enum Format {
-  FIVE_POINT
-  NUMERIC_INPUT
 }
 
 model AnswerFormat {
@@ -176,18 +152,17 @@ model AnswerFormat {
 }
 
 model Metric {
-  id         String               @id @default(cuid())
-  prompt     String
-  createdAt  DateTime             @default(now())
-  updatedAt  DateTime             @updatedAt
-  ownerId    String
-  owner      User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  goals      MetricMeasuresGoal[]
-  formatId   String
-  archived   Boolean              @default(false)
-  archivedAt DateTime             @default(now())
-
-  format           AnswerFormat   @relation(fields: [formatId], references: [id], onDelete: Cascade)
+  id               String               @id @default(cuid())
+  prompt           String
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  ownerId          String
+  formatId         String
+  archived         Boolean              @default(false)
+  archivedAt       DateTime             @default(now())
+  owner            User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  goals            MetricMeasuresGoal[]
+  format           AnswerFormat         @relation(fields: [formatId], references: [id], onDelete: Cascade)
   metricAnswers    MetricAnswer[]
   completionMetric LinkedMetric[]
   tags             MetricTag[]
@@ -197,28 +172,23 @@ model Metric {
 }
 
 model MetricAnswer {
-  id        String   @id @default(cuid())
-  value     Float
-  score     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  metricId  String
-  metric    Metric   @relation(fields: [metricId], references: [id], onDelete: Cascade)
-  memo      String?
-
-  // if this answer is linked to a metric, this will specify which habit-completion this answer relates to
-  HabitCompletion   HabitCompletion? @relation(fields: [habitCompletionId], references: [id])
+  id                String           @id @default(cuid())
+  value             Float
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  metricId          String
   habitCompletionId String?
+  memo              String?
+  score             Float
+  metric            Metric           @relation(fields: [metricId], references: [id], onDelete: Cascade)
+  HabitCompletion   HabitCompletion? @relation(fields: [habitCompletionId], references: [id])
 
   @@index([metricId])
   @@index([habitCompletionId])
 }
 
-// Necessary for Next auth
 model Account {
   id                String   @id @default(cuid())
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @default(now()) @updatedAt
   userId            String
   type              String
   provider          String
@@ -230,6 +200,8 @@ model Account {
   scope             String?
   id_token          String?  @db.Text
   session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -246,19 +218,14 @@ model Session {
   @@index([userId])
 }
 
-enum ScoringFormat {
-  Percentage
-  Normalized
-}
-
 model User {
   id            String        @id @default(cuid())
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now()) @updatedAt
   name          String?
   email         String?       @unique
   emailVerified DateTime?
   image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
   scoringWeeks  Int           @default(2)
   scoringUnit   ScoringFormat @default(Normalized)
   accounts      Account[]
@@ -275,4 +242,30 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Preferences {
+  userId       String                  @id
+  scoringWeeks Int                     @default(2)
+  scoringUnit  Preferences_scoringUnit @default(Normalized)
+}
+
+enum FrequencyHorizon {
+  DAY
+  WEEK
+}
+
+enum Format {
+  FIVE_POINT
+  NUMERIC_INPUT
+}
+
+enum ScoringFormat {
+  Percentage
+  Normalized
+}
+
+enum Preferences_scoringUnit {
+  Percentage
+  Normalized
 }
