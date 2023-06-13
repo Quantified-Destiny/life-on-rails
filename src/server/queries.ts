@@ -145,12 +145,8 @@ export async function getHabits({
       })
   );
 
-  const expandedHabits: ExpandedHabit[] = habits.map((h) => ({
+  const expandedHabits: ExpandedHabit[] = habits.map(remapTypes).map((h) => ({
     ...h,
-    createdAt: new Date(h.createdAt),
-    updatedAt: new Date(h.updatedAt),
-    archivedAt: new Date(h.archivedAt),
-    archived: h.archived == 1,
     score: habitScores.get(h.id) ?? 0,
     goals: h.goals.map((it) => it.goalId),
     tags: h.tags.map((it) => it.tag.name),
@@ -245,24 +241,16 @@ export async function getMetrics({
     ])
   );
 
-  const expandedMetrics: ExpandedMetric[] = metrics.map((m) => ({
-    ...m,
-    createdAt: new Date(m.createdAt),
-    archivedAt: new Date(m.archivedAt),
-    updatedAt: new Date(m.updatedAt),
-    archived: m.archived == 0,
-    linkedHabits: m.habits.map((it) => it.habitId),
-    tags: m.tags.map((mt) => mt.tag),
-    goals: m.goals.map((g) => ({
-      ...g.goal,
-      createdAt: new Date(g.goal.createdAt),
-      updatedAt: new Date(g.goal.updatedAt),
-      archivedAt: new Date(g.goal.archivedAt),
-      archived: g.goal.archived == 0,
-    })),
-    score: metricScores.get(m.id) ?? 0,
-    value: m.answers[0]?.value ?? 0,
-  }));
+  const expandedMetrics: ExpandedMetric[] = metrics
+    .map(remapTypes)
+    .map((m) => ({
+      ...m,
+      linkedHabits: m.habits.map((it) => it.habitId),
+      tags: m.tags.map((mt) => mt.tag),
+      goals: m.goals.map((g) => ({ ...g.goal })).map(remapTypes),
+      score: metricScores.get(m.id) ?? 0,
+      value: m.answers[0]?.value ?? 0,
+    }));
 
   const metricsMap = new Map<string, ExpandedMetric>();
   expandedMetrics.forEach((m) => {
@@ -297,7 +285,9 @@ interface MappedTypes {
   archived: boolean;
 }
 
-function normalize<T extends RemappableTypes>(it: T): Omit<T, keyof RemappableTypes> & MappedTypes {
+function remapTypes<T extends RemappableTypes>(
+  it: T
+): Omit<T, keyof RemappableTypes> & MappedTypes {
   return {
     ...it,
     createdAt: new Date(it.createdAt),
@@ -323,7 +313,7 @@ export async function getGoals(
     },
   });
 
-  const goals = g.map(normalize);
+  const goals = g.map(remapTypes);
 
   const goalsData = goals.map((g) => {
     const m: number[] = g.metrics.map(
