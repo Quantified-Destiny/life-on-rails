@@ -1,7 +1,7 @@
 import type { Goal, Metric } from "@prisma/client";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-
+import { metric, metricMeasuresGoal } from "../../../schema";
 import {
   getGoals,
   getHabits,
@@ -9,6 +9,7 @@ import {
   getMetrics,
   getPreferences,
 } from "../../queries";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const goalsRouter = createTRPCRouter({
   deleteGoal: protectedProcedure
@@ -37,16 +38,29 @@ export const goalsRouter = createTRPCRouter({
     }),
 
   getMetrics: protectedProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ goalId: z.string() }))
     .query(async ({ ctx, input }) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const metrics: Metric[] = await ctx.prisma.metric.findMany({
-        where: {
-          ownerId: ctx.session.user.id,
-          goals: { some: { goalId: input.id } },
-        },
-      });
-      return metrics;
+      const metrics = await ctx.db
+        .select({ metric })
+        .from(metric)
+        .where(
+          and(
+            eq(metric.ownerId, ctx.session.user.id),
+            eq(metricMeasuresGoal.goalId, input.goalId)
+          )
+        )
+        .innerJoin(
+          metricMeasuresGoal,
+          eq(metric.id, metricMeasuresGoal.metricId)
+        );
+
+      return metrics.map((m) => ({
+        ...m.metric,
+        archived: m.metric.archived == 1,
+        createdAt: new Date(m.metric.createdAt),
+        updatedAt: new Date(m.metric.updatedAt),
+        archivedAt: new Date(m.metric.archivedAt),
+      })) as Metric[];
     }),
 
   getGoal: protectedProcedure

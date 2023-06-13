@@ -75,7 +75,7 @@ function MetricsSection({ goalId }: { goalId: string }) {
       void context.invalidate();
     },
   });
-  const metricsQuery = api.goals.getMetrics.useQuery({ id: goalId });
+  const metricsQuery = api.goals.getMetrics.useQuery({ goalId: goalId });
 
   if (metricsQuery.isError) {
     return <p>ERROR</p>;
