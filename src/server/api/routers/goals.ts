@@ -118,6 +118,7 @@ export const goalsRouter = createTRPCRouter({
 
     const [goalsData, goalsMap] = await getGoals(
       ctx.prisma,
+      ctx.db,
       ctx.session.user.id,
       metricsMap,
       habitsMap

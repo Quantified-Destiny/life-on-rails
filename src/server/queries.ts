@@ -283,10 +283,21 @@ export interface GoalsReturnType {
 
 export async function getGoals(
   prisma: typeof prismaClient,
+  db: DB,
   userId: string,
   metricsMap: Map<string, ExpandedMetric>,
   habitsMap: Map<string, ExpandedHabit>
 ): Promise<[GoalsReturnType[], Map<string, GoalsReturnType>]> {
+
+  const g = await db.query.goal.findMany({
+    where: and(eq(goal.ownerId, userId), eq(goal.archived, 0)),
+    with: {
+      habits: true,
+      metrics: true
+    }
+  });
+
+
   const goals = await prisma.goal.findMany({
     where: {
       ownerId: userId,
