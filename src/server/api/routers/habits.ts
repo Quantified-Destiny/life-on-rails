@@ -5,7 +5,7 @@ import { FrequencyHorizon } from "@prisma/client";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import {
   getHabitCompletionSubDays,
-  getHabitsWithMetricsMap,
+  getHabits,
   getMetrics,
   getPreferences,
 } from "../../queries";
@@ -238,7 +238,7 @@ export const habitsRouter = createTRPCRouter({
         date: input.date,
       });
 
-      const [habits, _habitsMap] = await getHabitsWithMetricsMap({
+      const [habits, _habitsMap] = await getHabits({
         prisma: ctx.prisma,
         db: ctx.db,
         metricsMap,
@@ -289,7 +289,7 @@ export const habitsRouter = createTRPCRouter({
         scoringWeeks,
       });
 
-      const [habits, _habitsMap] = await getHabitsWithMetricsMap({
+      const [habits, _habitsMap] = await getHabits({
         prisma: ctx.prisma,
         db: ctx.db,
         metricsMap,

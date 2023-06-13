@@ -1,21 +1,13 @@
-import type {
-  Goal,
-  Habit,
-  HabitCompletion,
-  HabitTag,
-  LinkedMetric,
-  Metric,
-  MetricAnswer,
-  Tag,
-} from "@prisma/client";
+import type { Goal, Habit, Metric, Tag } from "@prisma/client";
 import { FrequencyHorizon } from "@prisma/client";
-import { endOfDay, isSameDay, startOfDay, subDays, subWeeks } from "date-fns";
+import { endOfDay, isSameDay, startOfDay, subDays } from "date-fns";
 
 import type { SQL } from "drizzle-orm";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import {
   goal,
   habit,
+  habitCompletion,
   linkedMetric,
   metric,
   metricAnswer,
@@ -70,7 +62,7 @@ export async function getHabitCompletionSubDays({
   return completionCounts;
 }
 
-export async function getHabitsWithMetricsMap({
+export async function getHabits({
   prisma,
   db,
   metricsMap,
@@ -108,16 +100,21 @@ export async function getHabitsWithMetricsMap({
     habits.map((h) => [h.id, h])
   );
 
-  const habitCompletions = await prisma.habitCompletion.groupBy({
-    by: ["habitId"],
-    _count: {
-      _all: true,
-    },
-    where: {
-      Habit: { ownerId: userId },
-      date: { gt: subDays(new Date(), scoringWeeks * 7) },
-    },
-  });
+  const habitCompletions = await db
+    .select({ habitId: habitCompletion.habitId, count: sql<number>`count(*)` })
+    .from(habitCompletion)
+    .leftJoin(habit, eq(habitCompletion.habitId, habit.id))
+    .where(
+      and(
+        eq(habit.ownerId, userId),
+        gt(
+          habitCompletion.date,
+          subDays(new Date(), scoringWeeks * 7).toISOString()
+        )
+      )
+    )
+    .groupBy(habit.id);
+
   const habitScores = new Map<string, number>(
     habitCompletions
       .filter((it) => habitsMap.has(it.habitId))
@@ -129,7 +126,7 @@ export async function getHabitsWithMetricsMap({
             ? habit.frequency
             : habit.frequency * 7;
         const maxCompletionCount = normalizedFrequency * scoringWeeks;
-        const completionScore = it._count._all / maxCompletionCount;
+        const completionScore = it.count / maxCompletionCount;
 
         const metricsScore = avg(
           habit.metrics.map((m) => metricsMap.get(m.metricId)!.score)
@@ -142,6 +139,7 @@ export async function getHabitsWithMetricsMap({
         return [it.habitId, score];
       })
   );
+
   const expandedHabits = habits.map((h) => ({
     ...h,
     score: habitScores.get(h.id) ?? 0,
@@ -160,129 +158,6 @@ export async function getHabitsWithMetricsMap({
   );
 
   return [expandedHabits, expandedHabitsMap];
-}
-export async function getHabits({
-  prisma,
-  userId,
-  scoringWeeks,
-  goalIds,
-  date = new Date(),
-}: {
-  prisma: typeof prismaClient;
-  userId: string;
-  scoringWeeks: number;
-  goalIds?: string[];
-  date?: Date;
-}): Promise<ExpandedHabit[]> {
-  type HabitType = (Habit & {
-    tags: (HabitTag & {
-      tag: Tag;
-    })[];
-    completions: HabitCompletion[];
-    metrics: (LinkedMetric & {
-      metric: Metric & {
-        metricAnswers: MetricAnswer[];
-        tags: { tag: Tag }[];
-        goals: { goal: Goal }[];
-      };
-    })[];
-    goals: { goalId: string }[];
-  })[];
-
-  const whereConditions = {
-    goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
-  };
-
-  const habits: HabitType = await prisma.habit.findMany({
-    where: {
-      ownerId: userId,
-      ...whereConditions,
-    },
-    include: {
-      completions: {
-        where: {
-          date: { gt: subWeeks(date, 1) },
-        },
-      },
-      metrics: {
-        include: {
-          metric: {
-            include: {
-              metricAnswers: {
-                where: { createdAt: { gt: startOfDay(date) } },
-              },
-              goals: { include: { goal: true } },
-              tags: { include: { tag: true } },
-            },
-          },
-        },
-      },
-      tags: { include: { tag: true } },
-      goals: { select: { goalId: true }, where: { goal: { archived: false } } },
-    },
-  });
-
-  const habitCompletions = await prisma.habitCompletion.groupBy({
-    by: ["habitId"],
-    _count: {
-      _all: true,
-    },
-    where: {
-      Habit: { ownerId: userId },
-      date: { gt: subDays(new Date(), scoringWeeks * 7) },
-    },
-  });
-
-  const habitCompletionsCount = new Map<string, number>(
-    habitCompletions.map((it) => {
-      return [it.habitId, it._count._all];
-    })
-  );
-
-  const expandedHabits = habits.map((habit) => {
-    const expandedMetrics = habit.metrics.map((m) => {
-      const value = m.metric.metricAnswers[0]?.value ?? 0;
-      const score = avg(m.metric.metricAnswers.map((it) => it.value));
-      const tags = m.metric.tags.map((it) => it.tag);
-      const goals = m.metric.goals.map((it) => it.goal);
-      return { ...m.metric, score, tags, linkedHabits: [], goals, value };
-    });
-
-    const normalizedFrequency =
-      habit.frequencyHorizon == FrequencyHorizon.WEEK
-        ? habit.frequency
-        : habit.frequency * 7;
-    const maxCompletionCount = normalizedFrequency * scoringWeeks;
-    const completionScore =
-      habitCompletionsCount.get(habit.id)! / maxCompletionCount;
-
-    const metricsScore = avg(
-      habit.metrics.map((m) =>
-        avg(m.metric.metricAnswers.map((it) => it.value))
-      )
-    );
-
-    const score =
-      habit.completionWeight * completionScore +
-      (1 - habit.completionWeight) * metricsScore;
-
-    const completions = habit.completions;
-    const completionsCount =
-      habit.frequencyHorizon == FrequencyHorizon.DAY
-        ? completions.filter((completion) => isSameDay(completion.date, date))
-            .length
-        : completions.length;
-    return {
-      ...habit,
-      score,
-      metrics: expandedMetrics,
-      goals: habit.goals.map((it) => it.goalId),
-      tags: habit.tags.map((it) => it.tag.name),
-      completions: completionsCount,
-    };
-  });
-
-  return expandedHabits;
 }
 
 export interface ExpandedMetric extends Metric {
@@ -337,9 +212,7 @@ export async function getMetrics({
         with: { tag: true },
       },
       answers: {
-        where: sql`${metricAnswer.createdAt} > ${startOfDay(
-          date
-        ).toISOString()}`,
+        where: gt(metricAnswer.createdAt, startOfDay(date).toISOString()),
       },
     },
   });

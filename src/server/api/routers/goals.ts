@@ -5,7 +5,6 @@ import { goal, metric, metricMeasuresGoal } from "../../../schema";
 import {
   getGoals,
   getHabits,
-  getHabitsWithMetricsMap,
   getMetrics,
   getPreferences,
 } from "../../queries";
@@ -76,19 +75,22 @@ export const goalsRouter = createTRPCRouter({
         },
       });
 
-      const habits = await getHabits({
-        prisma: ctx.prisma,
-        userId: ctx.session.user.id,
-        scoringWeeks: scoringWeeks,
-        goalIds: [input.id],
-      });
-
-      const [metrics, _map] = await getMetrics({
+      
+      const [metrics, metricsMap] = await getMetrics({
         prisma: ctx.prisma,
         db: ctx.db,
         userId: ctx.session.user.id,
         scoringWeeks: scoringWeeks,
         goalIds: [goal.id],
+      });
+
+      const habits = await getHabits({
+        prisma: ctx.prisma,
+        db: ctx.db,
+        metricsMap,
+        userId: ctx.session.user.id,
+        scoringWeeks: scoringWeeks,
+        goalIds: [input.id],
       });
 
       return {
@@ -108,7 +110,7 @@ export const goalsRouter = createTRPCRouter({
       scoringWeeks,
     });
 
-    const [habits, habitsMap] = await getHabitsWithMetricsMap({
+    const [habits, habitsMap] = await getHabits({
       prisma: ctx.prisma,
       db: ctx.db,
       metricsMap,
