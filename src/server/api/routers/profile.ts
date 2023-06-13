@@ -36,9 +36,9 @@ export const profileRouter = createTRPCRouter({
   updateScoringWeeks: protectedProcedure
     .input(z.object({ scoringWeeks: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.user.update({
+      await ctx.prisma.preferences.update({
         where: {
-          id: ctx.session.user.id,
+          userId: ctx.session.user.id,
         },
         data: { scoringWeeks: input.scoringWeeks },
       });
@@ -47,9 +47,9 @@ export const profileRouter = createTRPCRouter({
   updateScoringUnit: protectedProcedure
     .input(z.object({ scoringUnit: z.enum(["Percentage", "Normalized"]) }))
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.user.update({
+      await ctx.prisma.preferences.update({
         where: {
-          id: ctx.session.user.id,
+          userId: ctx.session.user.id,
         },
         data: { scoringUnit: input.scoringUnit },
       });

@@ -8,6 +8,7 @@ import {
   getHabits,
   getMetrics,
   getPreferences,
+  remapTypes,
 } from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { eq } from "drizzle-orm";
@@ -107,27 +108,11 @@ export const habitsRouter = createTRPCRouter({
   getMetrics: protectedProcedure
     .input(z.object({ habitId: z.string() }))
     .query(async ({ input, ctx }) => {
-      // return ctx.db.query.metric.findMany({
-      //   where: eq(metric.ownerId, ctx.session.user.id)
-      // })
-      
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const metrics: (Metric & { completionMetric: LinkedMetric[] })[] =
-        await ctx.prisma.metric.findMany({
-          where: {
-            ownerId: ctx.session.user.id,
-            completionMetric: {
-              some: {
-                habitId: input.habitId,
-              },
-            },
-          },
-          include: {
-            completionMetric: true,
-          },
-        });
-
-      return metrics;
+      return (
+        await ctx.db.query.metric.findMany({
+          where: eq(metric.ownerId, ctx.session.user.id),
+        })
+      ).map(remapTypes);
     }),
 
   createHabit: protectedProcedure

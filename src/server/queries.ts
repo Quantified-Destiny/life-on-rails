@@ -285,7 +285,7 @@ interface MappedTypes {
   archived: boolean;
 }
 
-function remapTypes<T extends RemappableTypes>(
+export function remapTypes<T extends RemappableTypes>(
   it: T
 ): Omit<T, keyof RemappableTypes> & MappedTypes {
   return {
