@@ -8,6 +8,7 @@ import {
   goal,
   habit,
   habitCompletion,
+  habitMeasuresGoal,
   linkedMetric,
   metric,
   metricAnswer,
@@ -63,7 +64,6 @@ export async function getHabitCompletionSubDays({
 }
 
 export async function getHabits({
-  prisma,
   db,
   metricsMap,
   userId,
@@ -79,23 +79,26 @@ export async function getHabits({
   goalIds?: string[];
   date?: Date;
 }): Promise<[ExpandedHabit[], Map<string, ExpandedHabit>]> {
-  const whereConditions = {
-    goals: goalIds ? { some: { goalId: { in: goalIds } } } : undefined,
-  };
+  const conditions = [eq(habit.ownerId, userId), eq(habit.archived, 0)];
+  if (goalIds) {
+    const goalSubquery = db
+      .select({ data: habit.id })
+      .from(habit)
+      .innerJoin(habitMeasuresGoal, eq(habit.id, habitMeasuresGoal.habitId))
+      .where(inArray(habitMeasuresGoal.goalId, goalIds));
+    conditions.push(inArray(habit.id, goalSubquery));
+  }
 
-  const habits = await prisma.habit.findMany({
-    where: {
-      ownerId: userId,
-      archived: false,
-      ...whereConditions,
-    },
-    include: {
+  const habits = await db.query.habit.findMany({
+    where: and(...conditions),
+    with: {
       metrics: true,
-      tags: { include: { tag: true } },
-      goals: { select: { goalId: true, goal: { select: { archived: true } } } },
-      completions: { where: { date: { gt: subDays(date, 7) } } },
+      tags: { with: { tag: true } },
+      goals: { columns: {id: true}, where: eq(goal.archived, 0) },
+      completions: {where: gt(habitCompletion.date, subDays(date, 7).toISOString())},
     },
   });
+
   const habitsMap = new Map<string, (typeof habits)[0]>(
     habits.map((h) => [h.id, h])
   );
@@ -140,18 +143,21 @@ export async function getHabits({
       })
   );
 
-  const expandedHabits = habits.map((h) => ({
+  const expandedHabits: ExpandedHabit[] = habits.map((h) => ({
     ...h,
+    createdAt: new Date(h.createdAt),
+    updatedAt: new Date(h.updatedAt),
+    archivedAt: new Date(h.archivedAt),
+    archived: h.archived == 1,
     score: habitScores.get(h.id) ?? 0,
-    goals: h.goals
-      .filter((it) => it.goal && it.goal.archived == false)
-      .map((it) => it.goalId),
+    goals: h.goals.map((it) => it.id),
     tags: h.tags.map((it) => it.tag.name),
     metrics: h.metrics.map((it) => metricsMap.get(it.metricId)!),
     completions:
       h.frequencyHorizon == FrequencyHorizon.WEEK
         ? h.completions.length
-        : h.completions.filter((it) => isSameDay(it.date, date)).length, //habitCompletionsCount.get(h.id) ?? 0,
+        : h.completions.filter((it) => isSameDay(new Date(it.date), date))
+            .length,
   }));
   const expandedHabitsMap = new Map<string, ExpandedHabit>(
     expandedHabits.map((h) => [h.id, h])
