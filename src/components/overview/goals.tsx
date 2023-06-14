@@ -43,9 +43,9 @@ export function GoalCard({
     },
   });
   return (
-    <div className="hover:bg-gray-100 py-4">
+    <div className="py-4 hover:bg-gray-100">
       <div className="flex w-full justify-between gap-2">
-        <div className="flex w-auto flex-row items-center gap-2">
+        <div className="flex w-auto flex-row items-center gap-2 overflow-x-scroll">
           <GoalIcon />
           <EditableField
             initialText={name}
@@ -53,7 +53,7 @@ export function GoalCard({
             className="text-yellow-800"
           ></EditableField>
         </div>
-        <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
+        <div className="flex flex-shrink-0 flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
           <span
             className={classNames(
               "h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl font-semibold",

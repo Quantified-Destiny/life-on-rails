@@ -89,7 +89,7 @@ function OverviewContent(
 ) {
   const hasUnlinkedItems = props.habits.length > 0 || props.metrics.length > 0;
   return (
-    <div className="mt-3 md:mx-auto">
+    <div className="mt-3 max-sm:max-w-screen-sm md:mx-auto">
       <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
         Linked Items
         <hr />
@@ -110,7 +110,7 @@ function OverviewContent(
           <hr />
         </h1>
       ) : (
-        <span className="text-gray-400 my-10">No unlinked items</span>
+        <span className="my-10 text-gray-400">No unlinked items</span>
       )}
       {props.habits.map((habit) => (
         <HabitCard

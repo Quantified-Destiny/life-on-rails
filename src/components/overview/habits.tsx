@@ -367,7 +367,7 @@ export function HabitCard({
   return (
     <>
       <div className="flex w-full flex-row justify-between gap-2">
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-2 overflow-x-scroll">
           {linked && (
             <CornerDownRight className="ml-4 h-6 w-6 stroke-black"></CornerDownRight>
           )}
@@ -380,7 +380,7 @@ export function HabitCard({
           ></EditableField>
         </div>
 
-        <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
+        <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap flex-shrink-0">
           <span
             className={classNames(
               "rounded-lg bg-gray-100 p-2 text-xl",

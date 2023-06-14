@@ -40,7 +40,7 @@ export function LinkedMetric({
   return (
     <div className="flex flex-row gap-2 w-full justify-between">
       <div
-        className={classNames("col-span-1 flex flex-row items-baseline gap-2", {
+        className={classNames("col-span-1 flex flex-row items-baseline gap-2 overflow-x-scroll", {
           "ml-0": offset == 1,
           "ml-8": offset == 2,
         })}
@@ -48,7 +48,7 @@ export function LinkedMetric({
         {offset > 0 && (
           <CornerDownRight className="ml-4 opacity-40"></CornerDownRight>
         )}
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-2 overflow-scroll">
           <MetricIcon />
           <EditableField
             initialText={prompt}
@@ -58,7 +58,7 @@ export function LinkedMetric({
           ></EditableField>
         </div>
       </div>
-      <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
+      <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap flex-shrink-0">
         <span
           className={classNames(
             "rounded-lg bg-gray-100 p-2 text-xl",
