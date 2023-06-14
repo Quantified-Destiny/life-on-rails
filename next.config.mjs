@@ -5,14 +5,13 @@
  */
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.mjs"));
 
-import removeImports from "next-remove-imports";
 import withMDX from "@next/mdx";
 import bundleAnalyzer from "@next/bundle-analyzer";
+import withPWA from "next-pwa";
 
-/** @type {function(import("next").NextConfig): import("next").NextConfig}} */
-const removeImportsFn = removeImports({
-  // test: /node_modules([\s\S]*?)\.(tsx|ts|js|mjs|jsx)$/,
-  // matchImports: "\\.(less|css|scss|sass|styl)$"
+const pwa = withPWA({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
 });
 
 const mdx = withMDX({
@@ -46,7 +45,7 @@ const config = {
     defaultLocale: "en",
   },
   typescript: {
-    ignoreBuildErrors: true
+    ignoreBuildErrors: true,
   },
   eslint: {
     // Warning: This allows production builds to successfully complete even if
@@ -56,4 +55,4 @@ const config = {
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
 };
 
-export default withBundleAnalyzer(mdx(config));
+export default pwa(withBundleAnalyzer(mdx(config)));

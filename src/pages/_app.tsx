@@ -12,6 +12,8 @@ import { Modals } from "../components/modals";
 import { TooltipProvider } from "../components/ui/tooltip";
 import "../styles/Calendar.css";
 import "../styles/globals.css";
+import PWAMeta from "../components/pwa-meta";
+import Head from "next/head";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -19,6 +21,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <ClerkProvider {...pageProps}>
+      <Head>
+        <PWAMeta />
+      </Head>
       <TooltipProvider delayDuration={400} skipDelayDuration={400}>
         <SessionProvider session={session}>
           <Modals></Modals>

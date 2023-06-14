@@ -5,6 +5,7 @@ import "@fontsource/raleway/600.css";
 import "@fontsource/raleway/800.css";
 import "../styles/Calendar.css";
 import "../styles/globals.css";
+import PWAMeta from "../components/pwa-meta";
 
 export const metadata = {
   title: "Next.js",
@@ -19,6 +20,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+        <head>
+          <PWAMeta/>
+        </head>
         <body>{children}</body>
       </html>
     </ClerkProvider>
