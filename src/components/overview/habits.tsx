@@ -365,11 +365,11 @@ export function HabitCard({
   });
 
   return (
-    <>
-      <div className="flex w-full flex-row justify-between gap-2">
-        <div className="flex flex-row items-center gap-2 overflow-x-scroll">
+    <div className="ml-2">
+      <div className="flex w-full flex-row justify-between">
+        <div className="flex flex-row items-center overflow-x-scroll">
           {linked && (
-            <CornerDownRight className="ml-4 h-6 w-6 stroke-black"></CornerDownRight>
+            <CornerDownRight className="h-4 w-4 flex-shrink-0 stroke-black opacity-40"></CornerDownRight>
           )}
           <HabitIcon />
           <EditableField
@@ -380,7 +380,7 @@ export function HabitCard({
           ></EditableField>
         </div>
 
-        <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap flex-shrink-0">
+        <div className="flex flex-shrink-0 flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
           <span
             className={classNames(
               "rounded-lg bg-gray-100 p-2 text-xl",
@@ -405,7 +405,7 @@ export function HabitCard({
           scoringUnit={scoringUnit}
         ></LinkedMetric>
       ))}
-    </>
+    </div>
   );
 }
 
