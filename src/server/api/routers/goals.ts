@@ -1,4 +1,3 @@
-import type { Goal, Metric } from "@prisma/client";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import {

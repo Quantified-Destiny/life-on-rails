@@ -67,7 +67,7 @@ function HabitsTable() {
   const habits = query.data;
 
   return (
-    <div className="container mx-auto max-w-screen-lg px-4 py-8 ">
+    <div className="mx-auto max-w-screen-lg px-4 py-8 ">
       <div className="relative flex flex-col overflow-auto rounded-xl border border-blue-200 bg-white bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
         <div className="relative m-0 flex items-center justify-between overflow-hidden border-b-2 bg-blue-200 p-6 text-gray-700 shadow-none">
           <div>

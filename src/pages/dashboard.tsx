@@ -169,7 +169,7 @@ function StatsCardRow({
   const aquery = api.habits.getCompletionsSubDays.useQuery();
 
   return (
-    <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
+    <div className="mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
         <div className=" relative flex flex-1 flex-col  rounded-xl  text-gray-700 shadow-md">
           <div className="rounded-t-xl bg-indigo-800 p-4 text-center text-2xl text-white">
@@ -351,7 +351,7 @@ function GoalsTable({
   // const goals = goalsData.goals;
 
   return (
-    <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
+    <div className="mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="relative flex flex-col overflow-auto rounded-xl border border-indigo-800 bg-white bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
         <div className="relative m-0 flex items-center justify-between overflow-hidden border-b-2 bg-indigo-800 p-6 text-gray-700 shadow-none">
           <div>
@@ -480,7 +480,7 @@ function HabitsTable({
   // const habits = query.data;
 
   return (
-    <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
+    <div className="mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="relative flex flex-col overflow-auto rounded-xl border border-indigo-800 bg-white bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
         <div className="relative m-0 flex items-center justify-between overflow-hidden border-b-2 bg-indigo-800 p-6 text-gray-700 shadow-none">
           <div>
@@ -594,7 +594,7 @@ function MetricsTable({
   // const metrics = metricData.metrics;
 
   return (
-    <div className="container mx-auto max-w-screen-lg px-4 py-2 ">
+    <div className="mx-auto max-w-screen-lg px-4 py-2 ">
       <div className="relative flex flex-col overflow-auto rounded-xl border border-indigo-800 bg-white bg-clip-border text-gray-700 shadow-lg xl:col-span-2">
         <div className="relative m-0 flex items-center justify-between overflow-hidden border-b-2 bg-indigo-800 p-6 text-gray-700 shadow-none">
           <div>

@@ -148,7 +148,7 @@ export const TemplatesList = () => {
 
 export const TemplatesPage = () => {
   return (
-    <div className="container mx-auto max-w-screen-lg px-4 py-8">
+    <div className="mx-auto max-w-screen-lg px-4 py-8">
       <h1 className="my-5 text-2xl font-bold">Templates</h1>
       <p className="text-gray-600">
         Feeling overwhelmed? These templates can get you started on just about

@@ -88,7 +88,7 @@ function OverviewContent(
   >
 ) {
   return (
-    <div className="mx-auto mt-3">
+    <div className="md:mx-auto mt-3">
       <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
         Linked Items
         <hr />
@@ -142,7 +142,7 @@ function OverviewPage() {
   const user = profileQuery.data;
 
   return (
-    <div className="container max-w-4xl">
+    <div className="max-w-4xl">
       <div className="mb-10 scrollbar-none">
         <Header filters={filters} setFilters={setFilters}></Header>
         {isEmpty(data) ? (

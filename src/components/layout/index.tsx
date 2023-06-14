@@ -22,6 +22,7 @@ import classNames from "classnames";
 import type { LucideIcon } from "lucide-react";
 import Head from "next/head";
 import { useSidebarStore } from "./state";
+import { cn } from "../../lib/utils";
 
 interface MenuItem {
   name: string;
@@ -40,8 +41,8 @@ function Sidebar(props: {
   return (
     <div
       className={`${
-        props.open ? "w-[14rem]" : "w-20"
-      } fixed bottom-0 left-0 top-0 h-screen bg-gradient-to-b from-[#00164d] to-[#3c118b] p-5 pt-8 duration-200`}
+        props.open ? "w-[14rem]" : "w-0 lg:w-20"
+      } fixed bottom-0 left-0 top-0 h-screen bg-gradient-to-b from-[#00164d] to-[#3c118b] md:p-5 md:pt-8 duration-200`}
     >
       <div
         className={`absolute -right-4 top-9 h-8 w-8 cursor-pointer rounded-full border-2 border-black bg-white ${
@@ -52,52 +53,62 @@ function Sidebar(props: {
         <ChevronLeft className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"></ChevronLeft>
       </div>
 
-      <div className="flex items-center gap-x-4">
-        <Link href="/journal">
-          <Image
-            src="/lor-logo-new.png"
-            alt=""
-            width="40"
-            height="40"
-            className="cursor-pointer rounded-lg bg-gray-100 opacity-90 duration-100"
-          />
-        </Link>
-        <h1 className={`origin-left text-white ${!props.open ? "hidden" : ""}`}>
-          Life on Rails
-        </h1>
-      </div>
-      {props.Menus.map((menu, index) => (
-        <Link
-          href={menu.link}
-          key={index}
-          className={classNames(
-            "flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm text-white hover:bg-slate-200 hover:bg-opacity-10",
-            menu?.gap ? "mt-9" : "mt-2",
-            path.includes(menu.link) ? "bg-slate-200 bg-opacity-10" : ""
-          )}
+      <div className={props.open ? "" : "max-lg:hidden"}>
+        <div
+          className={cn("flex items-center gap-x-4", {
+            hidden: !props.open,
+          })}
         >
-          <div>
-            {React.createElement(menu?.icon, {
-              size: 20,
-            })}
-          </div>
-          <span
-            className={`${
-              !props.open ? `hidden` : ""
-            } origin-left duration-200`}
+          <Link href="/journal">
+            <Image
+              src="/lor-logo-new.png"
+              alt=""
+              width="40"
+              height="40"
+              className="cursor-pointer rounded-lg bg-gray-100 opacity-90 duration-100"
+            />
+          </Link>
+          <h1
+            className={`origin-left text-white ${!props.open ? "hidden" : ""}`}
           >
-            {menu.name}
-          </span>
-        </Link>
-      ))}
-      <hr className="mx-2 my-8 h-px border-0 bg-gray-500 dark:bg-gray-700"></hr>
+            Life on Rails
+          </h1>
+          d
+        </div>
+        {props.Menus.map((menu, index) => (
+          <Link
+            href={menu.link}
+            key={index}
+            className={classNames(
+              "flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm text-white hover:bg-slate-200 hover:bg-opacity-10",
+              menu?.gap ? "mt-9" : "mt-2",
+              path.includes(menu.link) ? "bg-slate-200 bg-opacity-10" : ""
+            )}
+          >
+            <div>
+              {React.createElement(menu?.icon, {
+                size: 20,
+              })}
+            </div>
+            <span
+              className={`${
+                !props.open ? `hidden` : ""
+              } origin-left duration-200`}
+            >
+              {menu.name}
+            </span>
+          </Link>
+        ))}
 
-      <div className="items-right mt-10 flex w-full gap-x-4">
-        <UserButton
-          afterSignOutUrl="/"
-          userProfileMode="navigation"
-          userProfileUrl="/profile"
-        />
+        <hr className="mx-2 my-8 h-px border-0 bg-gray-500 dark:bg-gray-700"></hr>
+
+        <div className="items-right mt-10 flex w-full gap-x-4">
+          <UserButton
+            afterSignOutUrl="/"
+            userProfileMode="navigation"
+            userProfileUrl="/profile"
+          />
+        </div>
       </div>
     </div>
   );
@@ -150,12 +161,12 @@ function Layout({ children }: { children: ReactNode }) {
       <div
         className={classNames(
           "flex-1 overflow-scroll pt-5 scrollbar-none",
-          open ? "ml-[14rem]" : "ml-20"
+          open ? "md:ml-[14rem]" : "md:ml-20"
         )}
       >
         <main
           className={classNames(
-            "container mx-auto h-full overflow-scroll pt-5 scrollbar-none"
+            "h-full overflow-scroll pt-5 scrollbar-none md:container md:mx-auto"
           )}
         >
           {children}

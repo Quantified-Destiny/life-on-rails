@@ -42,7 +42,7 @@ function Journal({
 }: JournalProps) {
   return (
     <>
-      <div className="container flex max-w-5xl justify-center">
+      <div className="flex max-w-5xl justify-center">
         <div className="w-full">
           <div className="px-4 py-4 md:px-10 md:py-7">
             <div className="flex items-center justify-between">

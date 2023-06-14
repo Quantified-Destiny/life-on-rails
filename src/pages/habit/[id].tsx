@@ -195,7 +195,7 @@ function _HabitsPage({ id }: { id: string }) {
 
   return (
     <>
-      <div className="container mx-auto max-w-screen-md px-4 py-8">
+      <div className="mx-auto max-w-screen-md px-4 py-8">
         {/* <p>{JSON.stringify(habitData)}</p> */}
         {/* <p>{JSON.stringify(completionsData)}</p> */}
         <h1 className="mb-4 flex flex-row justify-center text-center text-2xl font-bold">
