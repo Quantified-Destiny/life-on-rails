@@ -104,7 +104,7 @@ function Sidebar(props: {
 
         <div className="items-right mt-10 flex w-full gap-x-4">
           <UserButton
-            afterSignOutUrl="/"
+            afterSignOutUrl="/journal"
             userProfileMode="navigation"
             userProfileUrl="/profile"
           />
