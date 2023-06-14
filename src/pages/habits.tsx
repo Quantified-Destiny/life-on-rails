@@ -76,7 +76,7 @@ function HabitsTable() {
             </h6>
           </div>
         </div>
-        <div className="overflow-x-scroll p-6 px-0 pb-2 pt-0">
+        <div className="overflow-x-scroll scrollbar-none p-6 px-0 pb-2 pt-0">
           <table className="w-full min-w-[640px] table-auto">
             <thead>
               <tr>

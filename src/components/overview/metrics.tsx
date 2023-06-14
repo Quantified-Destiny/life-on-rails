@@ -41,17 +41,17 @@ export function LinkedMetric({
     <div className="flex w-full flex-row justify-between">
       <div
         className={classNames(
-          "col-span-1 flex flex-row items-baseline md:gap-2 overflow-x-scroll",
+          "col-span-1 flex flex-row items-center overflow-x-scroll scrollbar-none md:gap-2",
           {
             "ml-0": offset == 1,
-            "ml-2 md:ml-8": offset == 2,
+            "ml-2": offset == 2,
           }
         )}
       >
         {offset > 0 && (
-          <CornerDownRight className="ml-4 opacity-40 flex-shrink-0 h-4 w-4"></CornerDownRight>
+          <CornerDownRight className="ml-2 h-4 w-4 flex-shrink-0 opacity-40"></CornerDownRight>
         )}
-        <div className="flex flex-row items-center md:gap-2 overflow-scroll">
+        <div className="flex flex-row items-center md:gap-2">
           <MetricIcon />
           <EditableField
             initialText={prompt}

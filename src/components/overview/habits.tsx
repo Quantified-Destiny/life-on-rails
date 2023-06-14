@@ -367,7 +367,7 @@ export function HabitCard({
   return (
     <div className="ml-2">
       <div className="flex w-full flex-row justify-between">
-        <div className="flex flex-row items-center overflow-x-scroll">
+        <div className="flex flex-row items-center overflow-x-scroll scrollbar-none">
           {linked && (
             <CornerDownRight className="h-4 w-4 flex-shrink-0 stroke-black opacity-40"></CornerDownRight>
           )}
