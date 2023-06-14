@@ -1,5 +1,9 @@
 import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
-  return <SignIn redirectUrl="/journal" />;
+  return (
+    <div className="flex h-screen w-screen items-center justify-center bg-gradient-to-b from-[#5ef4ca5a] to-[#4389faab]">
+      <SignIn redirectUrl="/journal" />;
+    </div>
+  );
 }

@@ -18,50 +18,38 @@ import { TooltipProvider } from "../components/ui/tooltip";
 import "../styles/Calendar.css";
 import "../styles/globals.css";
 
-const ClerkGuard = ({
-  allowAnonymous,
-  children,
-}: {
-  allowAnonymous: boolean;
-  children: ReactNode;
-}) => {
-  if (allowAnonymous) {
-    return <ClerkProvider>{children}</ClerkProvider>;
-  } else {
-    return (
-      <ClerkProvider>
-        <SignedIn>{children}</SignedIn>
-        <SignedOut>
-          <RedirectToSignIn />
-        </SignedOut>
-      </ClerkProvider>
-    );
-  }
+const ClerkGuard = ({ children }: { children: ReactNode }) => {
+  return (
+    <ClerkProvider>
+      <SignedIn>{children}</SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </ClerkProvider>
+  );
 };
 
-const MyApp: AppType = ({
-  Component,
-  pageProps: { ...pageProps },
-}) => {
+const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
   const router = useRouter();
-  const isIndex = ["/"].some((it) => it == router.pathname);
+  const isIndex = "/" == router.pathname;
+  const isSignin = "/sign-in" == router.pathname;
 
-  if (isIndex) {
+  if (isIndex || isSignin) {
     return (
-      <ClerkGuard allowAnonymous={isIndex}>
+      <ClerkProvider>
         <TooltipProvider delayDuration={400} skipDelayDuration={400}>
           <Component {...pageProps} />
         </TooltipProvider>
-      </ClerkGuard>
+      </ClerkProvider>
     );
   }
   return (
-    <ClerkGuard allowAnonymous={isIndex}>
+    <ClerkGuard>
       <TooltipProvider delayDuration={400} skipDelayDuration={400}>
-          <Modals></Modals>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+        <Modals></Modals>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </TooltipProvider>
     </ClerkGuard>
   );
