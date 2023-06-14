@@ -38,7 +38,7 @@ export function LinkedMetric({
   });
 
   return (
-    <>
+    <div className="flex flex-row gap-2 w-full justify-between">
       <div
         className={classNames("col-span-1 flex flex-row items-baseline gap-2", {
           "ml-0": offset == 1,
@@ -81,6 +81,6 @@ export function LinkedMetric({
           }
         ></Dropdown>
       </div>
-    </>
+    </div>
   );
 }

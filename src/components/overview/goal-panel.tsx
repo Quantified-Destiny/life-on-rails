@@ -81,7 +81,7 @@ function MetricsSection({ goalId }: { goalId: string }) {
   if (metricsQuery.isLoading) {
     return <p>LOADING</p>;
   }
-
+  console.log(metricsQuery.data);
   return (
     <>
       <div className="mb-4 grid w-full grid-cols-2 items-baseline justify-between gap-2">
@@ -96,7 +96,8 @@ function MetricsSection({ goalId }: { goalId: string }) {
               <div>
                 <p className="text-lg">{metric.prompt}</p>
                 <p className="text-sm text-gray-300">
-                  Created: {metric.createdAt.toUTCString()}
+                  {/* TODO remove when superjson works again */}
+                  Created: {new Date(metric.createdAt).toLocaleDateString()}
                 </p>
               </div>
               <div className="flex-shrink space-x-2 text-right">
@@ -242,7 +243,7 @@ function HabitsSection({
               <div>
                 <p className="text-lg">{habit.description}</p>
                 <p className="text-sm text-gray-300">
-                  Created: {habit.createdAt.toUTCString()}
+                  Created: {new Date(habit.createdAt).toUTCString()}
                 </p>
               </div>
               <div className="flex-shrink space-x-2 text-right">

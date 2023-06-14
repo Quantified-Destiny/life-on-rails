@@ -88,7 +88,7 @@ function OverviewContent(
   >
 ) {
   return (
-    <div className="mx-auto mt-3 grid grid-cols-2 items-center gap-2">
+    <div className="mx-auto mt-3">
       <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
         Linked Items
         <hr />

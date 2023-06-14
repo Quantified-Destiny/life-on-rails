@@ -134,7 +134,7 @@ export async function getHabits({
         const completionScore = it.count / maxCompletionCount;
 
         const metricsScore = avg(
-          habit.metrics.map((m) => metricsMap.get(m.metricId)!.score)
+          habit.metrics.map((m) => metricsMap.get(m.metricId)?.score ?? 0)
         );
 
         const score =

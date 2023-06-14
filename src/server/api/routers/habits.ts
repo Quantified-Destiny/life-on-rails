@@ -85,7 +85,7 @@ export const habitsRouter = createTRPCRouter({
   getCompletionsOnDay: protectedProcedure
     .input(z.object({ habitId: z.string(), date: z.date() }))
     .query(async ({ input, ctx }) => {
-      return await ctx.db
+      const data = await ctx.db
         .select()
         .from(habitCompletion)
         .where(
@@ -95,6 +95,8 @@ export const habitsRouter = createTRPCRouter({
             lt(habitCompletion.date, endOfDay(input.date).toISOString())
           )
         );
+      console.log(data);
+      return data.map(it => ({...it, date: new Date(it.date)}))
     }),
 
   deleteCompletion: protectedProcedure

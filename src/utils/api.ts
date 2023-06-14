@@ -50,9 +50,9 @@ export const api = createTRPCNext<AppRouter>({
         }),
         httpBatchLink({
           // use the handler defined in the pages file
-          //url: `${getBaseUrl()}/api/trpc`,
+          url: `${getBaseUrl()}/api/trpc`,
           // use the handler defined in middleware
-          url: `${getBaseUrl()}/trpc`,
+          //url: `${getBaseUrl()}/trpc`,
         }),
       ],
     };

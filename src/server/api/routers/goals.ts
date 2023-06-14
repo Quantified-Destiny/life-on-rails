@@ -8,7 +8,13 @@ import {
   metricMeasuresGoal,
   tag,
 } from "../../../schema";
-import { getGoals, getHabits, getMetrics, getPreferences } from "../../queries";
+import {
+  getGoals,
+  getHabits,
+  getMetrics,
+  getPreferences,
+  remapTypes,
+} from "../../queries";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const goalsRouter = createTRPCRouter({
@@ -52,13 +58,8 @@ export const goalsRouter = createTRPCRouter({
           eq(metric.id, metricMeasuresGoal.metricId)
         );
 
-      return metrics.map((m) => ({
-        ...m.metric,
-        archived: m.metric.archived == 1,
-        createdAt: new Date(m.metric.createdAt),
-        updatedAt: new Date(m.metric.updatedAt),
-        archivedAt: new Date(m.metric.archivedAt),
-      })) as Metric[];
+      const data = metrics.map((m) => remapTypes(m.metric));
+      return data;
     }),
 
   getGoal: protectedProcedure
@@ -67,18 +68,20 @@ export const goalsRouter = createTRPCRouter({
       const preferences = await getPreferences(ctx.db, ctx.session.user.id);
       const scoringWeeks = preferences.scoringWeeks;
 
-      const goal: Goal = await ctx.prisma.goal.findFirstOrThrow({
-        where: {
-          id: input.id,
-          ownerId: ctx.session.user.id,
-        },
-      });
+      const g = (
+        await ctx.db
+          .select()
+          .from(goal)
+          .where(
+            and(eq(goal.id, input.id), eq(goal.ownerId, ctx.session.user.id))
+          )
+      )[0]!;
 
       const [metrics, metricsMap] = await getMetrics({
         db: ctx.db,
         userId: ctx.session.user.id,
         scoringWeeks: scoringWeeks,
-        goalIds: [goal.id],
+        goalIds: [g.id],
       });
 
       const [habits, _map] = await getHabits({
@@ -91,7 +94,7 @@ export const goalsRouter = createTRPCRouter({
       });
 
       return {
-        ...goal,
+        ...g,
         habits,
         metrics,
       };

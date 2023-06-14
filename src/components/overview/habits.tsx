@@ -84,8 +84,8 @@ export function HabitHeaderLine({
 
   return (
     <>
-      <div className="flexflex-col">
-        <div className="flex flex-row items-center justify-between">
+      <div className="contents">
+        <div className="flex w-full flex-row items-center justify-between">
           <div className="flex flex-row items-baseline gap-2">
             <span className="inline-block rounded-full bg-blue-500 px-2 py-1 text-xs text-white">
               Habit
@@ -141,93 +141,6 @@ export function HabitHeaderLine({
             </span>
           </span>
         </div>
-      </div>
-    </>
-  );
-}
-export function HabitHeaderLineGrid({
-  id,
-  weight,
-  description,
-  frequency,
-  frequencyHorizon,
-  score,
-  completions,
-  linked,
-  scoringUnit,
-}: {
-  id: string;
-  weight: number | undefined;
-  description: string;
-  frequency: number;
-  frequencyHorizon: FrequencyHorizon;
-  score: number;
-  completions: number;
-  linked: boolean;
-  scoringUnit: ScoringFormat;
-}) {
-  const context = api.useContext();
-  const editHabit = api.habits.editHabit.useMutation({
-    onSuccess: () => {
-      void context.goals.getAllGoals.invalidate();
-    },
-  });
-
-  return (
-    <>
-      <div className={classNames("flex flex-row items-center gap-2")}>
-        {linked && (
-          <CornerDownRight className="ml-4 h-6 w-6 stroke-black"></CornerDownRight>
-        )}
-        <HabitIcon />
-        <EditableField
-          initialText={description}
-          commit={(text) =>
-            editHabit.mutate({ habitId: id, description: text })
-          }
-        ></EditableField>
-      </div>
-
-      {/* <span className="text-sm lowercase text-gray-500">
-        
-        <span className="space-x-1 text-sm">
-          <span className="text-md ">Completed</span>
-          <span className="text-md ">{completions}</span>
-          <span className="">/</span>
-          <EditableNumberField
-            initial={frequency}
-            commit={(number) =>
-              editFrequency.mutate({ habitId: id, frequency: number })
-            }
-            className="font-semibold"
-          ></EditableNumberField>
-          <span className="text-md ">times this</span>
-          <DropDown
-            frequencyHorizon={frequencyHorizon}
-            commit={(freq) =>
-              editFrequencyHorizon.mutate({
-                habitId: id,
-                frequencyHorizon: freq,
-              })
-            }
-            className="font-semibold"
-          ></DropDown>
-        </span>
-      </span> */}
-      <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
-        <span
-          className={classNames(
-            "rounded-lg bg-gray-100 p-2 text-xl",
-            textcolor(score)
-          )}
-        >
-          {scoringUnit == ScoringFormat.Normalized
-            ? min(1, score).toFixed(2)
-            : (min(1, score) * 100).toFixed(2) + "%"}
-        </span>
-        <HabitSheet habitId={id} scoringUnit={scoringUnit}>
-          <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
-        </HabitSheet>
       </div>
     </>
   );
@@ -426,13 +339,8 @@ export function HabitCard({
   id,
   linkedGoal,
   score,
-  weight,
   description,
-  frequency,
-  frequencyHorizon,
-  completions,
   metrics,
-  tags,
   scoringUnit,
 }: ExpandedHabit & {
   weight: number | undefined;
@@ -448,21 +356,46 @@ export function HabitCard({
     },
   });
 
-  const classes = v({ variant: linkedGoal ? "linked" : "freestanding" });
+  const linked = true;
+  const context = api.useContext();
+  const editHabit = api.habits.editHabit.useMutation({
+    onSuccess: () => {
+      void context.goals.getAllGoals.invalidate();
+    },
+  });
 
   return (
     <>
-      <HabitHeaderLineGrid
-        id={id}
-        weight={weight}
-        description={description}
-        frequency={frequency}
-        frequencyHorizon={frequencyHorizon}
-        score={score}
-        completions={completions}
-        linked={!!linkedGoal}
-        scoringUnit={scoringUnit}
-      ></HabitHeaderLineGrid>
+      <div className="flex w-full flex-row justify-between gap-2">
+        <div className="flex flex-row items-center gap-2">
+          {linked && (
+            <CornerDownRight className="ml-4 h-6 w-6 stroke-black"></CornerDownRight>
+          )}
+          <HabitIcon />
+          <EditableField
+            initialText={description}
+            commit={(text) =>
+              editHabit.mutate({ habitId: id, description: text })
+            }
+          ></EditableField>
+        </div>
+
+        <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
+          <span
+            className={classNames(
+              "rounded-lg bg-gray-100 p-2 text-xl",
+              textcolor(score)
+            )}
+          >
+            {scoringUnit == ScoringFormat.Normalized
+              ? min(1, score).toFixed(2)
+              : (min(1, score) * 100).toFixed(2) + "%"}
+          </span>
+          <HabitSheet habitId={id} scoringUnit={scoringUnit}>
+            <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+          </HabitSheet>
+        </div>
+      </div>
       {metrics.map((m) => (
         <LinkedMetric
           {...m}
@@ -472,14 +405,6 @@ export function HabitCard({
           scoringUnit={scoringUnit}
         ></LinkedMetric>
       ))}
-      {/* <CreateMetricLinkedToHabit habitId={id}></CreateMetricLinkedToHabit> */}
-      {/* <HabitFooter
-        id={id}
-        tags={tags}
-        linkedGoal={linkedGoal}
-        linkHabit={linkHabit.mutate}
-        unlinkHabit={unlinkHabit.mutate}
-      ></HabitFooter> */}
     </>
   );
 }

@@ -43,29 +43,31 @@ export function GoalCard({
     },
   });
   return (
-    <div className="contents" onClick={console.log}>
-      <div className="col-span-1 flex w-auto flex-row items-center gap-2">
-        <GoalIcon />
-        <EditableField
-          initialText={name}
-          commit={(name) => editGoal.mutate({ goalId: id, name })}
-          className="text-yellow-800"
-        ></EditableField>
-      </div>
-      <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
-        <span
-          className={classNames(
-            "h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl font-semibold",
-            textcolor(score)
-          )}
-        >
-          {scoringUnit == ScoringFormat.Normalized
-            ? min(1, score).toFixed(2)
-            : (min(1, score) * 100).toFixed(2) + "%"}
-        </span>
-        <GoalSheet goalId={id} score={score} scoringUnit={scoringUnit}>
-          <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
-        </GoalSheet>
+    <>
+      <div className="flex w-full justify-between gap-2">
+        <div className="flex w-auto flex-row items-center gap-2">
+          <GoalIcon />
+          <EditableField
+            initialText={name}
+            commit={(name) => editGoal.mutate({ goalId: id, name })}
+            className="text-yellow-800"
+          ></EditableField>
+        </div>
+        <div className="flex flex-row items-center space-x-2 justify-self-end whitespace-nowrap">
+          <span
+            className={classNames(
+              "h-fit w-fit rounded-lg bg-gray-100 p-2 text-xl font-semibold",
+              textcolor(score)
+            )}
+          >
+            {scoringUnit == ScoringFormat.Normalized
+              ? min(1, score).toFixed(2)
+              : (min(1, score) * 100).toFixed(2) + "%"}
+          </span>
+          <GoalSheet goalId={id} score={score} scoringUnit={scoringUnit}>
+            <Cog6ToothIcon className="h-6 w-6 cursor-pointer opacity-40"></Cog6ToothIcon>
+          </GoalSheet>
+        </div>
       </div>
       {habits.map((habit) => (
         <HabitCard
@@ -85,6 +87,6 @@ export function GoalCard({
           scoringUnit={scoringUnit}
         ></LinkedMetric>
       ))}
-    </div>
+    </>
   );
 }

@@ -130,7 +130,8 @@ function MetricsSection({ habitId }: { habitId: string }) {
               <div>
                 <p className="text-lg">{metric.prompt}</p>
                 <p className="text-sm text-gray-300">
-                  Created: {metric.createdAt.toUTCString()}
+                  {/* TODO remove when superjson works again */}
+                  Created: {new Date(metric.createdAt).toUTCString()}
                 </p>
               </div>
               <div className="flex-shrink space-x-2 text-right">
