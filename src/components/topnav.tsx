@@ -1,17 +1,7 @@
-import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 const TopNav = () => {
-  const { data: sessionData } = useSession();
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    await router.push("/");
-    await signOut();
-  };
-
   return (
     <nav
       className="
@@ -95,14 +85,6 @@ const TopNav = () => {
           >
             My Profile
           </Link>
-        </div>
-        <div className="relative flex items-center">
-          <button
-            className="rounded-full bg-gray-500 px-2 py-1 text-xs font-semibold text-white no-underline transition hover:bg-black/20"
-            onClick={sessionData ? handleSignOut : undefined}
-          >
-            {sessionData ? "Sign out" : "Sign in"}
-          </button>
         </div>
       </div>
     </nav>

@@ -1,38 +1,69 @@
-import { type Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
 import { api } from "../utils/api";
 
-import { ClerkProvider } from "@clerk/nextjs";
+import {
+  ClerkProvider,
+  RedirectToSignIn,
+  SignedIn,
+  SignedOut,
+} from "@clerk/nextjs";
 import "@fontsource/raleway/400.css";
 import "@fontsource/raleway/600.css";
 import "@fontsource/raleway/800.css";
+import { useRouter } from "next/router";
+import type { ReactNode } from "react";
 import Layout from "../components/layout";
 import { Modals } from "../components/modals";
 import { TooltipProvider } from "../components/ui/tooltip";
 import "../styles/Calendar.css";
 import "../styles/globals.css";
-import PWAMeta from "../components/pwa-meta";
-import Head from "next/head";
 
-const MyApp: AppType<{ session: Session | null }> = ({
-  Component,
-  pageProps: { session, ...pageProps },
+const ClerkGuard = ({
+  allowAnonymous,
+  children,
+}: {
+  allowAnonymous: boolean;
+  children: ReactNode;
 }) => {
+  if (allowAnonymous) {
+    return <ClerkProvider>{children}</ClerkProvider>;
+  } else {
+    return (
+      <ClerkProvider>
+        <SignedIn>{children}</SignedIn>
+        <SignedOut>
+          <RedirectToSignIn />
+        </SignedOut>
+      </ClerkProvider>
+    );
+  }
+};
+
+const MyApp: AppType = ({
+  Component,
+  pageProps: { ...pageProps },
+}) => {
+  const router = useRouter();
+  const isIndex = ["/"].some((it) => it == router.pathname);
+
+  if (isIndex) {
+    return (
+      <ClerkGuard allowAnonymous={isIndex}>
+        <TooltipProvider delayDuration={400} skipDelayDuration={400}>
+          <Component {...pageProps} />
+        </TooltipProvider>
+      </ClerkGuard>
+    );
+  }
   return (
-    <ClerkProvider {...pageProps}>
-      <Head>
-        <PWAMeta />
-      </Head>
+    <ClerkGuard allowAnonymous={isIndex}>
       <TooltipProvider delayDuration={400} skipDelayDuration={400}>
-        <SessionProvider session={session}>
           <Modals></Modals>
           <Layout>
             <Component {...pageProps} />
           </Layout>
-        </SessionProvider>
       </TooltipProvider>
-    </ClerkProvider>
+    </ClerkGuard>
   );
 };
 
