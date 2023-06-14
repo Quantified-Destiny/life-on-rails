@@ -1,15 +1,8 @@
-import {
-    SignedInAuthObject,
-    SignedOutAuthObject,
-} from "@clerk/nextjs/api";
-import { getAuth } from "@clerk/nextjs/server";
-import { GetServerSideProps } from "next";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
 export const AuthShowcase = () => {
-  //const { isLoaded, isSignedIn, user } = useUser();
-  
-  const isSignedIn = true;
+  const { isLoaded, isSignedIn, user } = useUser();
   
   if (isSignedIn) {
     return (

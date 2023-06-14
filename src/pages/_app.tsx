@@ -23,12 +23,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   // I don't know or care why TS can't find this property, but it's there
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-  if ([`/`, "/login"].includes(appProps.router.pathname))
-    return (
-      <SessionProvider session={session}>
-        <Component {...pageProps} />
-      </SessionProvider>
-    );
+  // if ([`/`, "/login"].includes(appProps.router.pathname))
+  //   return (
+  //     <SessionProvider session={session}>
+  //       <Component {...pageProps} />
+  //     </SessionProvider>
+  //   );
 
   return (
     <ClerkProvider {...pageProps}>
