@@ -132,18 +132,13 @@ function Layout({ children }: { children: ReactNode }) {
 
   const isFetching = useIsFetching();
 
-  // Auto close menu when on mobile
-
+  // Auto close menu when on mobile (only runs once on layout mount)
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 720) {
-        setOpen(false);
-      } else {
-        setOpen(true);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
+    if (window.innerWidth < 720) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+    }
   }, [setOpen]);
 
   return (

@@ -28,10 +28,11 @@ function Hero() {
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">
               <span className="sr-only">Hybrid Studios</span>
-              <img
-                className="h-8 w-auto"
+              <Image
                 src="/lor-logo-new.png"
                 alt=""
+                height={32}
+                width={32}
               />
             </a>
             <h1 className="p-1.5 font-extrabold text-gray-800">Life on Rails</h1>
