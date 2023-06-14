@@ -142,7 +142,7 @@ function OverviewPage() {
   const user = profileQuery.data;
 
   return (
-    <div className="max-w-4xl">
+    <div className="">
       <div className="mb-10 scrollbar-none">
         <Header filters={filters} setFilters={setFilters}></Header>
         {isEmpty(data) ? (

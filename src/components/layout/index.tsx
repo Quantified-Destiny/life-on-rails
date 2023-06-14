@@ -42,7 +42,7 @@ function Sidebar(props: {
     <div
       className={`${
         props.open ? "w-[14rem]" : "w-0 lg:w-20"
-      } fixed bottom-0 left-0 top-0 h-screen bg-gradient-to-b from-[#00164d] to-[#3c118b] md:p-5 md:pt-8 duration-200`}
+      } z-50 fixed bottom-0 left-0 top-0 h-screen bg-gradient-to-b from-[#00164d] to-[#3c118b] duration-200 md:p-5 md:pt-8`}
     >
       <div
         className={`absolute -right-4 top-9 h-8 w-8 cursor-pointer rounded-full border-2 border-black bg-white ${
