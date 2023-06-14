@@ -87,8 +87,9 @@ function OverviewContent(
     "goalsMap"
   >
 ) {
+  const hasUnlinkedItems = props.habits.length > 0 || props.metrics.length > 0;
   return (
-    <div className="md:mx-auto mt-3">
+    <div className="mt-3 md:mx-auto">
       <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
         Linked Items
         <hr />
@@ -103,11 +104,14 @@ function OverviewContent(
           scoringUnit={props.scoringUnit}
         ></GoalCard>
       ))}
-      {/* Habit Card with Progress Bar */}
-      <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
-        Unlinked Items
-        <hr />
-      </h1>
+      {hasUnlinkedItems ? (
+        <h1 className="under col-span-full my-10 ml-2 text-lg font-semibold uppercase text-slate-600">
+          Unlinked Items
+          <hr />
+        </h1>
+      ) : (
+        <span className="text-gray-400 my-10">No unlinked items</span>
+      )}
       {props.habits.map((habit) => (
         <HabitCard
           {...habit}

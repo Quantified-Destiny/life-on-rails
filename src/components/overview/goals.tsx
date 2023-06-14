@@ -43,7 +43,7 @@ export function GoalCard({
     },
   });
   return (
-    <>
+    <div className="hover:bg-gray-100 py-4">
       <div className="flex w-full justify-between gap-2">
         <div className="flex w-auto flex-row items-center gap-2">
           <GoalIcon />
@@ -87,6 +87,6 @@ export function GoalCard({
           scoringUnit={scoringUnit}
         ></LinkedMetric>
       ))}
-    </>
+    </div>
   );
 }
