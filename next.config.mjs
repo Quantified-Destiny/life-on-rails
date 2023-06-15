@@ -55,4 +55,5 @@ const config = {
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
 };
 
-export default pwa(withBundleAnalyzer(mdx(config)));
+//export default pwa(withBundleAnalyzer(mdx(config)));
+export default withBundleAnalyzer(mdx(config));

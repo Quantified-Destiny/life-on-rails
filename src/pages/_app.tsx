@@ -32,7 +32,8 @@ const ClerkGuard = ({ children }: { children: ReactNode }) => {
 const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
   const router = useRouter();
   const isIndex = "/" == router.pathname;
-  const isSignin = ["/sign-in", "/sign-up"].some(it => it == router.pathname);
+  console.log(router.pathname);
+  const isSignin = ["/sign-in", "/sign-up"].some(it => router.pathname.startsWith(it));
 
   if (isIndex || isSignin) {
     return (
