@@ -2,8 +2,9 @@ import type { FrequencyHorizon } from "@prisma/client";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { cn } from "../lib/utils";
 
 export const useInlineEdit = ({
   initialText,
@@ -97,18 +98,14 @@ export const EditableField = ({
 
   return (
     <div
-      className="group flex flex-row flex-nowrap gap-1 whitespace-nowrap rounded-lg px-2 py-2 hover:bg-gray-100"
+      className={cn("flex flex-row flex-nowrap gap-1 whitespace-nowrap rounded-lg px-2 py-2 hover:bg-sky-50 group", {"flex-grow": isActive})}
       {...triggerProps}
     >
       {isActive ? (
-        <input
-          {...editProps}
-          autoFocus
-          className={cn(className, "overflow-ellipsis")}
-        />
+          <Input {...editProps} autoFocus />
       ) : (
         <>
-          <span className={className}>{initialText}</span>
+          <div className={className}>{initialText}</div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

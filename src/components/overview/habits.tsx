@@ -6,6 +6,7 @@ import { ScoringFormat } from "@prisma/client";
 import { cva } from "class-variance-authority";
 import classNames from "classnames";
 import { useCombobox } from "downshift";
+import { CornerDownRight } from "lucide-react";
 import { useState } from "react";
 import type { ExpandedHabit } from "../../server/queries";
 import { api } from "../../utils/api";
@@ -16,12 +17,11 @@ import {
   EditableNumberField,
 } from "../inlineEdit";
 import { useAppState } from "../layout/appState";
+import { HabitIcon } from "../ui/icons";
 import { HabitSheet } from "./habit-panel";
 import { textcolor } from "./lib";
 import { LinkedMetric } from "./metrics";
 import { TagList } from "./tags";
-import { CornerDownRight } from "lucide-react";
-import { HabitIcon } from "../ui/icons";
 
 function min(a: number, b: number) {
   return a < b ? a : b;
@@ -365,9 +365,9 @@ export function HabitCard({
   });
 
   return (
-    <div className="ml-2">
+    <div className="ml-2 hover:bg-gray-200">
       <div className="flex w-full flex-row justify-between">
-        <div className="flex flex-row items-center overflow-x-scroll scrollbar-none">
+        <div className="flex flex-row items-center overflow-x-scroll scrollbar-none flex-grow">
           {linked && (
             <CornerDownRight className="h-4 w-4 flex-shrink-0 stroke-black opacity-40"></CornerDownRight>
           )}
