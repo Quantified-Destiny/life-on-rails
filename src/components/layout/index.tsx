@@ -21,8 +21,9 @@ import { UserButton } from "@clerk/nextjs";
 import classNames from "classnames";
 import type { LucideIcon } from "lucide-react";
 import Head from "next/head";
-import { useSidebarStore } from "./state";
+import { GiHamburgerMenu } from "react-icons/gi";
 import { cn } from "../../lib/utils";
+import { useSidebarStore } from "./state";
 
 interface MenuItem {
   name: string;
@@ -42,15 +43,21 @@ function Sidebar(props: {
     <div
       className={`${
         props.open ? "w-[14rem]" : "w-0 lg:w-20"
-      } z-50 fixed bottom-0 left-0 top-0 h-screen bg-gradient-to-b from-[#00164d] to-[#3c118b] duration-200 md:p-5 md:pt-8`}
+      } fixed bottom-0 left-0 top-0 z-50 h-screen bg-gradient-to-b from-[#00164d] to-[#3c118b] duration-200 md:p-5 md:pt-8`}
     >
       <div
-        className={`absolute -right-4 top-9 h-8 w-8 cursor-pointer rounded-full border-2 border-black bg-white ${
-          !props.open ? "rotate-180" : ""
+        className={`absolute top-2 h-8 w-8 cursor-pointer ${
+          props.open
+            ? "-right-4 rounded-full border-2 border-black bg-white"
+            : ""
         }`}
         onClick={() => props.setOpen(!props.open)}
       >
-        <ChevronLeft className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"></ChevronLeft>
+        {props.open ? (
+          <ChevronLeft className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"></ChevronLeft>
+        ) : (
+          <GiHamburgerMenu className="opacity-50" />
+        )}
       </div>
 
       <div className={props.open ? "" : "max-lg:hidden"}>
