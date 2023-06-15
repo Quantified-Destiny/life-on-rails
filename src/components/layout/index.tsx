@@ -47,16 +47,17 @@ function Sidebar(props: {
     >
       <div
         className={`absolute top-2 h-8 w-8 cursor-pointer ${
-          props.open
-            ? "-right-4 rounded-full border-2 border-black bg-white"
-            : ""
+          props.open ? "-right-4" : "-rotate-180"
         }`}
         onClick={() => props.setOpen(!props.open)}
       >
         {props.open ? (
-          <ChevronLeft className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"></ChevronLeft>
+          <ChevronLeft className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 transform rounded-full border-2 border-black bg-white"></ChevronLeft>
         ) : (
-          <GiHamburgerMenu className="opacity-50" />
+          <>
+            <ChevronLeft className="absolute left-1/2 top-1/2 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 transform rounded-full border-black bg-white  lg:visible"></ChevronLeft>
+            <GiHamburgerMenu className="absolute visible h-8 w-8 -left-3 opacity-50 lg:hidden" />
+          </>
         )}
       </div>
 
