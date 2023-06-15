@@ -356,7 +356,7 @@ export function HabitCard({
     },
   });
 
-  const linked = true;
+  const linked = linkedGoal != undefined;
   const context = api.useContext();
   const editHabit = api.habits.editHabit.useMutation({
     onSuccess: () => {
@@ -367,7 +367,7 @@ export function HabitCard({
   return (
     <div className="ml-2 hover:bg-gray-200">
       <div className="flex w-full flex-row justify-between">
-        <div className="flex flex-row items-center overflow-x-scroll scrollbar-none flex-grow">
+        <div className="flex flex-grow flex-row items-center overflow-x-scroll scrollbar-none">
           {linked && (
             <CornerDownRight className="h-4 w-4 flex-shrink-0 stroke-black opacity-40"></CornerDownRight>
           )}

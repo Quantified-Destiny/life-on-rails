@@ -44,7 +44,7 @@ export const goal = mysqlTable(
 export const goalRelations = relations(goal, ({ many }) => ({
   habits: many(habitMeasuresGoal),
   metrics: many(metricMeasuresGoal),
-  tags: many(goalTag)
+  tags: many(goalTag),
 }));
 
 export const goalTag = mysqlTable(
@@ -67,8 +67,8 @@ export const goalTag = mysqlTable(
 );
 
 export const goalTagRelations = relations(goalTag, ({ one }) => ({
-    tag: one(tag, {fields: [goalTag.tagId], references: [tag.id]}),
-    goal: one(goal, {fields: [goalTag.goalId], references: [goal.id]}),
+  tag: one(tag, { fields: [goalTag.tagId], references: [tag.id] }),
+  goal: one(goal, { fields: [goalTag.goalId], references: [goal.id] }),
 }));
 
 export const habit = mysqlTable(
@@ -108,7 +108,10 @@ export const habitRelations = relations(habit, ({ many }) => ({
 export const habitCompletion = mysqlTable(
   "HabitCompletion",
   {
-    id: varchar("id", { length: 191 }).primaryKey().notNull(),
+    id: varchar("id", { length: 191 })
+      .primaryKey()
+      .default(sql`(UUID())`)
+      .notNull(),
     habitId: varchar("habitId", { length: 191 }).notNull(),
     date: datetime("date", { mode: "string", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
@@ -194,8 +197,8 @@ export const habitTagRelations = relations(habitTag, ({ one }) => ({
   tag: one(tag, {
     fields: [habitTag.tagId],
     references: [tag.id],
-  })
-}))
+  }),
+}));
 
 export const linkedMetric = mysqlTable(
   "LinkedMetric",
@@ -256,12 +259,14 @@ export const metricRelations = relations(metric, ({ many }) => ({
 export const metricAnswer = mysqlTable(
   "MetricAnswer",
   {
-    id: varchar("id", { length: 191 }).primaryKey().notNull(),
+    id: varchar("id", { length: 191 }).primaryKey().default(sql`(UUID())`).notNull(),
     value: double("value").notNull(),
     createdAt: datetime("createdAt", { mode: "string", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
       .notNull(),
-    updatedAt: datetime("updatedAt", { mode: "string", fsp: 3 }).notNull(),
+    updatedAt: datetime("updatedAt", { mode: "string", fsp: 3 })
+      .default(sql`(CURRENT_TIMESTAMP(3))`)
+      .notNull(),
     metricId: varchar("metricId", { length: 191 }).notNull(),
     habitCompletionId: varchar("habitCompletionId", { length: 191 }),
     memo: varchar("memo", { length: 191 }),

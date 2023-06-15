@@ -142,6 +142,16 @@ const ProfilePage = () => {
                         <ResetAccountModal />
                       </DialogContent>
                     </Dialog>
+                    <Dialog>
+                      <DialogTrigger>
+                        <Button variant="secondary">
+                          Generate demo data
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <GenerateDataModal/>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               </dl>
@@ -159,10 +169,10 @@ enum ModalState {
   Done,
 }
 
-const actionButtonLabel = (state: ModalState) => {
+const actionButtonLabel = (text: string, state: ModalState) => {
   switch (state) {
     case ModalState.None:
-      return "Reset Account";
+      return text;
     case ModalState.Creating:
       return <Loader2 className="h-6 w-6 animate-spin" />;
     case ModalState.Done:
@@ -197,7 +207,41 @@ const ResetAccountModal = () => {
             setState(ModalState.Done);
           }}
         >
-          {actionButtonLabel(state)}
+          {actionButtonLabel("Reset account", state)}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const GenerateDataModal = () => {
+  const context = api.useContext();
+  const generateData = api.profile.generateTestData.useMutation({
+    onSettled() {
+      void context.invalidate();
+    },
+  });
+  const [state, setState] = useState<ModalState>(ModalState.None);
+
+  return (
+    <div className="rounded-lg bg-white p-5">
+      <div className="text-md mb-5 font-semibold">
+        You are about to generate fake habit completions.
+      </div>
+      <div className="font-light text-gray-500">
+        This will fill your instance with fake habit and metric completions
+        (which make not be entirely sound).
+      </div>
+      <div className="mt-4 flex justify-end gap-x-2">
+        <Button
+          variant="default"
+          onClick={async () => {
+            setState(ModalState.Creating);
+            await generateData.mutateAsync();
+            setState(ModalState.Done);
+          }}
+        >
+          {actionButtonLabel("Generate data", state)}
         </Button>
       </div>
     </div>

@@ -1,10 +1,14 @@
 import { clerkClient } from "@clerk/nextjs";
 import { type Metric } from "@prisma/client";
+import { subDays } from "date-fns";
+import type { InferModel } from "drizzle-orm";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { preferences } from "../../../schema";
+import { habitCompletion, metric, metricAnswer } from "../../../schema";
+import { habit, preferences } from "../../../schema";
 import type { prisma as prismaClient } from "../../db";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { toMysqlDate } from "../../../utils/dates";
 
 export const profileRouter = createTRPCRouter({
   getProfile: protectedProcedure.query(async ({ ctx }) => {
@@ -20,7 +24,12 @@ export const profileRouter = createTRPCRouter({
     // });
     const data = user;
 
-    const p = (await ctx.db.select().from(preferences).where(eq(preferences.userId, ctx.session.user.id)))[0]!
+    const p = (
+      await ctx.db
+        .select()
+        .from(preferences)
+        .where(eq(preferences.userId, ctx.session.user.id))
+    )[0]!;
 
     return {
       name: `${data.firstName || ""} ${data.lastName || ""}`,
@@ -61,6 +70,52 @@ export const profileRouter = createTRPCRouter({
       deleteHabits(ctx.prisma, ctx.session.user.id),
       deleteMetrics(ctx.prisma, ctx.session.user.id),
       deleteTags(ctx.prisma, ctx.session.user.id),
+    ]);
+  }),
+
+  generateTestData: protectedProcedure.mutation(async ({ ctx }) => {
+    const habits = await ctx.db.select().from(habit);
+    type HabitCompletionInsert = InferModel<typeof habitCompletion, "insert">;
+
+    const habitCompletions: HabitCompletionInsert[] = [];
+
+    habits.forEach((it) => {
+      let daysBack = 100;
+      while (daysBack > 0) {
+        habitCompletions.push({
+          habitId: it.id,
+          date: toMysqlDate(subDays(new Date(), daysBack)),
+        });
+
+        daysBack -= Math.floor(1 + Math.random() * 3);
+      }
+    });
+
+    const metrics = await ctx.db.select().from(metric);
+
+    type MetricAnswer = InferModel<typeof metricAnswer, "insert">;
+    const metricAnswers: MetricAnswer[] = [];
+
+    metrics.forEach((it) => {
+      let daysBack = 100;
+      while (daysBack > 0) {
+        const date = toMysqlDate(subDays(new Date(), daysBack));
+        const score = Math.floor(1 + Math.random() * 3);
+        metricAnswers.push({
+          metricId: it.id,
+          createdAt: date,
+          updatedAt: date,
+          value: score,
+          score,
+        });
+
+        daysBack -= 1;
+      }
+    });
+
+    await Promise.all([
+      ctx.db.insert(habitCompletion).values(habitCompletions),
+      ctx.db.insert(metricAnswer).values(metricAnswers),
     ]);
   }),
 });

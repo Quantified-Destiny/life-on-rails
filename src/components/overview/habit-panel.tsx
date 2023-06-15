@@ -4,6 +4,7 @@ import {
   differenceInCalendarDays,
   isSameDay,
   startOfDay,
+  startOfWeek,
   subMonths,
 } from "date-fns";
 import dynamic from "next/dynamic";
@@ -184,7 +185,7 @@ function CompletionsGrid({
   const windowed_data = useMemo(() => {
     const date = startOfDay(new Date());
 
-    const startDate = subMonths(new Date(), 6);
+    const startDate = subMonths(startOfWeek(new Date()), 6);
     const totalDays = differenceInCalendarDays(date, startDate) + 1;
 
     const data = new Array(totalDays).fill(0).map((_, i) => {
@@ -204,8 +205,11 @@ function CompletionsGrid({
         <tbody>
           {windowed_data.map((row, i) => (
             <tr key={i}>
-              {row.map((c, j) => {
-                const completions = c?.completions.length ?? 0;
+              {row.map((day, j) => {
+                const completions = day?.completions.length ?? 0;
+                if (day?.date == undefined) {
+                  return undefined;
+                }
                 return (
                   <td key={j}>
                     <TooltipProvider>
@@ -220,7 +224,7 @@ function CompletionsGrid({
                             )}
                             onClick={
                               completions > 0
-                                ? () => setDate(c.date)
+                                ? () => setDate(day.date)
                                 : undefined
                             }
                           />
@@ -228,7 +232,7 @@ function CompletionsGrid({
                         <TooltipContent>
                           {completions > 0 ? completions.toString() : "No"}{" "}
                           completion{completions != 1 && "s"} on{" "}
-                          {c?.date.toDateString()}
+                          {day?.date.toDateString()}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
