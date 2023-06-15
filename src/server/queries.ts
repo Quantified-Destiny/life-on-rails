@@ -227,10 +227,10 @@ export async function getMetrics({
     .select({ metricId: metricAnswer.metricId, count: sql<number>`count(*)` })
     .from(metricAnswer)
     .where(
-      and(
-        gt(metricAnswer.createdAt, startDate),
-        inArray(metricAnswer.metricId, metricIds)
-      )
+      //and(
+      gt(metricAnswer.createdAt, startDate)
+      //inArray(metricAnswer.metricId, metricIds)
+      //)
     )
     .groupBy(metricAnswer.metricId);
 
