@@ -259,7 +259,10 @@ export const metricRelations = relations(metric, ({ many }) => ({
 export const metricAnswer = mysqlTable(
   "MetricAnswer",
   {
-    id: varchar("id", { length: 191 }).primaryKey().default(sql`(UUID())`).notNull(),
+    id: varchar("id", { length: 191 })
+      .primaryKey()
+      .default(sql`(UUID())`)
+      .notNull(),
     value: double("value").notNull(),
     createdAt: datetime("createdAt", { mode: "string", fsp: 3 })
       .default(sql`(CURRENT_TIMESTAMP(3))`)
@@ -368,6 +371,17 @@ export const tag = mysqlTable(
     };
   }
 );
+
+export const memo = mysqlTable("Memo", {
+  id: varchar("id", { length: 191 }).primaryKey().notNull(),
+  text: varchar("id", { length: 1000 }).notNull(),
+  createdAt: datetime("createdAt", { mode: "string", fsp: 3 })
+    .default(sql`(CURRENT_TIMESTAMP(3))`)
+    .notNull(),
+  updatedAt: datetime("updatedAt", { mode: "string", fsp: 3 })
+    .default(sql`(CURRENT_TIMESTAMP(3))`)
+    .notNull(),
+});
 
 export const user = mysqlTable(
   "User",

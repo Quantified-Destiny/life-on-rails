@@ -36,9 +36,8 @@ function Sidebar(props: {
   open: boolean;
   setOpen: (open: boolean) => void;
   Menus: MenuItem[];
+  path: string;
 }) {
-  const router = useRouter();
-  const path = router.asPath;
   return (
     <div
       className={`${
@@ -90,7 +89,7 @@ function Sidebar(props: {
             className={classNames(
               "flex cursor-pointer items-center gap-x-4 rounded-md p-2 text-sm text-white hover:bg-slate-200 hover:bg-opacity-10",
               menu?.gap ? "mt-9" : "mt-2",
-              path.includes(menu.link) ? "bg-slate-200 bg-opacity-10" : ""
+              props.path.includes(menu.link) ? "bg-slate-200 bg-opacity-10" : ""
             )}
           >
             <div>
@@ -135,7 +134,7 @@ const menus = [
   // { name: "delete account", link: "/deactivate", icon: HelpCircle },
 ];
 
-function Layout({ children }: { children: ReactNode }) {
+function Layout({ path, children }: { path: string, children: ReactNode }) {
   const { open, setOpen } = useSidebarStore();
 
   const isFetching = useIsFetching();
@@ -155,7 +154,7 @@ function Layout({ children }: { children: ReactNode }) {
         <title>Life on Rails</title>
       </Head>
 
-      <Sidebar open={open} setOpen={setOpen} Menus={menus}></Sidebar>
+      <Sidebar path={path} open={open} setOpen={setOpen} Menus={menus}></Sidebar>
       <div
         className={classNames("h-1 w-full", {
           "animate-pulse bg-green-600": isFetching,

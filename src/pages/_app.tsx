@@ -48,7 +48,7 @@ const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
     <ClerkGuard>
       <TooltipProvider delayDuration={400} skipDelayDuration={400}>
         <Modals></Modals>
-        <Layout>
+        <Layout path={router.pathname}>
           <Component {...pageProps} />
         </Layout>
       </TooltipProvider>
